@@ -1,0 +1,146 @@
+<% content_for :title, "超抜報告" %>
+<% color_map = color_map_for_reports(@chobatsu_reports) %>
+
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Chobatsu Report</p>
+      <h1>超抜報告</h1>
+    </div>
+    <div class="setting-card">
+      <span>修霊合計数</span>
+      <strong><%= @total_serial_count %></strong>
+    </div>
+  </header>
+
+  <% if flash[:notice].present? %>
+    <div class="flash flash-notice"><%= flash[:notice] %></div>
+  <% end %>
+
+  <% if @chobatsu_report.errors.any? %>
+    <div class="flash flash-alert">
+      <strong>登録できませんでした</strong>
+      <ul>
+        <% @chobatsu_report.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="page-grid">
+    <section class="panel form-panel">
+      <h2>登録フォーム</h2>
+
+      <%= form_with model: @chobatsu_report, class: "report-form" do |form| %>
+        <div class="field-grid">
+          <div class="field">
+            <%= form.label :ceremony_date, "挙行日" %>
+            <%= form.date_field :ceremony_date %>
+          </div>
+
+          <div class="field">
+            <%= form.label :evangelism_meeting_id, "伝道会名" %>
+            <%= form.collection_select :evangelism_meeting_id, @evangelism_meetings, :id, :name, { prompt: "選択してください" } %>
+          </div>
+
+          <div class="field">
+            <%= form.label :assistant_name, "超抜点伝師名" %>
+            <%= form.text_field :assistant_name %>
+          </div>
+
+          <div class="field">
+            <%= form.label :participant_count, "超抜人数" %>
+            <%= form.number_field :participant_count, min: 0 %>
+          </div>
+
+          <div class="field">
+            <%= form.label :serial_number_from, "使用修霊番号(from)" %>
+            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, data: { usage_counter_target: "from", action: "input->usage-counter#update" } %>
+          </div>
+
+          <div class="field">
+            <%= form.label :serial_number_to, "使用修霊番号(to)" %>
+            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, data: { usage_counter_target: "to", action: "input->usage-counter#update" } %>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">使用数</span>
+            <div class="usage-count" data-usage-counter-target="output"><%= @chobatsu_report.usage_count %></div>
+          </div>
+
+          <div class="field">
+            <%= form.label :merit_fee_total, "功徳費合計" %>
+            <%= form.number_field :merit_fee_total, min: 0, step: 1 %>
+          </div>
+        </div>
+
+        <div class="actions">
+          <%= form.submit "登録する", class: "button-primary" %>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>使用修霊番号</h2>
+        <p><%= @total_serial_count %> 件を表示</p>
+      </div>
+
+      <div class="serial-grid-wrapper">
+        <table class="serial-grid">
+          <tbody>
+            <% serial_number_rows(@total_serial_count).each do |row| %>
+              <tr>
+                <% row.each do |number| %>
+                  <td style="<%= "--cell-color: #{color_map[number] || '#ffffff'}" %>"><%= number %></td>
+                <% end %>
+                <% (ChobatsuReportsHelper::GRID_COLUMNS - row.length).times do %>
+                  <td class="serial-grid-empty"></td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <% @evangelism_meetings.each do |meeting| %>
+          <div class="legend-item">
+            <span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span>
+            <div>
+              <strong><%= meeting.name %></strong>
+              <p><%= meeting.color_code %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const fromField = document.querySelector("[data-usage-counter-target='from']");
+    const toField = document.querySelector("[data-usage-counter-target='to']");
+    const output = document.querySelector("[data-usage-counter-target='output']");
+
+    if (!fromField || !toField || !output) return;
+
+    const updateUsage = () => {
+      const fromValue = Number.parseInt(fromField.value, 10);
+      const toValue = Number.parseInt(toField.value, 10);
+
+      if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
+        output.textContent = "0";
+        return;
+      }
+
+      output.textContent = String(toValue - fromValue + 1);
+    };
+
+    fromField.addEventListener("input", updateUsage);
+    toField.addEventListener("input", updateUsage);
+    updateUsage();
+  });
+</script>
