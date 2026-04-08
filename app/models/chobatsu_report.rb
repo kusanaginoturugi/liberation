@@ -34,7 +34,7 @@ class ChobatsuReport < ApplicationRecord
     return if serial_number_from.blank? || serial_number_to.blank?
     return if serial_number_to >= serial_number_from
 
-    errors.add(:serial_number_to, "は使用修霊番号(from)以上を入力してください")
+    errors.add(:serial_number_to, "は使用修霊番号(始)以上を入力してください")
   end
 
   def serial_number_range_is_within_total
