@@ -1,24 +1,32 @@
-# README
+# Liberation
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+超抜報告を登録する Rails アプリケーションです。
 
-Things you may want to cover:
+## Setup
 
-* Ruby version
+`mise` を使う場合は、最初にこのプロジェクトを trust してください。
 
-* System dependencies
+```bash
+mise trust
+mise install
+mise run setup
+```
 
-* Configuration
+## Development
 
-* Database creation
+Rails サーバーの起動:
 
-* Database initialization
+```bash
+mise run server
+```
 
-* How to run the test suite
+テスト実行:
 
-* Services (job queues, cache servers, search engines, etc.)
+```bash
+mise run test
+```
 
-* Deployment instructions
+## Environment
 
-* ...
+- Ruby `3.4.8`
+- Bundler gems are installed into `vendor/bundle`
