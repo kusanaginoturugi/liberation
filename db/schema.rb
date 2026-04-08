@@ -10,15 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_08_120200) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_08_131000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
     t.string "assistant_name", null: false
-    t.integer "participant_count", default: 0, null: false
+    t.integer "participant_count", null: false
     t.integer "serial_number_from", null: false
     t.integer "serial_number_to", null: false
-    t.integer "merit_fee_total", default: 0, null: false
+    t.integer "merit_fee_total", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["ceremony_date"], name: "index_chobatsu_reports_on_ceremony_date"

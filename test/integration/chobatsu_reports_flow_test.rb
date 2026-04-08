@@ -23,8 +23,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
           assistant_name: "山田",
           participant_count: 4,
           serial_number_from: 1,
-          serial_number_to: 4,
-          merit_fee_total: 4000
+          serial_number_to: 4
         }
       }
     end
@@ -32,6 +31,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_includes response.body, "登録しました"
+    assert_equal 20000, ChobatsuReport.last.merit_fee_total
   end
 
   test "overlapping range is rejected" do
@@ -53,13 +53,29 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
           assistant_name: "新規",
           participant_count: 1,
           serial_number_from: 12,
-          serial_number_to: 15,
-          merit_fee_total: 2000
+          serial_number_to: 15
         }
       }
     end
 
     assert_response :unprocessable_content
     assert_includes response.body, "重複しています"
+  end
+
+  test "missing required numeric fields show errors" do
+    assert_no_difference("ChobatsuReport.count") do
+      post chobatsu_reports_path, params: {
+        chobatsu_report: {
+          ceremony_date: Date.current,
+          evangelism_meeting_id: @meeting.id,
+          assistant_name: "未入力"
+        }
+      }
+    end
+
+    assert_response :unprocessable_content
+    assert_includes response.body, "Participant count can&#39;t be blank"
+    assert_includes response.body, "Serial number from can&#39;t be blank"
+    assert_includes response.body, "Serial number to can&#39;t be blank"
   end
 end

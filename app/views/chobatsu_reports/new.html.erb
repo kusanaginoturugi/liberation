@@ -34,44 +34,53 @@
 
       <%= form_with model: @chobatsu_report, class: "report-form" do |form| %>
         <div class="field-grid">
-          <div class="field">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:ceremony_date].any? %>">
             <%= form.label :ceremony_date, "挙行日" %>
             <%= form.date_field :ceremony_date %>
           </div>
 
-          <div class="field">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:evangelism_meeting].any? || @chobatsu_report.errors[:evangelism_meeting_id].any? %>">
             <%= form.label :evangelism_meeting_id, "伝道会名" %>
             <%= form.collection_select :evangelism_meeting_id, @evangelism_meetings, :id, :name, { prompt: "選択してください" } %>
           </div>
 
-          <div class="field">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:assistant_name].any? %>">
             <%= form.label :assistant_name, "超抜点伝師名" %>
             <%= form.text_field :assistant_name %>
           </div>
 
-          <div class="field">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
             <%= form.label :participant_count, "超抜人数" %>
-            <%= form.number_field :participant_count, min: 0 %>
+            <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, data: { calc_target: "participant", action: "input->report-form#update" } %>
+            <% @chobatsu_report.errors.full_messages_for(:participant_count).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
           </div>
 
-          <div class="field">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_from].any? %>">
             <%= form.label :serial_number_from, "使用修霊番号(from)" %>
-            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, data: { usage_counter_target: "from", action: "input->usage-counter#update" } %>
+            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_from.presence, data: { calc_target: "from", action: "input->report-form#update" } %>
+            <% @chobatsu_report.errors.full_messages_for(:serial_number_from).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
           </div>
 
-          <div class="field">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_to].any? %>">
             <%= form.label :serial_number_to, "使用修霊番号(to)" %>
-            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, data: { usage_counter_target: "to", action: "input->usage-counter#update" } %>
+            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_to.presence, data: { calc_target: "to", action: "input->report-form#update" } %>
+            <% @chobatsu_report.errors.full_messages_for(:serial_number_to).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
           </div>
 
           <div class="field usage-field">
             <span class="field-label">使用数</span>
-            <div class="usage-count" data-usage-counter-target="output"><%= @chobatsu_report.usage_count %></div>
+            <div class="usage-count" data-calc-target="usageOutput"><%= @chobatsu_report.usage_count %></div>
           </div>
 
-          <div class="field">
-            <%= form.label :merit_fee_total, "功徳費合計" %>
-            <%= form.number_field :merit_fee_total, min: 0, step: 1 %>
+          <div class="field usage-field">
+            <span class="field-label">功徳費合計</span>
+            <div class="usage-count" data-calc-target="meritOutput"><%= @chobatsu_report.calculated_merit_fee_total %></div>
           </div>
         </div>
 
@@ -110,7 +119,6 @@
             <span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span>
             <div>
               <strong><%= meeting.name %></strong>
-              <p><%= meeting.color_code %></p>
             </div>
           </div>
         <% end %>
@@ -121,26 +129,39 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const fromField = document.querySelector("[data-usage-counter-target='from']");
-    const toField = document.querySelector("[data-usage-counter-target='to']");
-    const output = document.querySelector("[data-usage-counter-target='output']");
+    const participantField = document.querySelector("[data-calc-target='participant']");
+    const fromField = document.querySelector("[data-calc-target='from']");
+    const toField = document.querySelector("[data-calc-target='to']");
+    const usageOutput = document.querySelector("[data-calc-target='usageOutput']");
+    const meritOutput = document.querySelector("[data-calc-target='meritOutput']");
 
-    if (!fromField || !toField || !output) return;
-
-    const updateUsage = () => {
+    const updateTotals = () => {
       const fromValue = Number.parseInt(fromField.value, 10);
       const toValue = Number.parseInt(toField.value, 10);
+      const participantValue = Number.parseInt(participantField.value, 10);
 
-      if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
-        output.textContent = "0";
-        return;
+      if (usageOutput) {
+        if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
+          usageOutput.textContent = "0";
+        } else {
+          usageOutput.textContent = String(toValue - fromValue + 1);
+        }
       }
 
-      output.textContent = String(toValue - fromValue + 1);
+      if (meritOutput) {
+        meritOutput.textContent = Number.isNaN(participantValue) ? "0" : String(participantValue * 5000);
+      }
     };
 
-    fromField.addEventListener("input", updateUsage);
-    toField.addEventListener("input", updateUsage);
-    updateUsage();
+    [participantField, fromField, toField].forEach((field) => {
+      if (field) field.addEventListener("input", updateTotals);
+    });
+
+    const firstInvalidField = document.querySelector(".field-with-error input, .field-with-error select, .field-with-error textarea");
+    if (firstInvalidField) {
+      firstInvalidField.focus();
+    }
+
+    updateTotals();
   });
 </script>

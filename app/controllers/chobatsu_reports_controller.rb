@@ -4,9 +4,10 @@ class ChobatsuReportsController < ApplicationController
   def new
     @chobatsu_report = ChobatsuReport.new(
       ceremony_date: Date.current,
-      serial_number_from: next_available_serial_number
+      participant_count: nil,
+      serial_number_from: nil,
+      serial_number_to: nil
     )
-    @chobatsu_report.serial_number_to = @chobatsu_report.serial_number_from
   end
 
   def create
@@ -28,8 +29,7 @@ class ChobatsuReportsController < ApplicationController
       :assistant_name,
       :participant_count,
       :serial_number_from,
-      :serial_number_to,
-      :merit_fee_total
+      :serial_number_to
     )
   end
 
@@ -39,14 +39,5 @@ class ChobatsuReportsController < ApplicationController
     @total_serial_count = SystemSetting.total_serial_count
   rescue ActiveRecord::RecordNotFound
     @total_serial_count = 0
-  end
-
-  def next_available_serial_number
-    max_number = @chobatsu_reports.maximum(:serial_number_to).to_i
-    next_number = max_number + 1
-    next_number = 1 unless next_number.positive?
-    return @total_serial_count if @total_serial_count.positive? && next_number > @total_serial_count
-
-    next_number
   end
 end

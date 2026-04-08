@@ -20,6 +20,34 @@ class ChobatsuReportTest < ActiveSupport::TestCase
     assert_equal 6, report.usage_count
   end
 
+  test "merit_fee_total is calculated from participant_count" do
+    report = ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      evangelism_meeting: @meeting,
+      assistant_name: "田中",
+      participant_count: 3,
+      serial_number_from: 10,
+      serial_number_to: 15,
+      merit_fee_total: 1
+    )
+
+    assert_equal 15000, report.merit_fee_total
+    assert_equal 15000, report.calculated_merit_fee_total
+  end
+
+  test "participant_count and serial range are required" do
+    report = ChobatsuReport.new(
+      ceremony_date: Date.current,
+      evangelism_meeting: @meeting,
+      assistant_name: "未入力"
+    )
+
+    assert_not report.valid?
+    assert_includes report.errors[:participant_count], "can't be blank"
+    assert_includes report.errors[:serial_number_from], "can't be blank"
+    assert_includes report.errors[:serial_number_to], "can't be blank"
+  end
+
   test "serial number ranges cannot overlap" do
     ChobatsuReport.create!(
       ceremony_date: Date.current,

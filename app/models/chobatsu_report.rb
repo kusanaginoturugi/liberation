@@ -1,11 +1,13 @@
 class ChobatsuReport < ApplicationRecord
   belongs_to :evangelism_meeting
 
-  validates :ceremony_date, :assistant_name, :serial_number_from, :serial_number_to, presence: true
+  before_validation :assign_merit_fee_total
+
+  validates :ceremony_date, :assistant_name, :participant_count, :serial_number_from, :serial_number_to, presence: true
   validates :participant_count, :merit_fee_total,
-            numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+            numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
   validates :serial_number_from, :serial_number_to,
-            numericality: { only_integer: true, greater_than: 0 }
+            numericality: { only_integer: true, greater_than: 0, allow_nil: true }
   validate :serial_number_range_is_valid
   validate :serial_number_range_is_within_total
   validate :serial_number_range_does_not_overlap
@@ -16,7 +18,17 @@ class ChobatsuReport < ApplicationRecord
     serial_number_to - serial_number_from + 1
   end
 
+  def calculated_merit_fee_total
+    return 0 if participant_count.blank?
+
+    participant_count * 5000
+  end
+
   private
+
+  def assign_merit_fee_total
+    self.merit_fee_total = calculated_merit_fee_total
+  end
 
   def serial_number_range_is_valid
     return if serial_number_from.blank? || serial_number_to.blank?
