@@ -7,11 +7,19 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "root page is accessible" do
+    EvangelismMeeting.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99)
+
     get root_path
 
     assert_response :success
     assert_includes response.body, "超抜報告"
     assert_includes response.body, "修霊合計数"
+    assert_includes response.body, "大江戸"
+    assert_includes response.body, "旧会場"
+    assert_includes response.body, "現在は選択不可"
+    assert_includes response.body, "<option value=\"\">選択してください</option>"
+    assert_includes response.body, "<option value=\"1\">大江戸</option>"
+    assert_not_includes response.body, "<option value=\"2\">旧会場</option>"
   end
 
   test "creating a report saves the record" do

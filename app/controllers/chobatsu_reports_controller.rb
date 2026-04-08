@@ -34,7 +34,8 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def load_form_collections
-    @evangelism_meetings = EvangelismMeeting.order(:id)
+    @evangelism_meetings = EvangelismMeeting.active.display_sorted
+    @legend_evangelism_meetings = EvangelismMeeting.display_sorted
     @chobatsu_reports = ChobatsuReport.includes(:evangelism_meeting).order(:serial_number_from)
     @total_serial_count = SystemSetting.total_serial_count
   rescue ActiveRecord::RecordNotFound

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_08_131000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_08_143000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -31,6 +31,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_08_131000) do
     t.string "color_code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: true, null: false
+    t.integer "display_order"
+    t.index ["active"], name: "index_evangelism_meetings_on_active"
+    t.index ["display_order"], name: "index_evangelism_meetings_on_display_order"
     t.index ["name"], name: "index_evangelism_meetings_on_name", unique: true
   end
 

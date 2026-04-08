@@ -114,11 +114,14 @@
       </div>
 
       <div class="legend">
-        <% @evangelism_meetings.each do |meeting| %>
+        <% @legend_evangelism_meetings.each do |meeting| %>
           <div class="legend-item">
             <span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span>
             <div>
               <strong><%= meeting.name %></strong>
+              <% unless meeting.active? %>
+                <p>現在は選択不可</p>
+              <% end %>
             </div>
           </div>
         <% end %>

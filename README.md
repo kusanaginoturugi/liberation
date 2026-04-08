@@ -26,6 +26,20 @@ mise run server
 mise run test
 ```
 
+修霊合計数の変更:
+
+```bash
+bin/rails 'settings:set_total_serial_count[1700]'
+```
+
+詳細は [運用マニュアル](./docs/manual.md) を参照してください。
+
+伝道会マスタの差し替え:
+
+```bash
+bin/rails 'meetings:sync[config/meetings.yml]'
+```
+
 ## Environment
 
 - Ruby `3.4.8`

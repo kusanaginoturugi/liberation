@@ -1,0 +1,37 @@
+meetings:
+  - name: 大江戸
+    color_code: "#C8C4C1"
+    display_order: 10
+    active: true
+  - name: お台場
+    color_code: "#EFB184"
+    display_order: 20
+    active: true
+  - name: 羽田
+    color_code: "#E88E86"
+    display_order: 30
+    active: true
+  - name: かながわ
+    color_code: "#A9D3A9"
+    display_order: 40
+    active: true
+  - name: 富士山
+    color_code: "#EFD77A"
+    display_order: 50
+    active: true
+  - name: 駿天
+    color_code: "#8FB6DE"
+    display_order: 60
+    active: true
+  - name: 埼玉
+    color_code: "#9FD2D6"
+    display_order: 70
+    active: true
+  - name: 千葉
+    color_code: "#E9AFC2"
+    display_order: 80
+    active: true
+  - name: 山梨
+    color_code: "#C2B0D9"
+    display_order: 90
+    active: true

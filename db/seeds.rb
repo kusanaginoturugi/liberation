@@ -7,21 +7,14 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-meetings = [
-  ["大江戸", "#C8C4C1"],
-  ["お台場", "#EFB184"],
-  ["羽田", "#E88E86"],
-  ["かながわ", "#A9D3A9"],
-  ["富士山", "#EFD77A"],
-  ["駿天", "#8FB6DE"],
-  ["埼玉", "#9FD2D6"],
-  ["千葉", "#E9AFC2"],
-  ["山梨", "#C2B0D9"]
-]
+rows = YAML.load_file(Rails.root.join("config/meetings.yml")).fetch("meetings")
 
-meetings.each do |name, color_code|
-  EvangelismMeeting.find_or_create_by!(name:) do |meeting|
-    meeting.color_code = color_code
+rows.each do |row|
+  EvangelismMeeting.find_or_initialize_by(name: row.fetch("name")).tap do |meeting|
+    meeting.color_code = row.fetch("color_code")
+    meeting.display_order = row["display_order"]
+    meeting.active = row.key?("active") ? row["active"] : true
+    meeting.save!
   end
 end
 
