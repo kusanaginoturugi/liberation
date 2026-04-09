@@ -32,8 +32,32 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get root_path
     assert_includes response.body, "修霊番号一覧"
     assert_not_includes response.body, "聖院一覧"
+    assert_includes response.body, "ユーザー一覧"
     assert_includes response.body, "超抜式一覧"
     assert_includes response.body, "伝道会一覧"
+  end
+
+  test "admin can create user" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get users_path
+    assert_includes response.body, "ユーザー追加"
+
+    assert_difference("User.count", 1) do
+      post users_path, params: {
+        user: {
+          name: "追加ユーザー",
+          email: "added@example.com",
+          region_id: @region.id,
+          password: "password123",
+          password_confirmation: "password123",
+          admin: "0"
+        }
+      }
+    end
+
+    assert_redirected_to users_path
+    assert_equal "追加ユーザー", User.find_by!(email: "added@example.com").name
   end
 
   test "admin can update event" do
@@ -51,6 +75,23 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to events_path
     assert_equal "第1回春期超抜式", @event.reload.name
+  end
+
+  test "admin can create event with event details" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    assert_difference("Event.count", 1) do
+      post events_path, params: {
+        event: {
+          name: "第2回超抜式"
+        }
+      }
+    end
+
+    event = Event.find_by!(name: "第2回超抜式")
+    assert_redirected_to events_path
+    assert_equal [@region.id, @other_region.id].sort, event.event_details.pluck(:region_id).sort
+    assert_equal [1667], event.event_details.pluck(:total_serial_count).uniq
   end
 
   test "admin can update event detail" do
@@ -113,6 +154,25 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_not @meeting.active?
   end
 
+  test "admin can create evangelism meeting" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    assert_difference("EvangelismMeeting.count", 1) do
+      post evangelism_meetings_path, params: {
+        evangelism_meeting: {
+          name: "新会場",
+          color_code: "#654321",
+          region_id: @region.id,
+          display_order: 55,
+          active: "1"
+        }
+      }
+    end
+
+    assert_redirected_to evangelism_meetings_path
+    assert_equal "新会場", EvangelismMeeting.find_by!(name: "新会場").name
+  end
+
   test "non admin cannot access management pages" do
     post session_path, params: { email: @user.email, password: "password123" }
 
@@ -126,6 +186,12 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     get event_event_details_path(@event)
+    assert_redirected_to root_path
+
+    get users_path
+    assert_redirected_to root_path
+
+    get new_user_path
     assert_redirected_to root_path
   end
 end

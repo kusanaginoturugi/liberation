@@ -4,6 +4,7 @@
   <div class="panel">
     <div class="panel-header">
       <h1>伝道会一覧</h1>
+      <%= link_to "伝道会追加", new_evangelism_meeting_path, class: "button-secondary" %>
     </div>
 
     <% if flash[:notice].present? %>

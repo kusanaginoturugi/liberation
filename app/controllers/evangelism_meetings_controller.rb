@@ -1,13 +1,27 @@
 class EvangelismMeetingsController < ApplicationController
   before_action :require_admin!
   before_action :set_evangelism_meeting, only: [:edit, :update]
-  before_action :load_regions, only: [:edit, :update]
+  before_action :load_regions, only: [:new, :create, :edit, :update]
 
   def index
     @evangelism_meetings = EvangelismMeeting.includes(:region).display_sorted
   end
 
+  def new
+    @evangelism_meeting = EvangelismMeeting.new(active: true)
+  end
+
   def edit
+  end
+
+  def create
+    @evangelism_meeting = EvangelismMeeting.new(evangelism_meeting_params)
+
+    if @evangelism_meeting.save
+      redirect_to evangelism_meetings_path, notice: "伝道会を追加しました"
+    else
+      render :new, status: :unprocessable_content
+    end
   end
 
   def update

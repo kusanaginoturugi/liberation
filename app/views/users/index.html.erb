@@ -1,0 +1,35 @@
+<% content_for :title, "ユーザー一覧" %>
+
+<div class="page-shell">
+  <div class="panel">
+    <div class="panel-header">
+      <h1>ユーザー一覧</h1>
+      <%= link_to "ユーザー追加", new_user_path, class: "button-secondary" %>
+    </div>
+
+    <% if flash[:notice].present? %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>メールアドレス</th>
+          <th>聖院</th>
+          <th>権限</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><%= user.name %></td>
+            <td><%= user.email %></td>
+            <td><%= user.region.name %></td>
+            <td><%= user.admin? ? "管理者" : "一般" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

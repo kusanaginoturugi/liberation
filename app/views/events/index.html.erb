@@ -4,6 +4,7 @@
   <div class="panel">
     <div class="panel-header">
       <h1>超抜式一覧</h1>
+      <%= link_to "超抜式追加", new_event_path, class: "button-secondary" %>
     </div>
 
     <% if flash[:notice].present? %>

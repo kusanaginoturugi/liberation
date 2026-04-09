@@ -1,4 +1,6 @@
 class EventDetail < ApplicationRecord
+  DEFAULT_TOTAL_SERIAL_COUNT = 1667
+
   belongs_to :event
   belongs_to :region
 
