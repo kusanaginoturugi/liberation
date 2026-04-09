@@ -306,6 +306,18 @@ body {
   white-space: nowrap;
 }
 
+.summary-sort-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.summary-sort-link span {
+  color: var(--accent-strong);
+}
+
 .summary-empty {
   text-align: center !important;
   color: var(--muted);

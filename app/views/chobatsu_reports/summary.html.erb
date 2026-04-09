@@ -34,7 +34,17 @@
         <thead>
           <tr>
             <th>No.</th>
-            <th>挙行日</th>
+            <th>
+              <%= link_to summary_chobatsu_reports_path(
+                    event_id: @selected_event&.id,
+                    region_id: @selected_region&.id,
+                    direction: @summary_sort_direction == :asc ? :desc : :asc
+                  ),
+                  class: "summary-sort-link" do %>
+                挙行日
+                <span><%= @summary_sort_direction == :asc ? "↑" : "↓" %></span>
+              <% end %>
+            </th>
             <th>伝道会名</th>
             <th>超抜霊数</th>
             <th>功徳費合計</th>

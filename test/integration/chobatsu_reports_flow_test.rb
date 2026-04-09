@@ -137,6 +137,48 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal report.user, @user
   end
 
+  test "summary page sorts by ceremony date" do
+    older_report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 8),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 1,
+      serial_number_from: 1,
+      serial_number_to: 1,
+      merit_fee_total: 5000
+    )
+    newer_report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 10),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 1,
+      serial_number_from: 2,
+      serial_number_to: 2,
+      merit_fee_total: 5000
+    )
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id }
+
+    assert_response :success
+    ascending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    assert_equal [older_report.ceremony_date.strftime("%Y/%m/%d"), newer_report.ceremony_date.strftime("%Y/%m/%d")],
+                 ascending_dates.first(2)
+    assert_includes response.body, "挙行日"
+    assert_includes response.body, "↑"
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id, direction: :desc }
+
+    assert_response :success
+    descending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    assert_equal [newer_report.ceremony_date.strftime("%Y/%m/%d"), older_report.ceremony_date.strftime("%Y/%m/%d")],
+                 descending_dates.first(2)
+    assert_includes response.body, "↓"
+  end
+
   test "new page shows refund summary fields" do
     get new_chobatsu_report_path
 

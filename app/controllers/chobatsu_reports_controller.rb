@@ -80,9 +80,10 @@ class ChobatsuReportsController < ApplicationController
     @events = Event.recent_first
     @selected_region = selected_region_for_index
     @selected_event = selected_event_for_index
+    @summary_sort_direction = summary_sort_direction
     @summary_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
                      .includes(:user)
-                     .order(:ceremony_date, :id)
+                     .reorder(ceremony_date: @summary_sort_direction, id: @summary_sort_direction)
   rescue ActiveRecord::RecordNotFound
     @regions = []
     @events = []
@@ -113,5 +114,9 @@ class ChobatsuReportsController < ApplicationController
     return Event.find(chobatsu_report_params[:event_id]) if action_name == "create" && chobatsu_report_params[:event_id].present?
 
     selected_event_for_index
+  end
+
+  def summary_sort_direction
+    params[:direction] == "desc" ? :desc : :asc
   end
 end
