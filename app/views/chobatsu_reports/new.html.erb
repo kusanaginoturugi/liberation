@@ -43,6 +43,11 @@
             <%= form.collection_select :evangelism_meeting_id, @evangelism_meetings, :id, :name, { prompt: "選択してください" } %>
           </div>
 
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:event].any? || @chobatsu_report.errors[:event_id].any? %>">
+            <%= form.label :event_id, "超抜式" %>
+            <%= form.collection_select :event_id, @events, :id, :name, { prompt: false, selected: @chobatsu_report.event_id || @selected_event&.id } %>
+          </div>
+
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:assistant_name].any? %>">
             <%= form.label :assistant_name, "超抜点伝師名" %>
             <%= form.text_field :assistant_name %>
@@ -107,18 +112,19 @@
     const updateTotals = () => {
       const fromValue = Number.parseInt(fromField.value, 10);
       const toValue = Number.parseInt(toField.value, 10);
-      const participantValue = Number.parseInt(participantField.value, 10);
+      let usageCount = 0;
 
       if (usageOutput) {
         if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
           usageOutput.textContent = "0";
         } else {
-          usageOutput.textContent = String(toValue - fromValue + 1);
+          usageCount = toValue - fromValue + 1;
+          usageOutput.textContent = String(usageCount);
         }
       }
 
       if (meritOutput) {
-        meritOutput.textContent = Number.isNaN(participantValue) ? "0" : String(participantValue * 5000);
+        meritOutput.textContent = String(usageCount * 5000);
       }
     };
 

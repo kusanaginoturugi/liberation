@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
 
-  helper_method :current_user, :user_signed_in?
+  helper_method :current_user, :user_signed_in?, :single_region_mode?
 
   private
 
@@ -36,6 +36,14 @@ class ApplicationController < ActionController::Base
     return if current_user&.admin?
 
     redirect_to root_path, alert: "管理者のみアクセスできます"
+  end
+
+  def single_region_mode?
+    Rails.configuration.x.single_region_mode
+  end
+
+  def primary_region_id
+    Rails.configuration.x.primary_region_id
   end
 
   def self.allow_unauthenticated_access(only: nil)

@@ -10,6 +10,7 @@ class ChobatsuReportsController < ApplicationController
   def new
     @chobatsu_report = ChobatsuReport.new(
       ceremony_date: Date.current,
+      event: @selected_event,
       participant_count: nil,
       serial_number_from: nil,
       serial_number_to: nil
@@ -31,6 +32,7 @@ class ChobatsuReportsController < ApplicationController
   def chobatsu_report_params
     params.require(:chobatsu_report).permit(
       :ceremony_date,
+      :event_id,
       :evangelism_meeting_id,
       :assistant_name,
       :participant_count,
@@ -41,39 +43,57 @@ class ChobatsuReportsController < ApplicationController
 
   def load_index_collections
     @regions = Region.order(:name)
+    @events = Event.recent_first
     @selected_region = selected_region_for_index
+    @selected_event = selected_event_for_index
     region_meetings = @selected_region.evangelism_meetings
     @legend_evangelism_meetings = region_meetings.display_sorted
-    @chobatsu_reports = reports_for_region(@selected_region.id)
+    @chobatsu_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
     @total_serial_count = SystemSetting.total_serial_count
   rescue ActiveRecord::RecordNotFound
     @regions = []
+    @events = []
     @legend_evangelism_meetings = []
     @chobatsu_reports = ChobatsuReport.none
     @total_serial_count = 0
   end
 
   def load_form_collections
+    @events = Event.recent_first
+    @selected_event = selected_event_for_form
     region_meetings = current_user.region.evangelism_meetings
     @evangelism_meetings = region_meetings.active.display_sorted
     @legend_evangelism_meetings = region_meetings.display_sorted
-    @chobatsu_reports = reports_for_region(current_user.region_id)
+    @chobatsu_reports = reports_for_region_and_event(current_user.region_id, @selected_event.id)
     @total_serial_count = SystemSetting.total_serial_count
   rescue ActiveRecord::RecordNotFound
+    @events = []
     @total_serial_count = 0
   end
 
-  def reports_for_region(region_id)
-    ChobatsuReport.joins(:evangelism_meeting)
-                  .where(evangelism_meetings: { region_id: })
+  def reports_for_region_and_event(region_id, event_id)
+    ChobatsuReport.where(region_id: region_id, event_id: event_id)
                   .includes(:evangelism_meeting)
                   .order(:serial_number_from)
   end
 
   def selected_region_for_index
+    return Region.find(primary_region_id) if single_region_mode?
     return Region.find(params[:region_id]) if params[:region_id].present?
     return current_user.region if current_user
 
     Region.order(:name).first || Region.new(name: "未設定")
+  end
+
+  def selected_event_for_index
+    return Event.find(params[:event_id]) if params[:event_id].present?
+
+    Event.recent_first.first || Event.new(name: "未設定")
+  end
+
+  def selected_event_for_form
+    return Event.find(chobatsu_report_params[:event_id]) if action_name == "create" && chobatsu_report_params[:event_id].present?
+
+    selected_event_for_index
   end
 end

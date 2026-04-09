@@ -1,6 +1,9 @@
 class ChobatsuReport < ApplicationRecord
+  belongs_to :region
+  belongs_to :event
   belongs_to :evangelism_meeting
 
+  before_validation :assign_region_from_meeting
   before_validation :assign_merit_fee_total
 
   validates :ceremony_date, :assistant_name, :participant_count, :serial_number_from, :serial_number_to, presence: true
@@ -8,8 +11,10 @@ class ChobatsuReport < ApplicationRecord
             numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
   validates :serial_number_from, :serial_number_to,
             numericality: { only_integer: true, greater_than: 0, allow_nil: true }
+  validates :event, :region, presence: true
   validate :serial_number_range_is_valid
   validate :serial_number_range_is_within_total
+  validate :region_matches_evangelism_meeting
   validate :serial_number_range_does_not_overlap
 
   def usage_count
@@ -19,12 +24,14 @@ class ChobatsuReport < ApplicationRecord
   end
 
   def calculated_merit_fee_total
-    return 0 if participant_count.blank?
-
-    participant_count * 5000
+    usage_count * 5000
   end
 
   private
+
+  def assign_region_from_meeting
+    self.region = evangelism_meeting.region if evangelism_meeting.present?
+  end
 
   def assign_merit_fee_total
     self.merit_fee_total = calculated_merit_fee_total
@@ -49,16 +56,22 @@ class ChobatsuReport < ApplicationRecord
   end
 
   def serial_number_range_does_not_overlap
-    return if serial_number_from.blank? || serial_number_to.blank? || evangelism_meeting.blank?
+    return if serial_number_from.blank? || serial_number_to.blank? || region.blank? || event.blank?
 
     overlap = self.class
                   .where.not(id:)
-                  .joins(:evangelism_meeting)
-                  .where(evangelism_meetings: { region_id: evangelism_meeting.region_id })
+                  .where(region_id: region_id, event_id: event_id)
                   .where("serial_number_from <= ? AND serial_number_to >= ?", serial_number_to, serial_number_from)
                   .first
     return if overlap.blank?
 
     errors.add(:base, "使用修霊番号が既存データと重複しています (#{overlap.serial_number_from}〜#{overlap.serial_number_to})")
+  end
+
+  def region_matches_evangelism_meeting
+    return if evangelism_meeting.blank? || region.blank?
+    return if evangelism_meeting.region_id == region_id
+
+    errors.add(:region, "は伝道会の聖院と一致させてください")
   end
 end

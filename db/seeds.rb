@@ -10,6 +10,7 @@
 rows = YAML.load_file(Rails.root.join("config/meetings.yml")).fetch("meetings")
 
 default_region = Region.find_or_create_by!(name: "共通")
+default_event = Event.find_or_create_by!(name: "第1回超抜式")
 
 rows.each do |row|
   EvangelismMeeting.find_or_initialize_by(name: row.fetch("name")).tap do |meeting|
@@ -18,6 +19,12 @@ rows.each do |row|
     meeting.display_order = row["display_order"]
     meeting.active = row.key?("active") ? row["active"] : true
     meeting.save!
+  end
+end
+
+Region.order(:id).find_each do |region|
+  EventDetail.find_or_create_by!(event: default_event, region: region) do |detail|
+    detail.count = 0
   end
 end
 

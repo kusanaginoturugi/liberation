@@ -12,7 +12,7 @@
         <strong><%= @total_serial_count %></strong>
       </div>
       <% if user_signed_in? %>
-        <%= link_to "超抜報告を登録", new_chobatsu_report_path, class: "button-primary compact-button" %>
+        <%= link_to "超抜報告を登録", new_chobatsu_report_path(event_id: @selected_event&.id), class: "button-primary compact-button" %>
       <% end %>
     </div>
   </header>
@@ -23,9 +23,15 @@
 
   <section class="panel region-filter-panel">
     <%= form_with url: root_path, method: :get, class: "region-filter-form" do |form| %>
+      <% unless single_region_mode? %>
+        <div class="field">
+          <%= form.label :region_id, "聖院" %>
+          <%= form.collection_select :region_id, @regions, :id, :name, { selected: @selected_region&.id }, { onchange: "this.form.requestSubmit()" } %>
+        </div>
+      <% end %>
       <div class="field">
-        <%= form.label :region_id, "聖院" %>
-        <%= form.collection_select :region_id, @regions, :id, :name, { selected: @selected_region&.id }, { onchange: "this.form.requestSubmit()" } %>
+        <%= form.label :event_id, "超抜式" %>
+        <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event&.id }, { onchange: "this.form.requestSubmit()" } %>
       </div>
     <% end %>
   </section>

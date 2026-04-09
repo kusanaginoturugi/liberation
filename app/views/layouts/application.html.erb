@@ -22,27 +22,35 @@
   </head>
 
   <body>
-    <% if user_signed_in? %>
-      <header class="app-nav">
-        <div class="app-nav__inner">
+    <header class="app-nav">
+      <div class="app-nav__inner">
+        <% if user_signed_in? %>
           <div>
             <strong><%= current_user.name %></strong>
             <span><%= current_user.region.name %></span>
           </div>
-          <div class="app-nav__actions">
-            <%= link_to "超抜報告", root_path, class: "button-secondary" %>
-            <% if user_signed_in? %>
-              <%= link_to "超抜報告を登録", new_chobatsu_report_path, class: "button-secondary" %>
-            <% end %>
+        <% else %>
+          <div>
+            <strong>Liberation</strong>
+          </div>
+        <% end %>
+        <div class="app-nav__actions">
+          <%= link_to "超抜報告", root_path, class: "button-secondary" %>
+          <% if user_signed_in? %>
+            <%= link_to "超抜報告を登録", new_chobatsu_report_path, class: "button-secondary" %>
             <% if current_user.admin? %>
-              <%= link_to "聖院一覧", regions_path, class: "button-secondary" %>
+              <% unless single_region_mode? %>
+                <%= link_to "聖院一覧", regions_path, class: "button-secondary" %>
+              <% end %>
               <%= link_to "伝道会一覧", evangelism_meetings_path, class: "button-secondary" %>
             <% end %>
             <%= button_to "ログアウト", session_path, method: :delete, class: "button-secondary" %>
-          </div>
+          <% else %>
+            <%= link_to "ログイン", new_session_path, class: "button-secondary" %>
+          <% end %>
         </div>
-      </header>
-    <% end %>
+      </div>
+    </header>
     <%= yield %>
   </body>
 </html>

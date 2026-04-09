@@ -24,13 +24,17 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
   end
 
-  test "admin sees management links and can update region" do
+  test "admin sees only meeting management link in single region mode" do
     post session_path, params: { email: @admin.email, password: "password123" }
 
     get root_path
     assert_includes response.body, "超抜報告"
-    assert_includes response.body, "聖院一覧"
+    assert_not_includes response.body, "聖院一覧"
     assert_includes response.body, "伝道会一覧"
+  end
+
+  test "admin can still update region directly" do
+    post session_path, params: { email: @admin.email, password: "password123" }
 
     get regions_path
     assert_includes response.body, "登録伝道会数"
