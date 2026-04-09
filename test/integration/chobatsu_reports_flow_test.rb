@@ -17,18 +17,41 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
   test "root page is accessible" do
     EvangelismMeeting.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99, region: @region)
+    other_region = Region.create!(name: "札幌")
+    EvangelismMeeting.create!(name: "札幌会場", color_code: "#111111", region: other_region)
 
     get root_path
 
     assert_response :success
     assert_includes response.body, "超抜報告"
     assert_includes response.body, "修霊合計数"
+    assert_includes response.body, "超抜報告を登録"
     assert_includes response.body, "大江戸"
     assert_includes response.body, "旧会場"
     assert_includes response.body, "現在は選択不可"
-    assert_includes response.body, "<option value=\"\">選択してください</option>"
-    assert_includes response.body, "<option value=\"1\">大江戸</option>"
-    assert_not_includes response.body, "<option value=\"2\">旧会場</option>"
+    assert_includes response.body, "札幌"
+    assert_not_includes response.body, "札幌会場"
+  end
+
+  test "root page switches displayed reports by region" do
+    other_region = Region.create!(name: "札幌")
+    other_meeting = EvangelismMeeting.create!(name: "札幌会場", color_code: "#111111", region: other_region)
+    ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      evangelism_meeting: other_meeting,
+      assistant_name: "札幌担当",
+      participant_count: 1,
+      serial_number_from: 50,
+      serial_number_to: 50,
+      merit_fee_total: 5000
+    )
+
+    get root_path, params: { region_id: other_region.id }
+
+    assert_response :success
+    assert_includes response.body, "札幌会場"
+    assert_not_includes response.body, "大江戸"
+    assert_includes response.body, ">50<"
   end
 
   test "creating a report saves the record" do

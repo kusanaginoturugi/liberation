@@ -4,6 +4,6 @@ Rails.application.routes.draw do
   resources :users, only: [:new, :create]
   resources :regions, only: [:index, :edit, :update]
   resources :evangelism_meetings, only: [:index, :edit, :update]
-  root "chobatsu_reports#new"
-  resources :chobatsu_reports, only: [:new, :create]
+  root "chobatsu_reports#index"
+  resources :chobatsu_reports, only: [:index, :new, :create]
 end

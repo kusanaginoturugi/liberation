@@ -1,0 +1,39 @@
+<% color_map = color_map_for_reports(chobatsu_reports) %>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>使用修霊番号</h2>
+    <p><%= total_serial_count %> 件を表示</p>
+  </div>
+
+  <div class="serial-grid-wrapper">
+    <table class="serial-grid">
+      <tbody>
+        <% serial_number_rows(total_serial_count).each do |row| %>
+          <tr>
+            <% row.each do |number| %>
+              <td style="<%= "--cell-color: #{color_map[number] || '#ffffff'}" %>"><%= number %></td>
+            <% end %>
+            <% (ChobatsuReportsHelper::GRID_COLUMNS - row.length).times do %>
+              <td class="serial-grid-empty"></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <% legend_evangelism_meetings.each do |meeting| %>
+      <div class="legend-item">
+        <span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span>
+        <div>
+          <strong><%= meeting.name %></strong>
+          <% unless meeting.active? %>
+            <p>現在は選択不可</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

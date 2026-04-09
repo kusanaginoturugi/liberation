@@ -1,0 +1,37 @@
+<% content_for :title, "超抜報告" %>
+
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Chobatsu Report</p>
+      <h1>超抜報告</h1>
+    </div>
+    <div class="page-header-actions">
+      <div class="setting-card">
+        <span>修霊合計数</span>
+        <strong><%= @total_serial_count %></strong>
+      </div>
+      <% if user_signed_in? %>
+        <%= link_to "超抜報告を登録", new_chobatsu_report_path, class: "button-primary compact-button" %>
+      <% end %>
+    </div>
+  </header>
+
+  <% if flash[:notice].present? %>
+    <div class="flash flash-notice"><%= flash[:notice] %></div>
+  <% end %>
+
+  <section class="panel region-filter-panel">
+    <%= form_with url: root_path, method: :get, class: "region-filter-form" do |form| %>
+      <div class="field">
+        <%= form.label :region_id, "聖院" %>
+        <%= form.collection_select :region_id, @regions, :id, :name, { selected: @selected_region&.id }, { onchange: "this.form.requestSubmit()" } %>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "report_grid",
+      chobatsu_reports: @chobatsu_reports,
+      legend_evangelism_meetings: @legend_evangelism_meetings,
+      total_serial_count: @total_serial_count %>
+</div>

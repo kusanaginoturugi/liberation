@@ -14,10 +14,12 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
   end
 
-  test "redirects unauthenticated users to sign in" do
+  test "unauthenticated users can view root page" do
     get root_path
 
-    assert_redirected_to new_session_path
+    assert_response :success
+    assert_includes response.body, "超抜報告"
+    assert_not_includes response.body, "超抜報告を登録"
   end
 
   test "user can sign in and access root page" do
@@ -27,6 +29,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_includes response.body, "超抜報告"
+    assert_includes response.body, "超抜報告を登録"
     assert_includes response.body, "ログアウト"
     assert_includes response.body, "大江戸"
   end
