@@ -19,9 +19,6 @@
         <span>残霊数</span>
         <strong><%= remaining_serial_count(@total_serial_count, @chobatsu_reports) %></strong>
       </div>
-      <% if user_signed_in? %>
-        <%= link_to "超抜報告を登録", new_chobatsu_report_path(event_id: @selected_event&.id), class: "button-primary compact-button" %>
-      <% end %>
     </div>
   </header>
 

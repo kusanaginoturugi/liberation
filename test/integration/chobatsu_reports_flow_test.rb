@@ -37,7 +37,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_includes response.body, "超抜報告"
+    assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, "修霊合計数"
     assert_includes response.body, "超抜報告を登録"
     assert_includes response.body, "大江戸"

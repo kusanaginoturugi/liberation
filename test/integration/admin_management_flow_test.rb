@@ -29,7 +29,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     post session_path, params: { email: @admin.email, password: "password123" }
 
     get root_path
-    assert_includes response.body, "超抜報告"
+    assert_includes response.body, "修霊番号一覧"
     assert_not_includes response.body, "聖院一覧"
     assert_includes response.body, "超抜式一覧"
     assert_includes response.body, "伝道会一覧"

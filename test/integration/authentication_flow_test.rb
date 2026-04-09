@@ -20,7 +20,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    assert_includes response.body, "超抜報告"
+    assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, "第1回超抜式"
     assert_includes response.body, "ログイン"
     assert_not_includes response.body, "聖院"
@@ -33,7 +33,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_response :success
-    assert_includes response.body, "超抜報告"
+    assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, "超抜報告を登録"
     assert_includes response.body, "ログアウト"
     assert_includes response.body, "大江戸"
