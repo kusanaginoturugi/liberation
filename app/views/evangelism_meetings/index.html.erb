@@ -18,21 +18,36 @@
           <th>色</th>
           <th>表示順</th>
           <th>有効</th>
-          <th>操作</th>
         </tr>
       </thead>
       <tbody>
         <% @evangelism_meetings.each do |meeting| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= edit_evangelism_meeting_path(meeting) %>" tabindex="0" role="link" aria-label="<%= "#{meeting.name}を編集" %>">
             <td><%= meeting.name %></td>
             <td><%= meeting.region.name %></td>
             <td><span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span> <%= meeting.color_code %></td>
             <td><%= meeting.display_order %></td>
             <td><%= meeting.active? ? "有効" : "無効" %></td>
-            <td><%= link_to "編集", edit_evangelism_meeting_path(meeting), class: "text-link" %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
+      row.addEventListener("click", () => {
+        window.location.href = row.dataset.href;
+      });
+
+      row.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.location.href = row.dataset.href;
+        }
+      });
+    });
+  });
+</script>

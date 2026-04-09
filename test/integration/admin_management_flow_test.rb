@@ -45,6 +45,10 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   test "admin can update evangelism meeting" do
     post session_path, params: { email: @admin.email, password: "password123" }
 
+    get evangelism_meetings_path
+    assert_not_includes response.body, ">編集<"
+    assert_includes response.body, edit_evangelism_meeting_path(@meeting)
+
     patch evangelism_meeting_path(@meeting), params: {
       evangelism_meeting: {
         name: "新大江戸",
