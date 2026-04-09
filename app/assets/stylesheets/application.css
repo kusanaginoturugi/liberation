@@ -39,6 +39,28 @@ body.gradient-disabled {
   --serial-cell-overlay: rgba(255, 255, 255, 0);
 }
 
+body.gradient-disabled .usage-count {
+  background: rgba(239, 177, 132, 0.2);
+}
+
+body.gradient-disabled .button-primary {
+  background: var(--accent);
+}
+
+body.gradient-disabled .serial-grid td {
+  background: var(--cell-color);
+}
+
+body.gradient-disabled .legend-item {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+body.gradient-disabled .serial-grid-wrapper,
+body.gradient-disabled .button-secondary,
+body.gradient-disabled .nav-dropdown__menu {
+  background: rgba(255, 255, 255, 0.92);
+}
+
 .app-nav {
   padding: 16px 0 0;
 }
