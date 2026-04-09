@@ -43,6 +43,7 @@
               <% unless single_region_mode? %>
                 <%= link_to "聖院一覧", regions_path, class: "button-secondary" %>
               <% end %>
+              <%= link_to "超抜式一覧", events_path, class: "button-secondary" %>
               <%= link_to "伝道会一覧", evangelism_meetings_path, class: "button-secondary" %>
             <% end %>
             <%= button_to "ログアウト", session_path, method: :delete, class: "button-secondary" %>

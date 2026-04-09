@@ -1,0 +1,47 @@
+<% content_for :title, "超抜式一覧" %>
+
+<div class="page-shell">
+  <div class="panel">
+    <div class="panel-header">
+      <h1>超抜式一覧</h1>
+    </div>
+
+    <% if flash[:notice].present? %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>超抜式名</th>
+          <th>登録日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @events.each do |event| %>
+          <tr class="clickable-row" data-href="<%= edit_event_path(event) %>" tabindex="0" role="link" aria-label="<%= "#{event.name}を編集" %>">
+            <td><%= event.name %></td>
+            <td><%= event.created_at.strftime("%Y/%m/%d") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
+      row.addEventListener("click", () => {
+        window.location.href = row.dataset.href;
+      });
+
+      row.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.location.href = row.dataset.href;
+        }
+      });
+    });
+  });
+</script>

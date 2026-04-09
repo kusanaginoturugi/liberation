@@ -4,6 +4,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   setup do
     @region = Region.create!(name: "共通")
     @other_region = Region.create!(name: "札幌")
+    @event = Event.create!(name: "第1回超抜式")
     @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
     @admin = User.create!(
       name: "管理者",
@@ -30,7 +31,25 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get root_path
     assert_includes response.body, "超抜報告"
     assert_not_includes response.body, "聖院一覧"
+    assert_includes response.body, "超抜式一覧"
     assert_includes response.body, "伝道会一覧"
+  end
+
+  test "admin can update event" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get events_path
+    assert_includes response.body, @event.name
+    assert_includes response.body, edit_event_path(@event)
+
+    patch event_path(@event), params: {
+      event: {
+        name: "第1回春期超抜式"
+      }
+    }
+
+    assert_redirected_to events_path
+    assert_equal "第1回春期超抜式", @event.reload.name
   end
 
   test "admin can still update region directly" do
@@ -83,6 +102,9 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     get evangelism_meetings_path
+    assert_redirected_to root_path
+
+    get events_path
     assert_redirected_to root_path
   end
 end
