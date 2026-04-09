@@ -248,6 +248,16 @@ body {
   text-align: left;
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover,
+.clickable-row:focus {
+  background: rgba(141, 90, 47, 0.06);
+  outline: none;
+}
+
 .text-link {
   color: var(--accent-strong);
   font-weight: 700;

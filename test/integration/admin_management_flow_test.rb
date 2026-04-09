@@ -31,6 +31,11 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "聖院一覧"
     assert_includes response.body, "伝道会一覧"
 
+    get regions_path
+    assert_includes response.body, "登録伝道会数"
+    assert_includes response.body, "1"
+    assert_includes response.body, edit_region_path(@region)
+
     patch region_path(@region), params: { region: { name: "本部" } }
 
     assert_redirected_to regions_path

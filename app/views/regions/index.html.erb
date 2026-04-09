@@ -14,17 +14,34 @@
       <thead>
         <tr>
           <th>聖院名</th>
-          <th>操作</th>
+          <th>登録伝道会数</th>
         </tr>
       </thead>
       <tbody>
         <% @regions.each do |region| %>
-          <tr>
+          <tr class="clickable-row" data-href="<%= edit_region_path(region) %>" tabindex="0" role="link" aria-label="<%= "#{region.name}を編集" %>">
             <td><%= region.name %></td>
-            <td><%= link_to "編集", edit_region_path(region), class: "text-link" %></td>
+            <td><%= region.try(:evangelism_meetings_count) || region.evangelism_meetings.count %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
+      row.addEventListener("click", () => {
+        window.location.href = row.dataset.href;
+      });
+
+      row.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.location.href = row.dataset.href;
+        }
+      });
+    });
+  });
+</script>
