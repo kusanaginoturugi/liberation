@@ -29,7 +29,10 @@
 
         <div class="field">
           <%= form.label :color_code, "カラーコード" %>
-          <%= form.text_field :color_code, required: true %>
+          <div class="color-field-group">
+            <%= form.color_field :color_code, class: "color-picker", data: { color_target: "picker" } %>
+            <%= form.text_field :color_code, required: true, data: { color_target: "text" } %>
+          </div>
         </div>
 
         <div class="field">
@@ -51,3 +54,22 @@
     <% end %>
   </section>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const picker = document.querySelector("[data-color-target='picker']");
+    const text = document.querySelector("[data-color-target='text']");
+
+    if (!picker || !text) return;
+
+    picker.addEventListener("input", () => {
+      text.value = picker.value.toUpperCase();
+    });
+
+    text.addEventListener("input", () => {
+      if (/^#[0-9a-fA-F]{6}$/.test(text.value)) {
+        picker.value = text.value;
+      }
+    });
+  });
+</script>

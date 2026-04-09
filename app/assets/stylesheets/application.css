@@ -275,6 +275,19 @@ body {
   min-height: 49px;
 }
 
+.color-field-group {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.color-picker {
+  min-height: 49px;
+  padding: 4px !important;
+  cursor: pointer;
+}
+
 .button-primary:hover {
   filter: brightness(1.05);
 }

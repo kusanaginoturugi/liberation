@@ -49,6 +49,9 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, ">編集<"
     assert_includes response.body, edit_evangelism_meeting_path(@meeting)
 
+    get edit_evangelism_meeting_path(@meeting)
+    assert_includes response.body, "type=\"color\""
+
     patch evangelism_meeting_path(@meeting), params: {
       evangelism_meeting: {
         name: "新大江戸",
