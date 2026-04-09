@@ -61,15 +61,13 @@ body.gradient-disabled .nav-dropdown__menu {
   background: rgba(255, 255, 255, 0.92);
 }
 
-body.number-shadow-enabled .setting-card strong,
-body.number-shadow-enabled .usage-count {
+body.number-shadow-enabled .serial-grid td {
   text-shadow:
     0 0 10px rgba(255, 255, 255, 0.85),
     0 2px 6px rgba(70, 45, 20, 0.1);
 }
 
-body.number-shadow-disabled .setting-card strong,
-body.number-shadow-disabled .usage-count {
+body.number-shadow-disabled .serial-grid td {
   text-shadow: none;
 }
 
