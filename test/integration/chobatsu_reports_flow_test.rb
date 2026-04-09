@@ -39,7 +39,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, "修霊合計数"
-    assert_includes response.body, "超抜報告を登録"
+    assert_includes response.body, "修霊番号登録"
     assert_includes response.body, "大江戸"
     assert_includes response.body, "第2回超抜式"
     assert_includes response.body, "旧会場"
