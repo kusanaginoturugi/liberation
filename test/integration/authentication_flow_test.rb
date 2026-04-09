@@ -26,6 +26,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_response :success
+    assert_includes response.body, "超抜報告"
     assert_includes response.body, "ログアウト"
     assert_includes response.body, "大江戸"
   end

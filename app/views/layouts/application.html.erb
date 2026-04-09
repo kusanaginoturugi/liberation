@@ -30,6 +30,7 @@
             <span><%= current_user.region.name %></span>
           </div>
           <div class="app-nav__actions">
+            <%= link_to "超抜報告", root_path, class: "button-secondary" %>
             <% if current_user.admin? %>
               <%= link_to "聖院一覧", regions_path, class: "button-secondary" %>
               <%= link_to "伝道会一覧", evangelism_meetings_path, class: "button-secondary" %>
