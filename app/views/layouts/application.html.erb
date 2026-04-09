@@ -21,7 +21,7 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
   </head>
 
-  <body class="<%= gradient_enabled? ? 'gradient-enabled' : 'gradient-disabled' %>">
+  <body class="<%= [gradient_enabled? ? 'gradient-enabled' : 'gradient-disabled', number_shadow_enabled? ? 'number-shadow-enabled' : 'number-shadow-disabled'].join(' ') %>">
     <header class="app-nav">
       <div class="app-nav__inner">
         <% if user_signed_in? %>

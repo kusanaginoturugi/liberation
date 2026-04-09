@@ -16,6 +16,12 @@
             配色のグラデーションを有効にする
           </label>
         </div>
+        <div class="field checkbox-field">
+          <label>
+            <%= form.check_box :number_shadow_enabled, { checked: @number_shadow_enabled }, "true", "false" %>
+            数字にドロップシャドウを付ける
+          </label>
+        </div>
       </div>
 
       <div class="actions">

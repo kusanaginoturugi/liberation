@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
 
-  helper_method :current_user, :user_signed_in?, :single_region_mode?, :gradient_enabled?
+  helper_method :current_user, :user_signed_in?, :single_region_mode?, :gradient_enabled?, :number_shadow_enabled?
 
   private
 
@@ -48,6 +48,10 @@ class ApplicationController < ActionController::Base
 
   def gradient_enabled?
     SystemSetting.gradient_enabled?
+  end
+
+  def number_shadow_enabled?
+    SystemSetting.number_shadow_enabled?
   end
 
   def self.allow_unauthenticated_access(only: nil)

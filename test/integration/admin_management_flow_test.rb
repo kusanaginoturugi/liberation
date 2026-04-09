@@ -44,15 +44,18 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get edit_settings_path
     assert_response :success
     assert_includes response.body, "配色のグラデーションを有効にする"
+    assert_includes response.body, "数字にドロップシャドウを付ける"
 
     patch settings_path, params: {
       settings: {
-        gradient_enabled: "false"
+        gradient_enabled: "false",
+        number_shadow_enabled: "true"
       }
     }
 
     assert_redirected_to edit_settings_path
     assert_not SystemSetting.gradient_enabled?
+    assert SystemSetting.number_shadow_enabled?
   end
 
   test "admin can create user" do

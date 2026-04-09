@@ -61,6 +61,16 @@ body.gradient-disabled .nav-dropdown__menu {
   background: rgba(255, 255, 255, 0.92);
 }
 
+body.number-shadow-enabled .setting-card strong,
+body.number-shadow-enabled .usage-count {
+  text-shadow: 0 2px 8px rgba(70, 45, 20, 0.18);
+}
+
+body.number-shadow-disabled .setting-card strong,
+body.number-shadow-disabled .usage-count {
+  text-shadow: none;
+}
+
 .app-nav {
   padding: 16px 0 0;
 }

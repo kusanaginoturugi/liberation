@@ -38,6 +38,11 @@ SystemSetting.find_or_initialize_by(key: SystemSetting::GRADIENT_ENABLED_KEY).ta
   setting.save!
 end
 
+SystemSetting.find_or_initialize_by(key: SystemSetting::NUMBER_SHADOW_ENABLED_KEY).tap do |setting|
+  setting.value = "false"
+  setting.save!
+end
+
 User.find_or_initialize_by(email: "admin@example.com").tap do |user|
   user.name = "管理者"
   user.region = default_region
