@@ -6,6 +6,16 @@
       <p class="eyebrow">Ceremony List</p>
       <h1>挙行一覧</h1>
     </div>
+    <div class="page-header-actions">
+      <%= link_to "CSV出力",
+          export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id, region_id: @selected_region&.id),
+          class: "button-secondary compact-button" %>
+      <%= link_to "PDF出力",
+          export_chobatsu_reports_path(format: :pdf, event_id: @selected_event&.id, region_id: @selected_region&.id),
+          class: "button-secondary compact-button",
+          target: "_blank",
+          rel: "noopener" %>
+    </div>
   </header>
 
   <section class="panel region-filter-panel">

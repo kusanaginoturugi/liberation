@@ -126,6 +126,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "挙行一覧"
+    assert_includes response.body, "CSV出力"
+    assert_includes response.body, "PDF出力"
     assert_includes response.body, "2026/04/09"
     assert_includes response.body, @meeting.name
     assert_includes response.body, ">2<"
