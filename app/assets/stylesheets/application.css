@@ -390,7 +390,7 @@ body.number-shadow-disabled .usage-count {
   white-space: nowrap;
 }
 
-.summary-table .summary-amount {
+.summary-table .summary-number {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }

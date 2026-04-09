@@ -46,11 +46,11 @@
               <% end %>
             </th>
             <th>伝道会名</th>
-            <th>超抜霊数</th>
-            <th>功徳費合計</th>
-            <th>みろく寺分</th>
-            <th>聖院還付金</th>
-            <th>伝道会還付金</th>
+            <th class="summary-number">超抜霊数</th>
+            <th class="summary-number">功徳費合計</th>
+            <th class="summary-number">みろく寺分</th>
+            <th class="summary-number">聖院還付金</th>
+            <th class="summary-number">伝道会還付金</th>
             <th>入力者名</th>
           </tr>
         </thead>
@@ -60,11 +60,11 @@
               <td><%= index + 1 %></td>
               <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
               <td><%= report.evangelism_meeting.name %></td>
-              <td><%= report.participant_count %></td>
-              <td class="summary-amount"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
-              <td class="summary-amount"><%= number_with_delimiter(report.mirokuji_share) %></td>
-              <td class="summary-amount"><%= number_with_delimiter(report.region_refund) %></td>
-              <td class="summary-amount"><%= number_with_delimiter(report.evangelism_meeting_refund) %></td>
+              <td class="summary-number"><%= number_with_delimiter(report.participant_count) %></td>
+              <td class="summary-number"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
+              <td class="summary-number"><%= number_with_delimiter(report.mirokuji_share) %></td>
+              <td class="summary-number"><%= number_with_delimiter(report.region_refund) %></td>
+              <td class="summary-number"><%= number_with_delimiter(report.evangelism_meeting_refund) %></td>
               <td><%= report.user&.name || "未設定" %></td>
             </tr>
           <% end %>
