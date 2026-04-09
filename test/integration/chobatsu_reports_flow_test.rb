@@ -23,6 +23,17 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     EvangelismMeeting.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99, region: @region)
     other_region = Region.create!(name: "札幌")
     EvangelismMeeting.create!(name: "札幌会場", color_code: "#111111", region: other_region)
+    ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      region: @region,
+      event: @event,
+      evangelism_meeting: @meeting,
+      assistant_name: "既存",
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 3,
+      merit_fee_total: 15000
+    )
 
     get root_path
 
@@ -34,6 +45,10 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "第2回超抜式"
     assert_includes response.body, "旧会場"
     assert_includes response.body, "現在は選択不可"
+    assert_includes response.body, "超抜済"
+    assert_includes response.body, "残霊数"
+    assert_includes response.body, ">3<"
+    assert_includes response.body, ">1664<"
     assert_not_includes response.body, "札幌会場"
     assert_not_includes response.body, "<label for=\"region_id\">聖院</label>"
   end

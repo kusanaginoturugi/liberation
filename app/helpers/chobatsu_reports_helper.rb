@@ -15,4 +15,12 @@ module ChobatsuReportsHelper
       end
     end
   end
+
+  def used_serial_count(reports)
+    reports.sum(&:usage_count)
+  end
+
+  def remaining_serial_count(total_serial_count, reports)
+    [total_serial_count.to_i - used_serial_count(reports), 0].max
+  end
 end

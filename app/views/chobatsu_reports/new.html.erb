@@ -6,9 +6,19 @@
       <p class="eyebrow">Chobatsu Report</p>
       <h1>超抜報告を登録</h1>
     </div>
-    <div class="setting-card">
-      <span>修霊合計数</span>
-      <strong><%= @total_serial_count %></strong>
+    <div class="page-header-actions">
+      <div class="setting-card">
+        <span>修霊合計数</span>
+        <strong><%= @total_serial_count %></strong>
+      </div>
+      <div class="setting-card">
+        <span>超抜済</span>
+        <strong><%= used_serial_count(@chobatsu_reports) %></strong>
+      </div>
+      <div class="setting-card">
+        <span>残霊数</span>
+        <strong><%= remaining_serial_count(@total_serial_count, @chobatsu_reports) %></strong>
+      </div>
     </div>
   </header>
 
