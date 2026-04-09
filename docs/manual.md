@@ -1,5 +1,101 @@
 # 運用マニュアル
 
+## ログイン
+
+初回セットアップ後は `db:seed` で初期ユーザーが作成されます。
+
+### 初期ユーザー
+
+- メールアドレス: `admin@example.com`
+- パスワード: `password123`
+- 聖院: `共通`
+- 権限: 管理者
+
+### 初期ユーザーの作成
+
+DB 作成後または初期化後に次を実行します。
+
+```bash
+bin/rails db:seed
+```
+
+### ログイン手順
+
+1. ブラウザでログイン画面を開きます
+2. メールアドレスに `admin@example.com` を入力します
+3. パスワードに `password123` を入力します
+4. ログイン後、超抜報告画面へ移動します
+
+### パスワード変更方法
+
+運用開始前に初期パスワードを変更してください。
+
+```bash
+bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!(password: "new-password-123", password_confirmation: "new-password-123")'
+```
+
+### 注意事項
+
+- seed は初期ユーザーが存在しない場合のみパスワードを設定します
+- 既存ユーザーに対して `db:seed` を再実行しても、パスワードは上書きしません
+- 本番環境では初期パスワードのまま運用しないでください
+
+## 管理メニュー
+
+管理者でログインすると、画面上部に以下のメニューが表示されます。
+
+- `聖院一覧`
+- `伝道会一覧`
+- `ログアウト`
+
+`聖院一覧` と `伝道会一覧` は管理者のみアクセスできます。
+
+## 聖院一覧と編集
+
+### 一覧画面
+
+- メニューの `聖院一覧` から開きます
+- 一覧には `聖院名` と `登録伝道会数` が表示されます
+- 編集リンクはありません
+- 行をクリックすると編集画面へ移動します
+
+### 編集画面
+
+- `聖院名` を変更できます
+- 更新後は `聖院一覧` に戻ります
+
+## 伝道会一覧と編集
+
+### 一覧画面
+
+- メニューの `伝道会一覧` から開きます
+- 一覧には以下が表示されます
+  - `伝道会名`
+  - `聖院`
+  - `色`
+  - `表示順`
+  - `有効`
+- 編集リンクはありません
+- 行をクリックすると編集画面へ移動します
+
+### 編集画面
+
+- `伝道会名`
+- `聖院`
+- `カラーコード`
+- `表示順`
+- `有効`
+
+を更新できます。
+
+### カラーコードの変更
+
+伝道会編集画面では、カラーコード入力でブラウザ標準のカラーピッカーが使えます。
+
+- 左側のカラーピッカーで色を選択できます
+- 右側のテキスト欄で `#RRGGBB` を直接入力できます
+- ピッカーとテキスト欄は連動します
+
 ## 修霊合計数の変更
 
 修霊合計数は `system_settings` テーブルの `total_serial_count` で管理しています。
@@ -39,50 +135,13 @@ bin/rails runner 'puts SystemSetting.total_serial_count'
 - コマンド実行後は画面を再読み込みして表示を確認してください
 - 本番環境で実行する場合は、対象環境のアプリケーションディレクトリで実行してください
 
-## ログイン
-
-初回セットアップ後は seed で初期ユーザーが作成されます。
-
-### 初期ユーザー
-
-- メールアドレス: `admin@example.com`
-- パスワード: `password123`
-- 聖院: `共通`
-
-### 初期ユーザーの作成
-
-DB 作成後または初期化後に次を実行します。
-
-```bash
-bin/rails db:seed
-```
-
-### ログイン手順
-
-1. ブラウザでログイン画面を開きます
-2. メールアドレスに `admin@example.com` を入力します
-3. パスワードに `password123` を入力します
-4. ログイン後、超抜報告画面へ移動します
-
-### パスワード変更方法
-
-運用開始前に初期パスワードを変更してください。
-
-```bash
-bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!(password: "new-password-123", password_confirmation: "new-password-123")'
-```
-
-### 注意事項
-
-- seed は初期ユーザーが存在しない場合のみパスワードを設定します
-- 既存ユーザーに対して `db:seed` を再実行しても、パスワードは上書きしません
-- 本番環境では初期パスワードのまま運用しないでください
-
 ## 伝道会マスタの差し替え
 
 伝道会マスタは `config/meetings.yml` で管理できます。
 差し替え時は既存データを物理削除せず、YAML にない伝道会を `active: false` にします。
 そのため過去の超抜報告データは壊れません。
+
+管理画面で個別編集できますが、伝道会セットをまとめて入れ替える場合は YAML 同期を使ってください。
 
 ### 変更ファイル
 
@@ -91,6 +150,7 @@ bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!
 ```yml
 meetings:
   - name: 大江戸
+    region_name: 共通
     color_code: "#C8C4C1"
     display_order: 10
     active: true
@@ -100,10 +160,11 @@ meetings:
 
 1. `config/meetings.yml` を編集します
 2. `meetings` 配列に必要な伝道会を定義します
-3. `display_order` で表示順を指定します
-4. `active: true` にするとフォームで選択可能になります
-5. `active: false` にするとフォームでは選べなくなります
-6. 編集後に同期コマンドを実行します
+3. `region_name` で所属聖院を指定します
+4. `display_order` で表示順を指定します
+5. `active: true` にするとフォームで選択可能になります
+6. `active: false` にするとフォームでは選べなくなります
+7. 編集後に同期コマンドを実行します
 
 ### 同期コマンド
 
@@ -124,10 +185,12 @@ Synced 9 evangelism meetings from config/meetings.yml
 ```yml
 meetings:
   - name: 大江戸
+    region_name: 共通
     color_code: "#C8C4C1"
     display_order: 10
     active: true
   - name: 札幌
+    region_name: 北海道
     color_code: "#B9D7EA"
     display_order: 100
     active: true
@@ -145,6 +208,7 @@ bin/rails 'meetings:sync[config/meetings.yml]'
 
 ```yml
 - name: 山梨
+  region_name: 共通
   color_code: "#C2B0D9"
   display_order: 90
   active: false
@@ -155,7 +219,7 @@ bin/rails 'meetings:sync[config/meetings.yml]'
 現在の伝道会一覧を確認するには次を実行します。
 
 ```bash
-bin/rails runner 'pp EvangelismMeeting.order(:display_order, :id).pluck(:name, :active, :display_order)'
+bin/rails runner 'pp EvangelismMeeting.includes(:region).order(:display_order, :id).map { |meeting| [meeting.name, meeting.region.name, meeting.active, meeting.display_order] }'
 ```
 
 ### 反映ルール

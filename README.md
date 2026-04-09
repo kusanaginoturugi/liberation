@@ -14,6 +14,8 @@ mise run setup
 
 初期ログイン情報と運用手順は [運用マニュアル](./docs/manual.md) を参照してください。
 
+管理者でログインすると、`聖院一覧` と `伝道会一覧` の管理画面を利用できます。
+
 ## Development
 
 Rails サーバーの起動:
@@ -41,6 +43,8 @@ bin/rails 'settings:set_total_serial_count[1700]'
 ```bash
 bin/rails 'meetings:sync[config/meetings.yml]'
 ```
+
+個別編集は管理画面、一括差し替えは上記 task を使います。
 
 ## Environment
 
