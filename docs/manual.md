@@ -39,6 +39,45 @@ bin/rails runner 'puts SystemSetting.total_serial_count'
 - コマンド実行後は画面を再読み込みして表示を確認してください
 - 本番環境で実行する場合は、対象環境のアプリケーションディレクトリで実行してください
 
+## ログイン
+
+初回セットアップ後は seed で初期ユーザーが作成されます。
+
+### 初期ユーザー
+
+- メールアドレス: `admin@example.com`
+- パスワード: `password123`
+- 聖院: `共通`
+
+### 初期ユーザーの作成
+
+DB 作成後または初期化後に次を実行します。
+
+```bash
+bin/rails db:seed
+```
+
+### ログイン手順
+
+1. ブラウザでログイン画面を開きます
+2. メールアドレスに `admin@example.com` を入力します
+3. パスワードに `password123` を入力します
+4. ログイン後、超抜報告画面へ移動します
+
+### パスワード変更方法
+
+運用開始前に初期パスワードを変更してください。
+
+```bash
+bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!(password: "new-password-123", password_confirmation: "new-password-123")'
+```
+
+### 注意事項
+
+- seed は初期ユーザーが存在しない場合のみパスワードを設定します
+- 既存ユーザーに対して `db:seed` を再実行しても、パスワードは上書きしません
+- 本番環境では初期パスワードのまま運用しないでください
+
 ## 伝道会マスタの差し替え
 
 伝道会マスタは `config/meetings.yml` で管理できます。

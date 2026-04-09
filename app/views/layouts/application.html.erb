@@ -22,6 +22,17 @@
   </head>
 
   <body>
+    <% if user_signed_in? %>
+      <header class="app-nav">
+        <div class="app-nav__inner">
+          <div>
+            <strong><%= current_user.name %></strong>
+            <span><%= current_user.region.name %></span>
+          </div>
+          <%= button_to "ログアウト", session_path, method: :delete, class: "button-secondary" %>
+        </div>
+      </header>
+    <% end %>
     <%= yield %>
   </body>
 </html>

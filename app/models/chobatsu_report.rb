@@ -49,10 +49,12 @@ class ChobatsuReport < ApplicationRecord
   end
 
   def serial_number_range_does_not_overlap
-    return if serial_number_from.blank? || serial_number_to.blank?
+    return if serial_number_from.blank? || serial_number_to.blank? || evangelism_meeting.blank?
 
     overlap = self.class
                   .where.not(id:)
+                  .joins(:evangelism_meeting)
+                  .where(evangelism_meetings: { region_id: evangelism_meeting.region_id })
                   .where("serial_number_from <= ? AND serial_number_to >= ?", serial_number_to, serial_number_from)
                   .first
     return if overlap.blank?

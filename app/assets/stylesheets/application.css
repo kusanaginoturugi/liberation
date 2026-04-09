@@ -28,9 +28,30 @@ body {
   font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
 }
 
+.app-nav {
+  padding: 16px 0 0;
+}
+
+.app-nav__inner {
+  width: min(1280px, calc(100% - 32px));
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-nav__inner span {
+  margin-left: 8px;
+  color: var(--muted);
+}
+
 .page-shell {
   width: min(1280px, calc(100% - 32px));
   margin: 32px auto 48px;
+}
+
+.auth-shell {
+  max-width: 640px;
 }
 
 .page-header {
@@ -192,6 +213,16 @@ body {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #fff;
   font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button-secondary {
+  border: 1px solid rgba(115, 97, 73, 0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text);
   font-weight: 700;
   cursor: pointer;
 }

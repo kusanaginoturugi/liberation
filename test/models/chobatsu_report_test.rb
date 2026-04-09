@@ -3,7 +3,8 @@ require "test_helper"
 class ChobatsuReportTest < ActiveSupport::TestCase
   setup do
     SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
-    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1")
+    @region = Region.create!(name: "共通")
+    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
   end
 
   test "usage_count is calculated from serial number range" do

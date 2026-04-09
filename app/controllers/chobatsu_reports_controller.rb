@@ -34,9 +34,13 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def load_form_collections
-    @evangelism_meetings = EvangelismMeeting.active.display_sorted
-    @legend_evangelism_meetings = EvangelismMeeting.display_sorted
-    @chobatsu_reports = ChobatsuReport.includes(:evangelism_meeting).order(:serial_number_from)
+    region_meetings = current_user.region.evangelism_meetings
+    @evangelism_meetings = region_meetings.active.display_sorted
+    @legend_evangelism_meetings = region_meetings.display_sorted
+    @chobatsu_reports = ChobatsuReport.joins(:evangelism_meeting)
+                                      .where(evangelism_meetings: { region_id: current_user.region_id })
+                                      .includes(:evangelism_meeting)
+                                      .order(:serial_number_from)
     @total_serial_count = SystemSetting.total_serial_count
   rescue ActiveRecord::RecordNotFound
     @total_serial_count = 0

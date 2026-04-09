@@ -12,6 +12,7 @@ namespace :meetings do
 
       rows.each do |row|
         meeting = EvangelismMeeting.find_or_initialize_by(name: row.fetch("name"))
+        meeting.region = Region.find_or_create_by!(name: row.fetch("region_name", "共通"))
         meeting.color_code = row.fetch("color_code")
         meeting.display_order = row["display_order"]
         meeting.active = row.key?("active") ? row["active"] : true

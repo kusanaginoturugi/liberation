@@ -3,11 +3,20 @@ require "test_helper"
 class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
   setup do
     SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
-    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1")
+    @region = Region.create!(name: "共通")
+    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
+    @user = User.create!(
+      name: "管理者",
+      email: "admin@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      region: @region
+    )
+    post session_path, params: { email: @user.email, password: "password123" }
   end
 
   test "root page is accessible" do
-    EvangelismMeeting.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99)
+    EvangelismMeeting.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99, region: @region)
 
     get root_path
 

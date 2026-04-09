@@ -1,0 +1,33 @@
+<% content_for :title, "ログイン" %>
+
+<div class="page-shell auth-shell">
+  <section class="panel form-panel auth-panel">
+    <h1>ログイン</h1>
+
+    <% if flash[:notice].present? %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+
+    <% if flash[:alert].present? %>
+      <div class="flash flash-alert"><%= flash[:alert] %></div>
+    <% end %>
+
+    <%= form_with url: session_path, class: "report-form" do |form| %>
+      <div class="field-grid">
+        <div class="field">
+          <%= form.label :email, "メールアドレス" %>
+          <%= form.email_field :email, required: true, autofocus: true %>
+        </div>
+
+        <div class="field">
+          <%= form.label :password, "パスワード" %>
+          <%= form.password_field :password, required: true %>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "ログイン", class: "button-primary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

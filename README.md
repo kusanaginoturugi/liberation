@@ -12,6 +12,8 @@ mise install
 mise run setup
 ```
 
+初期ログイン情報と運用手順は [運用マニュアル](./docs/manual.md) を参照してください。
+
 ## Development
 
 Rails サーバーの起動:

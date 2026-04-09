@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_08_143000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_090200) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -33,9 +33,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_08_143000) do
     t.datetime "updated_at", null: false
     t.boolean "active", default: true, null: false
     t.integer "display_order"
+    t.integer "region_id", null: false
     t.index ["active"], name: "index_evangelism_meetings_on_active"
     t.index ["display_order"], name: "index_evangelism_meetings_on_display_order"
     t.index ["name"], name: "index_evangelism_meetings_on_name", unique: true
+    t.index ["region_id"], name: "index_evangelism_meetings_on_region_id"
+  end
+
+  create_table "regions", force: :cascade do |t|
+    t.text "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_regions_on_name", unique: true
   end
 
   create_table "system_settings", force: :cascade do |t|
@@ -46,5 +55,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_08_143000) do
     t.index ["key"], name: "index_system_settings_on_key", unique: true
   end
 
+  create_table "users", force: :cascade do |t|
+    t.text "email", null: false
+    t.string "password_digest", null: false
+    t.text "name", null: false
+    t.integer "region_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["region_id"], name: "index_users_on_region_id"
+  end
+
   add_foreign_key "chobatsu_reports", "evangelism_meetings"
+  add_foreign_key "evangelism_meetings", "regions"
+  add_foreign_key "users", "regions"
 end

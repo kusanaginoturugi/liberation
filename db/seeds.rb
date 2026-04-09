@@ -9,8 +9,11 @@
 #   end
 rows = YAML.load_file(Rails.root.join("config/meetings.yml")).fetch("meetings")
 
+default_region = Region.find_or_create_by!(name: "共通")
+
 rows.each do |row|
   EvangelismMeeting.find_or_initialize_by(name: row.fetch("name")).tap do |meeting|
+    meeting.region = Region.find_or_create_by!(name: row.fetch("region_name", "共通"))
     meeting.color_code = row.fetch("color_code")
     meeting.display_order = row["display_order"]
     meeting.active = row.key?("active") ? row["active"] : true
@@ -21,4 +24,14 @@ end
 SystemSetting.find_or_initialize_by(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY).tap do |setting|
   setting.value = "1667"
   setting.save!
+end
+
+User.find_or_initialize_by(email: "admin@example.com").tap do |user|
+  user.name = "管理者"
+  user.region = default_region
+  if user.new_record?
+    user.password = "password123"
+    user.password_confirmation = "password123"
+  end
+  user.save!
 end

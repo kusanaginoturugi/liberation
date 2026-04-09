@@ -1,4 +1,5 @@
 class EvangelismMeeting < ApplicationRecord
+  belongs_to :region
   has_many :chobatsu_reports, dependent: :restrict_with_exception
 
   scope :active, -> { where(active: true) }
