@@ -39,7 +39,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, "修霊合計数"
-    assert_includes response.body, "修霊番号登録"
+    assert_includes response.body, "挙行報告"
     assert_includes response.body, "大江戸"
     assert_includes response.body, "第2回超抜式"
     assert_includes response.body, "旧会場"
@@ -125,14 +125,14 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
     assert_response :success
-    assert_includes response.body, "超抜集計"
+    assert_includes response.body, "挙行一覧"
     assert_includes response.body, "2026/04/09"
     assert_includes response.body, @meeting.name
     assert_includes response.body, ">2<"
-    assert_includes response.body, ">20000<"
-    assert_includes response.body, ">13000<"
-    assert_includes response.body, ">3000<"
-    assert_includes response.body, ">4000<"
+    assert_includes response.body, ">20,000<"
+    assert_includes response.body, ">13,000<"
+    assert_includes response.body, ">3,000<"
+    assert_includes response.body, ">4,000<"
     assert_includes response.body, @user.name
     assert_equal report.user, @user
   end
@@ -183,9 +183,33 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get new_chobatsu_report_path
 
     assert_response :success
+    assert_includes response.body, "CSV出力"
+    assert_includes response.body, "PDF出力"
     assert_includes response.body, "みろく寺分"
     assert_includes response.body, "聖院還付金"
     assert_includes response.body, "伝道会還付金"
+  end
+
+  test "report page exports csv" do
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 9),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 4,
+      merit_fee_total: 20000
+    )
+
+    get export_chobatsu_reports_path(format: :csv, event_id: @event.id)
+
+    assert_response :success
+    assert_equal "text/csv", response.media_type
+    assert_includes response.body, "挙行日,伝道会名,超抜霊数"
+    assert_includes response.body, "2026/04/09"
+    assert_includes response.body, @meeting.name
   end
 
   test "overlapping range is rejected in the same event" do

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>挙行報告 PDF出力</title>
+    <style>
+      body {
+        margin: 24px;
+        color: #2b231d;
+        font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      p {
+        margin: 0 0 16px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      th, td {
+        border: 1px solid #6a5d52;
+        padding: 8px 10px;
+        text-align: left;
+      }
+
+      th {
+        background: #f3eee8;
+      }
+
+      .print-note {
+        margin-top: 16px;
+        color: #6a5d52;
+        font-size: 12px;
+      }
+
+      @media print {
+        .print-note {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>挙行報告</h1>
+    <p><%= @selected_event.name %></p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>挙行日</th>
+          <th>伝道会名</th>
+          <th>超抜霊数</th>
+          <th>功徳費合計</th>
+          <th>みろく寺分</th>
+          <th>聖院還付金</th>
+          <th>伝道会還付金</th>
+          <th>入力者名</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @export_reports.each_with_index do |report, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
+            <td><%= report.evangelism_meeting.name %></td>
+            <td><%= report.participant_count %></td>
+            <td><%= report.calculated_merit_fee_total %></td>
+            <td><%= report.mirokuji_share %></td>
+            <td><%= report.region_refund %></td>
+            <td><%= report.evangelism_meeting_refund %></td>
+            <td><%= report.user&.name || "未設定" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <p class="print-note">この画面は印刷用です。ブラウザの印刷機能から PDF 保存してください。</p>
+
+    <script>
+      window.addEventListener("load", () => window.print());
+    </script>
+  </body>
+</html>

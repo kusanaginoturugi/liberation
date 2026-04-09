@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   root "chobatsu_reports#index"
   resources :chobatsu_reports, only: [:index, :new, :create] do
     collection do
+      get :export
       get :summary
     end
   end

@@ -1,10 +1,10 @@
-<% content_for :title, "超抜集計" %>
+<% content_for :title, "挙行一覧" %>
 
 <div class="page-shell">
   <header class="page-header">
     <div>
-      <p class="eyebrow">Chobatsu Summary</p>
-      <h1>超抜集計</h1>
+      <p class="eyebrow">Ceremony List</p>
+      <h1>挙行一覧</h1>
     </div>
   </header>
 
@@ -61,10 +61,10 @@
               <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
               <td><%= report.evangelism_meeting.name %></td>
               <td><%= report.participant_count %></td>
-              <td><%= report.calculated_merit_fee_total %></td>
-              <td><%= report.mirokuji_share %></td>
-              <td><%= report.region_refund %></td>
-              <td><%= report.evangelism_meeting_refund %></td>
+              <td class="summary-amount"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
+              <td class="summary-amount"><%= number_with_delimiter(report.mirokuji_share) %></td>
+              <td class="summary-amount"><%= number_with_delimiter(report.region_refund) %></td>
+              <td class="summary-amount"><%= number_with_delimiter(report.evangelism_meeting_refund) %></td>
               <td><%= report.user&.name || "未設定" %></td>
             </tr>
           <% end %>

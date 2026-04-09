@@ -390,6 +390,11 @@ body.number-shadow-disabled .usage-count {
   white-space: nowrap;
 }
 
+.summary-table .summary-amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .summary-sort-link {
   display: inline-flex;
   align-items: center;

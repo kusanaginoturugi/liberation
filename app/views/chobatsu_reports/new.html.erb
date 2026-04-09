@@ -1,12 +1,14 @@
-<% content_for :title, "修霊番号登録" %>
+<% content_for :title, "挙行報告" %>
 
 <div class="page-shell">
   <header class="page-header">
     <div>
-      <p class="eyebrow">Chobatsu Report</p>
-      <h1>修霊番号登録</h1>
+      <p class="eyebrow">Ceremony Report</p>
+      <h1>挙行報告</h1>
     </div>
     <div class="page-header-actions">
+      <%= link_to "CSV出力", export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id), class: "button-secondary compact-button" %>
+      <%= link_to "PDF出力", export_chobatsu_reports_path(format: :pdf, event_id: @selected_event&.id), class: "button-secondary compact-button", target: "_blank", rel: "noopener" %>
       <div class="setting-card">
         <span>修霊合計数</span>
         <strong><%= @total_serial_count %></strong>

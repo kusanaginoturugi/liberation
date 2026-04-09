@@ -3,7 +3,7 @@ class ChobatsuReportsController < ApplicationController
 
   before_action :load_index_collections, only: [:index]
   before_action :load_summary_collections, only: [:summary]
-  before_action :load_form_collections, only: [:new, :create]
+  before_action :load_form_collections, only: [:new, :create, :export]
 
   def index
   end
@@ -21,12 +21,29 @@ class ChobatsuReportsController < ApplicationController
   def summary
   end
 
+  def export
+    @export_reports = @chobatsu_reports.includes(:user).reorder(ceremony_date: :asc, id: :asc)
+
+    respond_to do |format|
+      format.csv do
+        send_data generate_csv(@export_reports),
+                  filename: export_filename("csv"),
+                  type: "text/csv; charset=utf-8"
+      end
+
+      format.pdf do
+        response.headers["Content-Disposition"] = %(inline; filename="#{export_filename("pdf")}")
+        render :export, layout: false
+      end
+    end
+  end
+
   def create
     @chobatsu_report = ChobatsuReport.new(chobatsu_report_params)
     @chobatsu_report.user = current_user
 
     if @chobatsu_report.save
-      redirect_to root_path, notice: "超抜報告を登録しました"
+      redirect_to root_path, notice: "挙行報告を登録しました"
     else
       render :new, status: :unprocessable_content
     end
@@ -122,5 +139,41 @@ class ChobatsuReportsController < ApplicationController
 
   def total_serial_count_for(event, region)
     EventDetail.find_by!(event: event, region: region).total_serial_count
+  end
+
+  def generate_csv(reports)
+    lines = []
+    lines << csv_line(["挙行日", "伝道会名", "超抜霊数", "功徳費合計", "みろく寺分", "聖院還付金", "伝道会還付金", "入力者名"])
+
+    reports.each do |report|
+      lines << csv_line([
+        report.ceremony_date.strftime("%Y/%m/%d"),
+        report.evangelism_meeting.name,
+        report.participant_count,
+        report.calculated_merit_fee_total,
+        report.mirokuji_share,
+        report.region_refund,
+        report.evangelism_meeting_refund,
+        report.user&.name || "未設定"
+      ])
+    end
+
+    lines.join
+  end
+
+  def export_filename(extension)
+    event_token = @selected_event&.id || "event"
+    "gyoko_hokoku_#{event_token}.#{extension}"
+  end
+
+  def csv_line(values)
+    values.map { |value| csv_escape(value) }.join(",") + "\n"
+  end
+
+  def csv_escape(value)
+    text = value.to_s
+    return text unless text.match?(/[",\n]/)
+
+    %("#{text.gsub('"', '""')}")
   end
 end
