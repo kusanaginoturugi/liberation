@@ -1,9 +1,10 @@
 class ChobatsuReportsController < ApplicationController
-  allow_unauthenticated_access only: [:index, :summary]
+  allow_unauthenticated_access only: [:index, :summary, :export]
 
   before_action :load_index_collections, only: [:index]
   before_action :load_summary_collections, only: [:summary]
-  before_action :load_form_collections, only: [:new, :create, :export]
+  before_action :load_form_collections, only: [:new, :create]
+  before_action :load_export_collections, only: [:export]
 
   def index
   end
@@ -22,18 +23,19 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def export
-    @export_reports = @chobatsu_reports.includes(:user).reorder(ceremony_date: :asc, id: :asc)
+    @export_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
+                      .includes(:user)
+                      .reorder(ceremony_date: :asc, id: :asc)
 
     respond_to do |format|
+      format.html do
+        render :export, layout: false
+      end
+
       format.csv do
         send_data generate_csv(@export_reports),
                   filename: export_filename("csv"),
                   type: "text/csv; charset=utf-8"
-      end
-
-      format.pdf do
-        response.headers["Content-Disposition"] = %(inline; filename="#{export_filename("pdf")}")
-        render :export, layout: false
       end
     end
   end
@@ -105,6 +107,18 @@ class ChobatsuReportsController < ApplicationController
     @regions = []
     @events = []
     @summary_reports = ChobatsuReport.none
+  end
+
+  def load_export_collections
+    @regions = Region.order(:name)
+    @events = Event.recent_first
+    @selected_region = selected_region_for_index
+    @selected_event = selected_event_for_index
+  rescue ActiveRecord::RecordNotFound
+    @regions = []
+    @events = []
+    @selected_region = Region.new(name: "未設定")
+    @selected_event = Event.new(name: "未設定")
   end
 
   def reports_for_region_and_event(region_id, event_id)

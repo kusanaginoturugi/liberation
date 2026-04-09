@@ -214,6 +214,27 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, @meeting.name
   end
 
+  test "report page exports printable html for pdf button" do
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 9),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 4,
+      merit_fee_total: 20000
+    )
+
+    get export_chobatsu_reports_path(event_id: @event.id, region_id: @region.id)
+
+    assert_response :success
+    assert_equal "text/html", response.media_type
+    assert_includes response.body, "挙行報告"
+    assert_includes response.body, "window.print()"
+  end
+
   test "overlapping range is rejected in the same event" do
     ChobatsuReport.create!(
       ceremony_date: Date.current,
