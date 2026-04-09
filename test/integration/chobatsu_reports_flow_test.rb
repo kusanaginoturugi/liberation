@@ -106,6 +106,35 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal 20000, ChobatsuReport.last.merit_fee_total
     assert_equal @event, ChobatsuReport.last.event
     assert_equal @region, ChobatsuReport.last.region
+    assert_equal @user, ChobatsuReport.last.user
+  end
+
+  test "summary page shows registered report data" do
+    report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 9),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 4,
+      merit_fee_total: 20000
+    )
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id }
+
+    assert_response :success
+    assert_includes response.body, "超抜集計"
+    assert_includes response.body, "2026/04/09"
+    assert_includes response.body, @meeting.name
+    assert_includes response.body, ">2<"
+    assert_includes response.body, ">20000<"
+    assert_includes response.body, ">13000<"
+    assert_includes response.body, ">3000<"
+    assert_includes response.body, ">4000<"
+    assert_includes response.body, @user.name
+    assert_equal report.user, @user
   end
 
   test "new page shows refund summary fields" do

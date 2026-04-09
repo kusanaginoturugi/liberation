@@ -1,0 +1,70 @@
+<% content_for :title, "超抜集計" %>
+
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Chobatsu Summary</p>
+      <h1>超抜集計</h1>
+    </div>
+  </header>
+
+  <section class="panel region-filter-panel">
+    <%= form_with url: summary_chobatsu_reports_path, method: :get, class: "region-filter-form" do |form| %>
+      <% unless single_region_mode? %>
+        <div class="field">
+          <%= form.label :region_id, "聖院" %>
+          <%= form.collection_select :region_id, @regions, :id, :name, { selected: @selected_region&.id }, { onchange: "this.form.requestSubmit()" } %>
+        </div>
+      <% end %>
+      <div class="field">
+        <%= form.label :event_id, "超抜式" %>
+        <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event&.id }, { onchange: "this.form.requestSubmit()" } %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>登録一覧</h2>
+      <p><%= @summary_reports.size %> 件</p>
+    </div>
+
+    <div class="summary-table-wrapper">
+      <table class="admin-table summary-table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>挙行日</th>
+            <th>伝道会名</th>
+            <th>超抜霊数</th>
+            <th>功徳費合計</th>
+            <th>みろく寺分</th>
+            <th>聖院還付金</th>
+            <th>伝道会還付金</th>
+            <th>入力者名</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @summary_reports.each_with_index do |report, index| %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
+              <td><%= report.evangelism_meeting.name %></td>
+              <td><%= report.participant_count %></td>
+              <td><%= report.calculated_merit_fee_total %></td>
+              <td><%= report.mirokuji_share %></td>
+              <td><%= report.region_refund %></td>
+              <td><%= report.evangelism_meeting_refund %></td>
+              <td><%= report.user&.name || "未設定" %></td>
+            </tr>
+          <% end %>
+          <% if @summary_reports.empty? %>
+            <tr>
+              <td colspan="9" class="summary-empty">該当する超抜報告はありません</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

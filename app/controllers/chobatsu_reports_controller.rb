@@ -1,7 +1,8 @@
 class ChobatsuReportsController < ApplicationController
-  allow_unauthenticated_access only: [:index]
+  allow_unauthenticated_access only: [:index, :summary]
 
   before_action :load_index_collections, only: [:index]
+  before_action :load_summary_collections, only: [:summary]
   before_action :load_form_collections, only: [:new, :create]
 
   def index
@@ -17,8 +18,12 @@ class ChobatsuReportsController < ApplicationController
     )
   end
 
+  def summary
+  end
+
   def create
     @chobatsu_report = ChobatsuReport.new(chobatsu_report_params)
+    @chobatsu_report.user = current_user
 
     if @chobatsu_report.save
       redirect_to root_path, notice: "超抜報告を登録しました"
@@ -68,6 +73,20 @@ class ChobatsuReportsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     @events = []
     @total_serial_count = 0
+  end
+
+  def load_summary_collections
+    @regions = Region.order(:name)
+    @events = Event.recent_first
+    @selected_region = selected_region_for_index
+    @selected_event = selected_event_for_index
+    @summary_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
+                     .includes(:user)
+                     .order(:ceremony_date, :id)
+  rescue ActiveRecord::RecordNotFound
+    @regions = []
+    @events = []
+    @summary_reports = ChobatsuReport.none
   end
 
   def reports_for_region_and_event(region_id, event_id)

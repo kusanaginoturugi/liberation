@@ -294,6 +294,23 @@ body {
   text-align: left;
 }
 
+.summary-table-wrapper {
+  overflow-x: auto;
+}
+
+.summary-table {
+  min-width: 960px;
+}
+
+.summary-table th {
+  white-space: nowrap;
+}
+
+.summary-empty {
+  text-align: center !important;
+  color: var(--muted);
+}
+
 .clickable-row {
   cursor: pointer;
 }

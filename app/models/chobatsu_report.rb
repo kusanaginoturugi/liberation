@@ -1,6 +1,7 @@
 class ChobatsuReport < ApplicationRecord
   belongs_to :region
   belongs_to :event
+  belongs_to :user, optional: true
   belongs_to :evangelism_meeting
 
   before_validation :assign_region_from_meeting

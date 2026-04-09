@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_09_112000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_123000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -23,11 +23,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_112000) do
     t.datetime "updated_at", null: false
     t.integer "region_id", default: 1, null: false
     t.integer "event_id", default: 1, null: false
+    t.integer "user_id"
     t.index ["ceremony_date"], name: "index_chobatsu_reports_on_ceremony_date"
     t.index ["evangelism_meeting_id"], name: "index_chobatsu_reports_on_evangelism_meeting_id"
     t.index ["event_id"], name: "index_chobatsu_reports_on_event_id"
     t.index ["region_id"], name: "index_chobatsu_reports_on_region_id"
     t.index ["serial_number_from", "serial_number_to"], name: "idx_on_serial_number_from_serial_number_to_786d8ec233"
+    t.index ["user_id"], name: "index_chobatsu_reports_on_user_id"
   end
 
   create_table "evangelism_meetings", force: :cascade do |t|
@@ -92,6 +94,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_112000) do
   add_foreign_key "chobatsu_reports", "evangelism_meetings"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "regions"
+  add_foreign_key "chobatsu_reports", "users"
   add_foreign_key "evangelism_meetings", "regions"
   add_foreign_key "event_details", "events"
   add_foreign_key "event_details", "regions"
