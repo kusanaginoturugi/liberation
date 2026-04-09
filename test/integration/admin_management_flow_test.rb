@@ -32,9 +32,27 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get root_path
     assert_includes response.body, "修霊番号一覧"
     assert_not_includes response.body, "聖院一覧"
+    assert_includes response.body, "設定"
     assert_includes response.body, "ユーザー一覧"
     assert_includes response.body, "超抜式一覧"
     assert_includes response.body, "伝道会一覧"
+  end
+
+  test "admin can update settings" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get edit_settings_path
+    assert_response :success
+    assert_includes response.body, "配色のグラデーションを有効にする"
+
+    patch settings_path, params: {
+      settings: {
+        gradient_enabled: "false"
+      }
+    }
+
+    assert_redirected_to edit_settings_path
+    assert_not SystemSetting.gradient_enabled?
   end
 
   test "admin can create user" do
@@ -192,6 +210,9 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     get new_user_path
+    assert_redirected_to root_path
+
+    get edit_settings_path
     assert_redirected_to root_path
   end
 end

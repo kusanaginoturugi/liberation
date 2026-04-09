@@ -1,10 +1,18 @@
 class SystemSetting < ApplicationRecord
   TOTAL_SERIAL_COUNT_KEY = "total_serial_count".freeze
+  GRADIENT_ENABLED_KEY = "gradient_enabled".freeze
 
   validates :key, presence: true, uniqueness: true
   validates :value, presence: true
 
   def self.total_serial_count
     find_by!(key: TOTAL_SERIAL_COUNT_KEY).value.to_i
+  end
+
+  def self.gradient_enabled?
+    setting = find_by(key: GRADIENT_ENABLED_KEY)
+    return true if setting.blank?
+
+    ActiveModel::Type::Boolean.new.cast(setting.value)
   end
 end

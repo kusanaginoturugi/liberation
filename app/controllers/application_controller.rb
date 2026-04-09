@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
 
-  helper_method :current_user, :user_signed_in?, :single_region_mode?
+  helper_method :current_user, :user_signed_in?, :single_region_mode?, :gradient_enabled?
 
   private
 
@@ -44,6 +44,10 @@ class ApplicationController < ActionController::Base
 
   def primary_region_id
     Rails.configuration.x.primary_region_id
+  end
+
+  def gradient_enabled?
+    SystemSetting.gradient_enabled?
   end
 
   def self.allow_unauthenticated_access(only: nil)

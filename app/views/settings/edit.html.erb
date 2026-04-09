@@ -1,0 +1,26 @@
+<% content_for :title, "設定" %>
+
+<div class="page-shell auth-shell">
+  <section class="panel form-panel auth-panel">
+    <h1>設定</h1>
+
+    <% if flash[:notice].present? %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+
+    <%= form_with url: settings_path, method: :patch, scope: :settings, class: "report-form" do |form| %>
+      <div class="field-grid">
+        <div class="field checkbox-field">
+          <label>
+            <%= form.check_box :gradient_enabled, { checked: @gradient_enabled }, "true", "false" %>
+            配色のグラデーションを有効にする
+          </label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "更新する", class: "button-primary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

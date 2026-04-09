@@ -21,7 +21,7 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
   </head>
 
-  <body>
+  <body class="<%= gradient_enabled? ? 'gradient-enabled' : 'gradient-disabled' %>">
     <header class="app-nav">
       <div class="app-nav__inner">
         <% if user_signed_in? %>
@@ -46,6 +46,7 @@
                   <% unless single_region_mode? %>
                     <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
                   <% end %>
+                  <%= link_to "設定", edit_settings_path, class: "nav-dropdown__item" %>
                   <%= link_to "ユーザー一覧", users_path, class: "nav-dropdown__item" %>
                   <%= link_to "超抜式一覧", events_path, class: "nav-dropdown__item" %>
                   <%= link_to "伝道会一覧", evangelism_meetings_path, class: "nav-dropdown__item" %>
