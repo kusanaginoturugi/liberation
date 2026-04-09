@@ -5,6 +5,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     @region = Region.create!(name: "共通")
     @other_region = Region.create!(name: "札幌")
     @event = Event.create!(name: "第1回超抜式")
+    @event_detail = EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
     @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
     @admin = User.create!(
       name: "管理者",
@@ -50,6 +51,23 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to events_path
     assert_equal "第1回春期超抜式", @event.reload.name
+  end
+
+  test "admin can update event detail" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get event_event_details_path(@event)
+    assert_includes response.body, @region.name
+    assert_includes response.body, edit_event_event_detail_path(@event, @event_detail)
+
+    patch event_event_detail_path(@event, @event_detail), params: {
+      event_detail: {
+        total_serial_count: 1800
+      }
+    }
+
+    assert_redirected_to event_event_details_path(@event)
+    assert_equal 1800, @event_detail.reload.total_serial_count
   end
 
   test "admin can still update region directly" do
@@ -105,6 +123,9 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     get events_path
+    assert_redirected_to root_path
+
+    get event_event_details_path(@event)
     assert_redirected_to root_path
   end
 end

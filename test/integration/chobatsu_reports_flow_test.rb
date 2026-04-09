@@ -6,8 +6,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     @region = Region.create!(name: "共通")
     @event = Event.create!(name: "第1回超抜式")
     @next_event = Event.create!(name: "第2回超抜式")
-    EventDetail.create!(event: @event, region: @region, count: 0)
-    EventDetail.create!(event: @next_event, region: @region, count: 0)
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
+    EventDetail.create!(event: @next_event, region: @region, total_serial_count: 1667)
     @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
     @user = User.create!(
       name: "管理者",
@@ -54,7 +54,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
   test "root page switches displayed reports by event in single region mode" do
     other_region = Region.create!(name: "札幌")
-    EventDetail.create!(event: @event, region: other_region, count: 0)
+    EventDetail.create!(event: @event, region: other_region, total_serial_count: 1667)
     other_meeting = EvangelismMeeting.create!(name: "札幌会場", color_code: "#111111", region: other_region)
     ChobatsuReport.create!(
       ceremony_date: Date.current,

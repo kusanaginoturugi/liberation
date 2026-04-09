@@ -1,9 +1,9 @@
-<% content_for :title, "超抜式一覧" %>
+<% content_for :title, "#{@event.name} の聖院別設定" %>
 
 <div class="page-shell">
   <div class="panel">
     <div class="panel-header">
-      <h1>超抜式一覧</h1>
+      <h1><%= @event.name %> の聖院別設定</h1>
     </div>
 
     <% if flash[:notice].present? %>
@@ -13,17 +13,15 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th>超抜式名</th>
-          <th>登録日</th>
-          <th>聖院別設定</th>
+          <th>聖院</th>
+          <th>修霊合計数</th>
         </tr>
       </thead>
       <tbody>
-        <% @events.each do |event| %>
-          <tr class="clickable-row" data-href="<%= edit_event_path(event) %>" tabindex="0" role="link" aria-label="<%= "#{event.name}を編集" %>">
-            <td><%= event.name %></td>
-            <td><%= event.created_at.strftime("%Y/%m/%d") %></td>
-            <td><%= link_to "設定一覧", event_event_details_path(event), class: "text-link", onclick: "event.stopPropagation();" %></td>
+        <% @event_details.each do |event_detail| %>
+          <tr class="clickable-row" data-href="<%= edit_event_event_detail_path(@event, event_detail) %>" tabindex="0" role="link" aria-label="<%= "#{event_detail.region.name} の設定を編集" %>">
+            <td><%= event_detail.region.name %></td>
+            <td><%= event_detail.total_serial_count %></td>
           </tr>
         <% end %>
       </tbody>

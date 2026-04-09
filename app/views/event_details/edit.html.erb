@@ -1,0 +1,41 @@
+<% content_for :title, "#{@event.name} / #{@event_detail.region.name} 設定編集" %>
+
+<div class="page-shell auth-shell">
+  <section class="panel form-panel auth-panel">
+    <h1><%= @event.name %> / <%= @event_detail.region.name %> 設定編集</h1>
+
+    <% if @event_detail.errors.any? %>
+      <div class="flash flash-alert">
+        <strong>更新できませんでした</strong>
+        <ul>
+          <% @event_detail.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: [@event, @event_detail], class: "report-form" do |form| %>
+      <div class="field-grid">
+        <div class="field">
+          <label>超抜式</label>
+          <input type="text" value="<%= @event.name %>" disabled>
+        </div>
+
+        <div class="field">
+          <label>聖院</label>
+          <input type="text" value="<%= @event_detail.region.name %>" disabled>
+        </div>
+
+        <div class="field">
+          <%= form.label :total_serial_count, "修霊合計数" %>
+          <%= form.number_field :total_serial_count, min: 1, required: true, autofocus: true %>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "更新する", class: "button-primary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

@@ -4,7 +4,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
   setup do
     @region = Region.create!(name: "共通")
     @event = Event.create!(name: "第1回超抜式")
-    EventDetail.create!(event: @event, region: @region, count: 0)
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
     @user = User.create!(
       name: "管理者",
       email: "admin@example.com",

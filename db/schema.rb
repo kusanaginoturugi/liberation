@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_09_123000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_133000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -49,9 +49,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_123000) do
   create_table "event_details", force: :cascade do |t|
     t.integer "event_id", null: false
     t.integer "region_id", default: 1, null: false
-    t.integer "count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "total_serial_count", default: 1667, null: false
     t.index ["event_id", "region_id"], name: "index_event_details_on_event_id_and_region_id", unique: true
     t.index ["event_id"], name: "index_event_details_on_event_id"
     t.index ["region_id"], name: "index_event_details_on_region_id"

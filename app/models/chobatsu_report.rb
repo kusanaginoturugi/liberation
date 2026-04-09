@@ -60,12 +60,12 @@ class ChobatsuReport < ApplicationRecord
   def serial_number_range_is_within_total
     return if serial_number_to.blank?
 
-    total_count = SystemSetting.total_serial_count
+    total_count = event_detail_total_serial_count
     return if serial_number_to <= total_count
 
     errors.add(:serial_number_to, "は修霊合計数(#{total_count})以下を入力してください")
   rescue ActiveRecord::RecordNotFound
-    errors.add(:base, "修霊合計数の設定が見つかりません")
+    errors.add(:base, "超抜式ごとの修霊合計数設定が見つかりません")
   end
 
   def serial_number_range_does_not_overlap
@@ -86,5 +86,9 @@ class ChobatsuReport < ApplicationRecord
     return if evangelism_meeting.region_id == region_id
 
     errors.add(:region, "は伝道会の聖院と一致させてください")
+  end
+
+  def event_detail_total_serial_count
+    EventDetail.find_by!(event_id: event_id, region_id: region_id).total_serial_count
   end
 end

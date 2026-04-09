@@ -6,8 +6,8 @@ class ChobatsuReportTest < ActiveSupport::TestCase
     @region = Region.create!(name: "共通")
     @event = Event.create!(name: "第1回超抜式")
     @next_event = Event.create!(name: "第2回超抜式")
-    EventDetail.create!(event: @event, region: @region, count: 0)
-    EventDetail.create!(event: @next_event, region: @region, count: 0)
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
+    EventDetail.create!(event: @next_event, region: @region, total_serial_count: 1667)
     @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
   end
 

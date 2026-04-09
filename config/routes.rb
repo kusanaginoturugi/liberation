@@ -3,7 +3,9 @@ Rails.application.routes.draw do
   resource :session, only: [:new, :create, :destroy]
   resources :users, only: [:new, :create]
   resources :regions, only: [:index, :edit, :update]
-  resources :events, only: [:index, :edit, :update]
+  resources :events, only: [:index, :edit, :update] do
+    resources :event_details, only: [:index, :edit, :update]
+  end
   resources :evangelism_meetings, only: [:index, :edit, :update]
   root "chobatsu_reports#index"
   resources :chobatsu_reports, only: [:index, :new, :create] do

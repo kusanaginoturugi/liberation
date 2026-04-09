@@ -53,7 +53,7 @@ class ChobatsuReportsController < ApplicationController
     region_meetings = @selected_region.evangelism_meetings
     @legend_evangelism_meetings = region_meetings.display_sorted
     @chobatsu_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
-    @total_serial_count = SystemSetting.total_serial_count
+    @total_serial_count = total_serial_count_for(@selected_event, @selected_region)
   rescue ActiveRecord::RecordNotFound
     @regions = []
     @events = []
@@ -69,7 +69,7 @@ class ChobatsuReportsController < ApplicationController
     @evangelism_meetings = region_meetings.active.display_sorted
     @legend_evangelism_meetings = region_meetings.display_sorted
     @chobatsu_reports = reports_for_region_and_event(current_user.region_id, @selected_event.id)
-    @total_serial_count = SystemSetting.total_serial_count
+    @total_serial_count = total_serial_count_for(@selected_event, current_user.region)
   rescue ActiveRecord::RecordNotFound
     @events = []
     @total_serial_count = 0
@@ -118,5 +118,9 @@ class ChobatsuReportsController < ApplicationController
 
   def summary_sort_direction
     params[:direction] == "desc" ? :desc : :asc
+  end
+
+  def total_serial_count_for(event, region)
+    EventDetail.find_by!(event: event, region: region).total_serial_count
   end
 end

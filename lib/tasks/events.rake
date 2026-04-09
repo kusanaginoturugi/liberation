@@ -11,7 +11,7 @@ namespace :events do
 
     Region.order(:id).find_each do |region|
       EventDetail.find_or_create_by!(event: event, region: region) do |detail|
-        detail.count = 0
+        detail.total_serial_count = 1667
       end
     end
 
