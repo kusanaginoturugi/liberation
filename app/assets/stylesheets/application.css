@@ -63,7 +63,9 @@ body.gradient-disabled .nav-dropdown__menu {
 
 body.number-shadow-enabled .setting-card strong,
 body.number-shadow-enabled .usage-count {
-  text-shadow: 0 2px 8px rgba(70, 45, 20, 0.18);
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.85),
+    0 2px 6px rgba(70, 45, 20, 0.1);
 }
 
 body.number-shadow-disabled .setting-card strong,
