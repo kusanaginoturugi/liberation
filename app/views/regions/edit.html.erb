@@ -1,0 +1,31 @@
+<% content_for :title, "聖院編集" %>
+
+<div class="page-shell auth-shell">
+  <section class="panel form-panel auth-panel">
+    <h1>聖院編集</h1>
+
+    <% if @region.errors.any? %>
+      <div class="flash flash-alert">
+        <strong>更新できませんでした</strong>
+        <ul>
+          <% @region.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @region, class: "report-form" do |form| %>
+      <div class="field-grid">
+        <div class="field">
+          <%= form.label :name, "聖院名" %>
+          <%= form.text_field :name, required: true, autofocus: true %>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "更新する", class: "button-primary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

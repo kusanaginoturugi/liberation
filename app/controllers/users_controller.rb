@@ -13,6 +13,7 @@ class UsersController < ApplicationController
     @regions = Region.order(:name)
 
     if @user.save
+      @user.update_column(:admin, true) unless User.where.not(id: @user.id).exists?
       start_session_for(@user)
       redirect_to root_path, notice: "ユーザーを作成しました"
     else

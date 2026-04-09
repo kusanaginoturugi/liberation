@@ -1,0 +1,38 @@
+<% content_for :title, "伝道会一覧" %>
+
+<div class="page-shell">
+  <div class="panel">
+    <div class="panel-header">
+      <h1>伝道会一覧</h1>
+    </div>
+
+    <% if flash[:notice].present? %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>伝道会名</th>
+          <th>聖院</th>
+          <th>色</th>
+          <th>表示順</th>
+          <th>有効</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @evangelism_meetings.each do |meeting| %>
+          <tr>
+            <td><%= meeting.name %></td>
+            <td><%= meeting.region.name %></td>
+            <td><span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span> <%= meeting.color_code %></td>
+            <td><%= meeting.display_order %></td>
+            <td><%= meeting.active? ? "有効" : "無効" %></td>
+            <td><%= link_to "編集", edit_evangelism_meeting_path(meeting), class: "text-link" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -32,6 +32,12 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+  def require_admin!
+    return if current_user&.admin?
+
+    redirect_to root_path, alert: "管理者のみアクセスできます"
+  end
+
   def self.allow_unauthenticated_access(only: nil)
     @allow_unauthenticated_actions = Array(only || action_methods).map(&:to_sym)
   end

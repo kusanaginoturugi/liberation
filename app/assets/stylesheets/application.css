@@ -40,6 +40,12 @@ body {
   align-items: center;
 }
 
+.app-nav__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .app-nav__inner span {
   margin-left: 8px;
   color: var(--muted);
@@ -218,6 +224,8 @@ body {
 }
 
 .button-secondary {
+  display: inline-flex;
+  align-items: center;
   border: 1px solid rgba(115, 97, 73, 0.2);
   border-radius: 12px;
   padding: 10px 16px;
@@ -225,6 +233,36 @@ body {
   color: var(--text);
   font-weight: 700;
   cursor: pointer;
+  text-decoration: none;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(115, 97, 73, 0.12);
+  text-align: left;
+}
+
+.text-link {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.checkbox-field {
+  justify-content: end;
+}
+
+.checkbox-field label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 49px;
 }
 
 .button-primary:hover {

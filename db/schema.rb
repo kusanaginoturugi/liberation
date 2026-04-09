@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_09_090200) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_093000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -62,6 +62,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_090200) do
     t.integer "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "admin", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["region_id"], name: "index_users_on_region_id"
   end

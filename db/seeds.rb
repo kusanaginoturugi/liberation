@@ -29,6 +29,7 @@ end
 User.find_or_initialize_by(email: "admin@example.com").tap do |user|
   user.name = "管理者"
   user.region = default_region
+  user.admin = true
   if user.new_record?
     user.password = "password123"
     user.password_confirmation = "password123"

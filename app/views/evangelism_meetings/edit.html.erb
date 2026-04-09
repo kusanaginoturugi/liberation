@@ -1,0 +1,53 @@
+<% content_for :title, "伝道会編集" %>
+
+<div class="page-shell auth-shell">
+  <section class="panel form-panel auth-panel">
+    <h1>伝道会編集</h1>
+
+    <% if @evangelism_meeting.errors.any? %>
+      <div class="flash flash-alert">
+        <strong>更新できませんでした</strong>
+        <ul>
+          <% @evangelism_meeting.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @evangelism_meeting, class: "report-form" do |form| %>
+      <div class="field-grid">
+        <div class="field">
+          <%= form.label :name, "伝道会名" %>
+          <%= form.text_field :name, required: true, autofocus: true %>
+        </div>
+
+        <div class="field">
+          <%= form.label :region_id, "聖院" %>
+          <%= form.collection_select :region_id, @regions, :id, :name, {}, { required: true } %>
+        </div>
+
+        <div class="field">
+          <%= form.label :color_code, "カラーコード" %>
+          <%= form.text_field :color_code, required: true %>
+        </div>
+
+        <div class="field">
+          <%= form.label :display_order, "表示順" %>
+          <%= form.number_field :display_order, min: 1 %>
+        </div>
+
+        <div class="field checkbox-field">
+          <label>
+            <%= form.check_box :active %>
+            有効
+          </label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "更新する", class: "button-primary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

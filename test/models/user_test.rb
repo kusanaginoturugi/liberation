@@ -11,10 +11,12 @@ class UserTest < ActiveSupport::TestCase
       email: " ADMIN@EXAMPLE.COM ",
       password: "password123",
       password_confirmation: "password123",
-      region: @region
+      region: @region,
+      admin: true
     )
 
     assert_equal "admin@example.com", user.email
     assert user.authenticate("password123")
+    assert user.admin?
   end
 end
