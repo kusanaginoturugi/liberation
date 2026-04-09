@@ -58,11 +58,6 @@
             <%= form.collection_select :event_id, @events, :id, :name, { prompt: false, selected: @chobatsu_report.event_id || @selected_event&.id } %>
           </div>
 
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:assistant_name].any? %>">
-            <%= form.label :assistant_name, "超抜点伝師名" %>
-            <%= form.text_field :assistant_name %>
-          </div>
-
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
             <%= form.label :participant_count, "超抜人数" %>
             <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, data: { calc_target: "participant", action: "input->report-form#update" } %>
@@ -96,6 +91,21 @@
             <span class="field-label">功徳費合計</span>
             <div class="usage-count" data-calc-target="meritOutput"><%= @chobatsu_report.calculated_merit_fee_total %></div>
           </div>
+
+          <div class="field usage-field">
+            <span class="field-label">みろく寺分</span>
+            <div class="usage-count" data-calc-target="mirokujiOutput"><%= @chobatsu_report.mirokuji_share %></div>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">聖院還付金</span>
+            <div class="usage-count" data-calc-target="regionRefundOutput"><%= @chobatsu_report.region_refund %></div>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">伝道会還付金</span>
+            <div class="usage-count" data-calc-target="meetingRefundOutput"><%= @chobatsu_report.evangelism_meeting_refund %></div>
+          </div>
         </div>
 
         <div class="actions">
@@ -118,11 +128,15 @@
     const toField = document.querySelector("[data-calc-target='to']");
     const usageOutput = document.querySelector("[data-calc-target='usageOutput']");
     const meritOutput = document.querySelector("[data-calc-target='meritOutput']");
+    const mirokujiOutput = document.querySelector("[data-calc-target='mirokujiOutput']");
+    const regionRefundOutput = document.querySelector("[data-calc-target='regionRefundOutput']");
+    const meetingRefundOutput = document.querySelector("[data-calc-target='meetingRefundOutput']");
 
     const updateTotals = () => {
       const fromValue = Number.parseInt(fromField.value, 10);
       const toValue = Number.parseInt(toField.value, 10);
       let usageCount = 0;
+      let meritTotal = 0;
 
       if (usageOutput) {
         if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
@@ -134,7 +148,20 @@
       }
 
       if (meritOutput) {
-        meritOutput.textContent = String(usageCount * 5000);
+        meritTotal = usageCount * 5000;
+        meritOutput.textContent = String(meritTotal);
+      }
+
+      if (mirokujiOutput) {
+        mirokujiOutput.textContent = String(Math.floor(meritTotal * 0.65));
+      }
+
+      if (regionRefundOutput) {
+        regionRefundOutput.textContent = String(Math.floor(meritTotal * 0.15));
+      }
+
+      if (meetingRefundOutput) {
+        meetingRefundOutput.textContent = String(Math.floor(meritTotal * 0.20));
       }
     };
 

@@ -34,7 +34,6 @@ class ChobatsuReportsController < ApplicationController
       :ceremony_date,
       :event_id,
       :evangelism_meeting_id,
-      :assistant_name,
       :participant_count,
       :serial_number_from,
       :serial_number_to

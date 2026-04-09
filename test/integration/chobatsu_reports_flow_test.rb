@@ -28,7 +28,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       evangelism_meeting: @meeting,
-      assistant_name: "既存",
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 3,
@@ -62,7 +61,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: other_region,
       event: @event,
       evangelism_meeting: other_meeting,
-      assistant_name: "札幌担当",
       participant_count: 1,
       serial_number_from: 50,
       serial_number_to: 50,
@@ -73,7 +71,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @next_event,
       evangelism_meeting: @meeting,
-      assistant_name: "次回担当",
       participant_count: 1,
       serial_number_from: 88,
       serial_number_to: 88,
@@ -96,7 +93,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
           ceremony_date: Date.current,
           event_id: @event.id,
           evangelism_meeting_id: @meeting.id,
-          assistant_name: "山田",
           participant_count: 4,
           serial_number_from: 1,
           serial_number_to: 4
@@ -112,13 +108,21 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal @region, ChobatsuReport.last.region
   end
 
+  test "new page shows refund summary fields" do
+    get new_chobatsu_report_path
+
+    assert_response :success
+    assert_includes response.body, "みろく寺分"
+    assert_includes response.body, "聖院還付金"
+    assert_includes response.body, "伝道会還付金"
+  end
+
   test "overlapping range is rejected in the same event" do
     ChobatsuReport.create!(
       ceremony_date: Date.current,
       region: @region,
       event: @event,
       evangelism_meeting: @meeting,
-      assistant_name: "既存",
       participant_count: 2,
       serial_number_from: 10,
       serial_number_to: 12,
@@ -131,7 +135,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
           ceremony_date: Date.current,
           event_id: @event.id,
           evangelism_meeting_id: @meeting.id,
-          assistant_name: "新規",
           participant_count: 1,
           serial_number_from: 12,
           serial_number_to: 15
@@ -149,7 +152,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       evangelism_meeting: @meeting,
-      assistant_name: "既存",
       participant_count: 2,
       serial_number_from: 10,
       serial_number_to: 12,
@@ -162,7 +164,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
           ceremony_date: Date.current,
           event_id: @next_event.id,
           evangelism_meeting_id: @meeting.id,
-          assistant_name: "次回",
           participant_count: 1,
           serial_number_from: 10,
           serial_number_to: 12
@@ -179,8 +180,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
         chobatsu_report: {
           ceremony_date: Date.current,
           event_id: @event.id,
-          evangelism_meeting_id: @meeting.id,
-          assistant_name: "未入力"
+          evangelism_meeting_id: @meeting.id
         }
       }
     end

@@ -6,7 +6,7 @@ class ChobatsuReport < ApplicationRecord
   before_validation :assign_region_from_meeting
   before_validation :assign_merit_fee_total
 
-  validates :ceremony_date, :assistant_name, :participant_count, :serial_number_from, :serial_number_to, presence: true
+  validates :ceremony_date, :participant_count, :serial_number_from, :serial_number_to, presence: true
   validates :participant_count, :merit_fee_total,
             numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
   validates :serial_number_from, :serial_number_to,
@@ -25,6 +25,18 @@ class ChobatsuReport < ApplicationRecord
 
   def calculated_merit_fee_total
     usage_count * 5000
+  end
+
+  def mirokuji_share
+    (calculated_merit_fee_total * 0.65).to_i
+  end
+
+  def region_refund
+    (calculated_merit_fee_total * 0.15).to_i
+  end
+
+  def evangelism_meeting_refund
+    (calculated_merit_fee_total * 0.20).to_i
   end
 
   private
