@@ -3,7 +3,9 @@ class UsersController < ApplicationController
 
   before_action :require_admin!, only: [:index]
   before_action :ensure_user_creation_allowed!, only: [:new, :create]
-  before_action :load_regions, only: [:new, :create]
+  before_action :set_user, only: [:edit, :update]
+  before_action :authorize_user_edit!, only: [:edit, :update]
+  before_action :load_regions, only: [:new, :create, :edit, :update]
 
   def index
     @users = User.includes(:region).order(:id)
@@ -11,6 +13,9 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
+  end
+
+  def edit
   end
 
   def create
@@ -29,12 +34,49 @@ class UsersController < ApplicationController
     end
   end
 
+  def update
+    if @user.update(user_update_params)
+      if @user == current_user
+        redirect_to root_path, notice: "プロフィールを更新しました"
+      else
+        redirect_to users_path, notice: "ユーザーを更新しました"
+      end
+    else
+      render :edit, status: :unprocessable_content
+    end
+  end
+
   private
+
+  def set_user
+    @user = User.find(params[:id])
+  end
+
+  def authorize_user_edit!
+    return if current_user&.admin?
+    return if @user == current_user
+
+    redirect_to root_path, alert: "編集権限がありません"
+  end
 
   def user_params
     permitted = [:email, :password, :password_confirmation, :name, :region_id]
     permitted << :admin if current_user&.admin?
     params.require(:user).permit(*permitted)
+  end
+
+  def user_update_params
+    permitted = [:email, :name, :password, :password_confirmation]
+    if current_user&.admin?
+      permitted << :region_id
+      permitted << :admin unless @user == current_user
+    end
+    attrs = params.require(:user).permit(*permitted)
+    if attrs[:password].blank?
+      attrs.delete(:password)
+      attrs.delete(:password_confirmation)
+    end
+    attrs
   end
 
   def ensure_user_creation_allowed!

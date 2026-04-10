@@ -135,6 +135,25 @@ body.number-shadow-disabled .serial-grid td {
   color: var(--muted);
 }
 
+.nav-user-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  display: inline-block;
+}
+
+.nav-user-link:hover {
+  background: rgba(141, 90, 47, 0.08);
+}
+
+.field-hint {
+  margin: 4px 0 0;
+  font-size: 0.8em;
+  color: var(--muted);
+}
+
 .page-shell {
   width: min(1280px, calc(100% - 32px));
   margin: 32px auto 48px;

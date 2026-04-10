@@ -25,10 +25,10 @@
     <header class="app-nav">
       <div class="app-nav__inner">
         <% if user_signed_in? %>
-          <div>
+          <%= link_to edit_user_path(current_user), class: "nav-user-link" do %>
             <strong><%= current_user.name %></strong>
             <span><%= current_user.region.name %></span>
-          </div>
+          <% end %>
         <% else %>
           <div>
             <strong>Liberation</strong>

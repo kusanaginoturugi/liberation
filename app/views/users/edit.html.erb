@@ -1,0 +1,68 @@
+<% editing_self = @user == current_user %>
+<% content_for :title, editing_self ? "プロフィール編集" : "ユーザー編集" %>
+
+<div class="page-shell auth-shell">
+  <section class="panel form-panel auth-panel">
+    <h1><%= editing_self ? "プロフィール編集" : "ユーザー編集" %></h1>
+    <% unless editing_self %>
+      <p style="color: var(--muted); margin: 0 0 16px;"><%= @user.name %> (<%= @user.email %>)</p>
+    <% end %>
+
+    <% if @user.errors.any? %>
+      <div class="flash flash-alert">
+        <strong>更新できませんでした</strong>
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, class: "report-form" do |form| %>
+      <div class="field-grid">
+        <div class="field">
+          <%= form.label :name, "名前" %>
+          <%= form.text_field :name, required: true %>
+        </div>
+
+        <div class="field">
+          <%= form.label :email, "メールアドレス" %>
+          <%= form.email_field :email, required: true %>
+        </div>
+
+        <% if current_user.admin? %>
+          <div class="field">
+            <%= form.label :region_id, "聖院" %>
+            <%= form.collection_select :region_id, @regions, :id, :name, { prompt: "選択してください" }, { required: true } %>
+          </div>
+
+          <% unless editing_self %>
+            <div class="field checkbox-field">
+              <label>
+                <%= form.check_box :admin %>
+                管理者
+              </label>
+            </div>
+          <% end %>
+        <% end %>
+
+        <div class="field">
+          <%= form.label :password, "新しいパスワード" %>
+          <%= form.password_field :password, autocomplete: "new-password" %>
+          <p class="field-hint">変更しない場合は空欄のままにしてください</p>
+        </div>
+
+        <div class="field">
+          <%= form.label :password_confirmation, "パスワード確認" %>
+          <%= form.password_field :password_confirmation, autocomplete: "new-password" %>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "更新する", class: "button-primary" %>
+        <%= link_to "キャンセル", editing_self ? root_path : users_path, class: "button-secondary" %>
+      </div>
+    <% end %>
+  </section>
+</div>
