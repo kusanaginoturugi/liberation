@@ -23,7 +23,6 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       admin: false
     )
-    SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
   end
 
   test "admin sees only meeting management link in single region mode" do

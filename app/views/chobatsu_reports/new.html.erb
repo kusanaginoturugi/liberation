@@ -117,10 +117,6 @@
             <div class="usage-count" data-calc-target="regionRefundOutput"><%= @chobatsu_report.region_refund %></div>
           </div>
 
-          <div class="field usage-field">
-            <span class="field-label">伝道会還付金</span>
-            <div class="usage-count" data-calc-target="meetingRefundOutput"><%= @chobatsu_report.evangelism_meeting_refund %></div>
-          </div>
         </div>
 
         <div class="actions">
@@ -145,7 +141,6 @@
     const meritOutput = document.querySelector("[data-calc-target='meritOutput']");
     const mirokujiOutput = document.querySelector("[data-calc-target='mirokujiOutput']");
     const regionRefundOutput = document.querySelector("[data-calc-target='regionRefundOutput']");
-    const meetingRefundOutput = document.querySelector("[data-calc-target='meetingRefundOutput']");
 
     const updateTotals = () => {
       const fromValue = Number.parseInt(fromField.value, 10);
@@ -173,10 +168,6 @@
 
       if (regionRefundOutput) {
         regionRefundOutput.textContent = String(Math.floor(meritTotal * 0.15));
-      }
-
-      if (meetingRefundOutput) {
-        meetingRefundOutput.textContent = String(Math.floor(meritTotal * 0.20));
       }
     };
 

@@ -36,10 +36,6 @@ class ChobatsuReport < ApplicationRecord
     (calculated_merit_fee_total * 0.15).to_i
   end
 
-  def evangelism_meeting_refund
-    (calculated_merit_fee_total * 0.20).to_i
-  end
-
   private
 
   def assign_region_from_meeting

@@ -28,11 +28,6 @@ Region.order(:id).find_each do |region|
   end
 end
 
-SystemSetting.find_or_initialize_by(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY).tap do |setting|
-  setting.value = "1667"
-  setting.save!
-end
-
 SystemSetting.find_or_initialize_by(key: SystemSetting::GRADIENT_ENABLED_KEY).tap do |setting|
   setting.value = "true"
   setting.save!

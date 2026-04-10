@@ -2,7 +2,6 @@ require "test_helper"
 
 class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
   setup do
-    SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
     @region = Region.create!(name: "共通")
     @event = Event.create!(name: "第1回超抜式")
     @next_event = Event.create!(name: "第2回超抜式")
@@ -134,7 +133,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">20,000<"
     assert_includes response.body, ">13,000<"
     assert_includes response.body, ">3,000<"
-    assert_includes response.body, ">4,000<"
     assert_includes response.body, @user.name
     assert_equal report.user, @user
   end
@@ -189,7 +187,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "PDF出力"
     assert_includes response.body, "みろく寺分"
     assert_includes response.body, "聖院還付金"
-    assert_includes response.body, "伝道会還付金"
   end
 
   test "report page exports csv" do

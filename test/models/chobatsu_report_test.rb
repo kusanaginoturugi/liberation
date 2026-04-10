@@ -2,7 +2,6 @@ require "test_helper"
 
 class ChobatsuReportTest < ActiveSupport::TestCase
   setup do
-    SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
     @region = Region.create!(name: "共通")
     @event = Event.create!(name: "第1回超抜式")
     @next_event = Event.create!(name: "第2回超抜式")
@@ -40,23 +39,6 @@ class ChobatsuReportTest < ActiveSupport::TestCase
 
     assert_equal 30000, report.merit_fee_total
     assert_equal 30000, report.calculated_merit_fee_total
-  end
-
-  test "refund amounts are calculated from merit_fee_total" do
-    report = ChobatsuReport.create!(
-      ceremony_date: Date.current,
-      event: @event,
-      region: @region,
-      evangelism_meeting: @meeting,
-      participant_count: 3,
-      serial_number_from: 10,
-      serial_number_to: 15,
-      merit_fee_total: 1
-    )
-
-    assert_equal 19500, report.mirokuji_share
-    assert_equal 4500, report.region_refund
-    assert_equal 6000, report.evangelism_meeting_refund
   end
 
   test "participant_count and serial range are required" do

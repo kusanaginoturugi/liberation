@@ -13,7 +13,6 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
       region: @region
     )
     EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
-    SystemSetting.create!(key: SystemSetting::TOTAL_SERIAL_COUNT_KEY, value: "1667")
   end
 
   test "unauthenticated users can view root page" do
