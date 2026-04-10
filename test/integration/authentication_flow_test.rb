@@ -21,8 +21,8 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, "第1回超抜式"
+    assert_includes response.body, "対象聖院"
     assert_includes response.body, "ログイン"
-    assert_not_includes response.body, "聖院"
     assert_not_includes response.body, "挙行報告"
   end
 

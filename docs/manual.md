@@ -8,7 +8,7 @@
 
 - メールアドレス: `admin@example.com`
 - パスワード: `password123`
-- 聖院: `共通`
+- 聖院: `聖明王院`
 - 権限: 管理者
 
 ### 初期ユーザーの作成
@@ -44,11 +44,14 @@ bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!
 
 管理者でログインすると、画面上部に以下のメニューが表示されます。
 
+- `設定`
+- `ユーザー一覧`
+- `超抜式一覧`
 - `伝道会一覧`
 - `ログアウト`
 
 現在は単一聖院モードで運用しているため、`聖院一覧` メニューは非表示です。
-`伝道会一覧` は管理者のみアクセスできます。
+上記メニューは管理者のみアクセスできます。
 
 ### 単一聖院モードについて
 
@@ -57,6 +60,8 @@ bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!
 - `regions` テーブルや管理画面の実装自体は残してあります
 - 将来複数聖院運用に戻す場合は、`config/initializers/app_features.rb` の `single_region_mode` を `false` に変更してください
 - あわせて `primary_region_id` は既定聖院として使われます
+- ただし、単一聖院モードから複数聖院モードへの切り替えは設定変更だけで完了する想定ではありません
+- 画面導線、運用手順、既存データの前提を見直すため、システム更新を前提に対応してください
 
 ## 聖院一覧と編集
 
@@ -66,6 +71,9 @@ bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!
 - 一覧には `聖院名` と `登録伝道会数` が表示されます
 - 編集リンクはありません
 - 行をクリックすると編集画面へ移動します
+
+現在の単一聖院モードではメニュー自体を隠しています。
+将来複数聖院運用へ戻したときに使う想定です。
 
 ### 編集画面
 
@@ -106,42 +114,55 @@ bin/rails runner 'user = User.find_by!(email: "admin@example.com"); user.update!
 
 ## 修霊合計数の変更
 
-修霊合計数は `system_settings` テーブルの `total_serial_count` で管理しています。
-変更すると、超抜報告画面の使用修霊番号グリッドの表示件数も変わります。
+修霊合計数は超抜式ごとに管理します。
+現在の単一聖院モードでは、実質的に「超抜式ごとに 1 つの修霊合計数」を持つ運用です。
+内部的には `event_details.total_serial_count` を使っています。
 
-### 変更コマンド
+### 変更手順
 
-```bash
-bin/rails 'settings:set_total_serial_count[1700]'
-```
-
-`1700` の部分を変更したい件数に置き換えてください。
-
-### 実行例
-
-```bash
-bin/rails 'settings:set_total_serial_count[1800]'
-```
-
-成功すると以下のように表示されます。
-
-```text
-Updated total_serial_count to 1800
-```
-
-### 反映確認
-
-現在値を確認するには次を実行します。
-
-```bash
-bin/rails runner 'puts SystemSetting.total_serial_count'
-```
+1. 管理メニューの `超抜式一覧` を開きます
+2. 対象の超抜式をクリックします
+3. `修霊合計数` を更新します
+4. 保存後、`修霊番号一覧` と `挙行報告` に反映されます
 
 ### 注意事項
 
-- 0 以下の値は設定できません
-- コマンド実行後は画面を再読み込みして表示を確認してください
-- 本番環境で実行する場合は、対象環境のアプリケーションディレクトリで実行してください
+- `修霊合計数` は 1 以上の半角数字で入力してください
+- 単一聖院モードでも、内部には `event_details` のレコードを持っています
+- 将来複数聖院運用へ戻した場合は、超抜式ごとに聖院別設定画面を使います
+
+## 超抜式の運用
+
+### 開催中の扱い
+
+- `開催中` の超抜式は常に 1 件だけです
+- ある超抜式を `開催中` にすると、他の超抜式は自動で `終了` になります
+- `開催中` が 0 件になる更新はできません
+
+### 挙行報告との関係
+
+- `挙行報告` 画面では超抜式を選択しません
+- その時点の `開催中` の超抜式が自動で使われます
+- 画面上部に `対象超抜式` が表示されます
+
+### 過去分の確認
+
+- `修霊番号一覧` では `超抜式` を切り替えて過去分を確認できます
+- `挙行一覧` は現在の対象超抜式を見出しに表示します
+
+## CSV 出力
+
+画面上部の `CSV出力` メニューから、以下の形式を選べます。
+
+- `UTF-8`
+- `UTF-8(BOM)`
+- `SJIS`
+
+### 使い分け
+
+- 通常は `UTF-8`
+- Excel for Windows で文字化けする場合は `UTF-8(BOM)`
+- さらに互換性を優先する場合は `SJIS`
 
 ## 伝道会マスタの差し替え
 
@@ -158,7 +179,7 @@ bin/rails runner 'puts SystemSetting.total_serial_count'
 ```yml
 meetings:
   - name: 大江戸
-    region_name: 共通
+    region_name: 聖明王院
     color_code: "#C8C4C1"
     display_order: 10
     active: true
@@ -193,7 +214,7 @@ Synced 9 evangelism meetings from config/meetings.yml
 ```yml
 meetings:
   - name: 大江戸
-    region_name: 共通
+    region_name: 聖明王院
     color_code: "#C8C4C1"
     display_order: 10
     active: true
@@ -216,7 +237,7 @@ bin/rails 'meetings:sync[config/meetings.yml]'
 
 ```yml
 - name: 山梨
-  region_name: 共通
+  region_name: 聖明王院
   color_code: "#C2B0D9"
   display_order: 90
   active: false
