@@ -26,7 +26,7 @@
       <div class="app-nav__inner">
         <% if user_signed_in? %>
           <%= link_to edit_user_path(current_user), class: "nav-user-link" do %>
-            <strong><%= current_user.name %></strong>
+            <strong><%= current_user.name %><%= "（管理者）" if current_user.admin? %></strong>
             <span><%= current_user.region.name %></span>
           <% end %>
         <% else %>
@@ -43,7 +43,9 @@
               <details class="nav-dropdown">
                 <summary class="button-secondary nav-dropdown__summary">管理</summary>
                 <div class="nav-dropdown__menu">
-                  <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
+                  <% unless single_region_mode? %>
+                    <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
+                  <% end %>
                   <%= link_to "設定", edit_settings_path, class: "nav-dropdown__item" %>
                   <%= link_to "ユーザー一覧", users_path, class: "nav-dropdown__item" %>
                   <%= link_to "超抜式一覧", events_path, class: "nav-dropdown__item" %>

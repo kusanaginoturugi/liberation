@@ -30,7 +30,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_includes response.body, "修霊番号一覧"
-    assert_includes response.body, "聖院一覧"
+    assert_not_includes response.body, "聖院一覧"
     assert_includes response.body, "設定"
     assert_includes response.body, "ユーザー一覧"
     assert_includes response.body, "超抜式一覧"
