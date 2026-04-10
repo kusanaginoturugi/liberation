@@ -37,9 +37,9 @@ class ChobatsuReportsController < ApplicationController
       end
 
       format.csv do
-        send_data generate_csv(@export_reports),
+        send_data csv_data_for_export(@export_reports),
                   filename: export_filename("csv"),
-                  type: "text/csv; charset=utf-8"
+                  type: "text/csv; charset=#{csv_charset}"
       end
     end
   end
@@ -241,6 +241,30 @@ class ChobatsuReportsController < ApplicationController
     end
 
     lines.join
+  end
+
+  def csv_data_for_export(reports)
+    csv = generate_csv(reports)
+
+    case csv_encoding
+    when "utf8_bom"
+      "\uFEFF" + csv
+    when "sjis"
+      csv.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "?")
+    else
+      csv
+    end
+  end
+
+  def csv_encoding
+    value = params[:encoding].to_s
+    return value if %w[utf8 utf8_bom sjis].include?(value)
+
+    "utf8"
+  end
+
+  def csv_charset
+    csv_encoding == "sjis" ? "windows-31j" : "utf-8"
   end
 
   def export_filename(extension)

@@ -36,12 +36,10 @@
           <%= form.collection_select :region_id, @regions, :id, :name, { selected: @selected_region&.id }, { onchange: "this.form.requestSubmit()" } %>
         </div>
       <% end %>
-      <% unless single_region_mode? %>
-        <div class="field">
-          <%= form.label :event_id, "超抜式" %>
-          <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event&.id }, { onchange: "this.form.requestSubmit()" } %>
-        </div>
-      <% end %>
+      <div class="field">
+        <%= form.label :event_id, "超抜式" %>
+        <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event&.id }, { onchange: "this.form.requestSubmit()" } %>
+      </div>
     <% end %>
   </section>
 

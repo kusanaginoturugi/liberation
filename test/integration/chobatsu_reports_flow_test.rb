@@ -51,7 +51,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">1664<"
     assert_not_includes response.body, "札幌会場"
     assert_not_includes response.body, "<label for=\"region_id\">聖院</label>"
-    assert_not_includes response.body, "<label for=\"event_id\">超抜式</label>"
+    assert_includes response.body, "<label for=\"event_id\">超抜式</label>"
   end
 
   test "root page switches displayed reports by event in single region mode" do
@@ -132,6 +132,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "対象超抜式"
     assert_includes response.body, @event.name
     assert_includes response.body, "CSV出力"
+    assert_includes response.body, "UTF-8(BOM)"
+    assert_includes response.body, "SJIS"
     assert_includes response.body, "PDF出力"
     assert_includes response.body, "2026/04/09"
     assert_includes response.body, @meeting.name
@@ -190,6 +192,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "CSV出力"
+    assert_includes response.body, "UTF-8(BOM)"
+    assert_includes response.body, "SJIS"
     assert_includes response.body, "PDF出力"
     assert_includes response.body, "対象超抜式"
     assert_includes response.body, @next_event.name
@@ -223,13 +227,53 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       merit_fee_total: 20000
     )
 
-    get export_chobatsu_reports_path(format: :csv, event_id: @event.id)
+    get export_chobatsu_reports_path(format: :csv, event_id: @event.id, encoding: :utf8)
 
     assert_response :success
     assert_equal "text/csv", response.media_type
     assert_includes response.body, "挙行日,伝道会名,超抜霊数"
     assert_includes response.body, "2026/04/09"
     assert_includes response.body, @meeting.name
+  end
+
+  test "report page exports csv with utf-8 bom" do
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 9),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 4,
+      merit_fee_total: 20000
+    )
+
+    get export_chobatsu_reports_path(format: :csv, event_id: @event.id, encoding: :utf8_bom)
+
+    assert_response :success
+    assert_equal "text/csv", response.media_type
+    assert response.body.start_with?("\uFEFF")
+  end
+
+  test "report page exports csv with sjis" do
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 9),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 4,
+      merit_fee_total: 20000
+    )
+
+    get export_chobatsu_reports_path(format: :csv, event_id: @event.id, encoding: :sjis)
+
+    assert_response :success
+    assert_equal "text/csv", response.media_type
+    assert_equal Encoding::Windows_31J, response.body.encoding
   end
 
   test "report page exports printable html for pdf button" do

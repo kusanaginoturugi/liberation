@@ -8,7 +8,14 @@
       <p class="page-context">対象超抜式: <strong><%= @selected_event.name %></strong></p>
     </div>
     <div class="page-header-actions">
-      <%= link_to "CSV出力", export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id, region_id: current_user.region_id), class: "button-secondary compact-button" %>
+      <details class="nav-dropdown">
+        <summary class="button-secondary nav-dropdown__summary">CSV出力</summary>
+        <div class="nav-dropdown__menu">
+          <%= link_to "UTF-8", export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id, region_id: current_user.region_id, encoding: :utf8), class: "nav-dropdown__item" %>
+          <%= link_to "UTF-8(BOM)", export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id, region_id: current_user.region_id, encoding: :utf8_bom), class: "nav-dropdown__item" %>
+          <%= link_to "SJIS", export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id, region_id: current_user.region_id, encoding: :sjis), class: "nav-dropdown__item" %>
+        </div>
+      </details>
       <%= link_to "PDF出力", export_chobatsu_reports_path(event_id: @selected_event&.id, region_id: current_user.region_id), class: "button-secondary compact-button", target: "_blank", rel: "noopener" %>
       <div class="setting-card">
         <span>修霊合計数</span>
