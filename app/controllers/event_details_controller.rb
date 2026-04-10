@@ -1,6 +1,7 @@
 class EventDetailsController < ApplicationController
   before_action :require_admin!
   before_action :set_event
+  before_action :ensure_event_details!
   before_action :set_event_detail, only: [:edit, :update]
 
   def index
@@ -26,6 +27,14 @@ class EventDetailsController < ApplicationController
 
   def set_event_detail
     @event_detail = @event.event_details.find(params[:id])
+  end
+
+  def ensure_event_details!
+    Region.order(:id).find_each do |region|
+      EventDetail.find_or_create_by!(event: @event, region: region) do |detail|
+        detail.total_serial_count = EventDetail::DEFAULT_TOTAL_SERIAL_COUNT
+      end
+    end
   end
 
   def event_detail_params

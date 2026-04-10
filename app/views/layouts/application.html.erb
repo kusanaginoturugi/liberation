@@ -43,9 +43,7 @@
               <details class="nav-dropdown">
                 <summary class="button-secondary nav-dropdown__summary">管理</summary>
                 <div class="nav-dropdown__menu">
-                  <% unless single_region_mode? %>
-                    <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
-                  <% end %>
+                  <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
                   <%= link_to "設定", edit_settings_path, class: "nav-dropdown__item" %>
                   <%= link_to "ユーザー一覧", users_path, class: "nav-dropdown__item" %>
                   <%= link_to "超抜式一覧", events_path, class: "nav-dropdown__item" %>
@@ -62,5 +60,51 @@
       </div>
     </header>
     <%= yield %>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const normalizeNumericValue = (value) =>
+          value
+            .replace(/[０-９]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xFEE0))
+            .replace(/\D/g, "");
+
+        const numericOnlyField = (target) => {
+          if (!(target instanceof HTMLInputElement)) return null;
+          if (target.dataset.numericOnly !== "true") return null;
+
+          return target;
+        };
+
+        const sanitizeNumericField = (field) => {
+          const normalizedValue = normalizeNumericValue(field.value);
+          if (field.value !== normalizedValue) {
+            field.value = normalizedValue;
+          }
+        };
+
+        document.addEventListener("compositionstart", (event) => {
+          const field = numericOnlyField(event.target);
+          if (!field) return;
+
+          field.dataset.composing = "true";
+        });
+
+        document.addEventListener("compositionend", (event) => {
+          const field = numericOnlyField(event.target);
+          if (!field) return;
+
+          delete field.dataset.composing;
+          sanitizeNumericField(field);
+        });
+
+        document.addEventListener("input", (event) => {
+          const field = numericOnlyField(event.target);
+          if (!field) return;
+          if (field.dataset.composing === "true") return;
+
+          sanitizeNumericField(field);
+        });
+      });
+    </script>
   </body>
 </html>

@@ -37,7 +37,7 @@
 
         <div class="field">
           <%= form.label :display_order, "表示順" %>
-          <%= form.number_field :display_order, min: 1 %>
+          <%= form.number_field :display_order, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
         </div>
 
         <div class="field checkbox-field">

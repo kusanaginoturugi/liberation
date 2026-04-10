@@ -90,7 +90,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          event_id: @event.id,
           evangelism_meeting_id: @meeting.id,
           participant_count: 4,
           serial_number_from: 1,
@@ -103,7 +102,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_includes response.body, "登録しました"
     assert_equal 20000, ChobatsuReport.last.merit_fee_total
-    assert_equal @event, ChobatsuReport.last.event
+    assert_equal @next_event, ChobatsuReport.last.event
     assert_equal @region, ChobatsuReport.last.region
     assert_equal @user, ChobatsuReport.last.user
   end
@@ -185,8 +184,23 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "CSV出力"
     assert_includes response.body, "PDF出力"
+    assert_includes response.body, "対象超抜式"
+    assert_includes response.body, @next_event.name
     assert_includes response.body, "みろく寺分"
     assert_includes response.body, "聖院還付金"
+    assert_not_includes response.body, 'name="chobatsu_report[event_id]"'
+  end
+
+  test "new page recreates missing event detail and keeps numeric max usable" do
+    EventDetail.delete_all
+    primary_region = Region.find(Rails.configuration.x.primary_region_id)
+
+    get new_chobatsu_report_path
+
+    assert_response :success
+    assert_includes response.body, 'name="chobatsu_report[serial_number_from]"'
+    assert_includes response.body, 'max="1667"'
+    assert_equal 1, EventDetail.where(event: @next_event, region: primary_region).count
   end
 
   test "report page exports csv" do
@@ -236,7 +250,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     ChobatsuReport.create!(
       ceremony_date: Date.current,
       region: @region,
-      event: @event,
+      event: @next_event,
       evangelism_meeting: @meeting,
       participant_count: 2,
       serial_number_from: 10,
@@ -248,7 +262,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          event_id: @event.id,
           evangelism_meeting_id: @meeting.id,
           participant_count: 1,
           serial_number_from: 12,
@@ -277,7 +290,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          event_id: @next_event.id,
           evangelism_meeting_id: @meeting.id,
           participant_count: 1,
           serial_number_from: 10,
@@ -294,7 +306,6 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          event_id: @event.id,
           evangelism_meeting_id: @meeting.id
         }
       }

@@ -30,7 +30,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_includes response.body, "修霊番号一覧"
-    assert_not_includes response.body, "聖院一覧"
+    assert_includes response.body, "聖院一覧"
     assert_includes response.body, "設定"
     assert_includes response.body, "ユーザー一覧"
     assert_includes response.body, "超抜式一覧"
@@ -135,18 +135,28 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   test "admin can update event" do
     post session_path, params: { email: @admin.email, password: "password123" }
 
+    other_event = Event.create!(name: "別超抜式", closed: true)
+    EventDetail.create!(event: other_event, region: @region, total_serial_count: 1667)
+
     get events_path
     assert_includes response.body, @event.name
     assert_includes response.body, edit_event_path(@event)
 
+    get edit_event_path(@event)
+    assert_includes response.body, 'name="event[total_serial_count]"'
+
     patch event_path(@event), params: {
       event: {
-        name: "第1回春期超抜式"
+        name: "第1回春期超抜式",
+        total_serial_count: 1800
       }
     }
 
     assert_redirected_to events_path
     assert_equal "第1回春期超抜式", @event.reload.name
+    assert_equal 1800, @event.event_details.find_by!(region_id: @region.id).total_serial_count
+    assert_not @event.closed?
+    assert other_event.reload.closed?
   end
 
   test "admin can create event with event details" do
@@ -155,7 +165,8 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_difference("Event.count", 1) do
       post events_path, params: {
         event: {
-          name: "第2回超抜式"
+          name: "第2回超抜式",
+          total_serial_count: 1777
         }
       }
     end
@@ -163,7 +174,10 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     event = Event.find_by!(name: "第2回超抜式")
     assert_redirected_to events_path
     assert_equal [@region.id, @other_region.id].sort, event.event_details.pluck(:region_id).sort
-    assert_equal [1667], event.event_details.pluck(:total_serial_count).uniq
+    assert_equal 1777, event.event_details.find_by!(region_id: @region.id).total_serial_count
+    assert_equal 1667, event.event_details.find_by!(region_id: @other_region.id).total_serial_count
+    assert_not event.closed?
+    assert @event.reload.closed?
   end
 
   test "admin can update event detail" do
@@ -181,6 +195,40 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to event_event_details_path(@event)
     assert_equal 1800, @event_detail.reload.total_serial_count
+  end
+
+  test "event detail index recreates missing region settings" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    EventDetail.delete_all
+
+    get event_event_details_path(@event)
+
+    assert_response :success
+    assert_includes response.body, @region.name
+    assert_includes response.body, @other_region.name
+    assert_equal [@region.id, @other_region.id].sort, @event.event_details.reload.pluck(:region_id).sort
+  end
+
+  test "numeric inputs advertise numeric-only hints" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get new_chobatsu_report_path
+    assert_response :success
+    assert_includes response.body, 'name="chobatsu_report[participant_count]"'
+    assert_includes response.body, 'inputmode="numeric"'
+    assert_includes response.body, 'pattern="[0-9]*"'
+    assert_includes response.body, 'data-numeric-only="true"'
+
+    get edit_event_event_detail_path(@event, @event_detail)
+    assert_response :success
+    assert_includes response.body, 'name="event_detail[total_serial_count]"'
+    assert_includes response.body, 'data-numeric-only="true"'
+
+    get new_evangelism_meeting_path
+    assert_response :success
+    assert_includes response.body, 'name="evangelism_meeting[display_order]"'
+    assert_includes response.body, 'data-numeric-only="true"'
   end
 
   test "admin can still update region directly" do

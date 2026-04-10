@@ -26,6 +26,16 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "挙行報告"
   end
 
+  test "root page still shows event selector when event detail is missing" do
+    EventDetail.delete_all
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, 'name="event_id"'
+    assert_includes response.body, @event.name
+  end
+
   test "user can sign in and access root page" do
     post session_path, params: { email: @user.email, password: "password123" }
 

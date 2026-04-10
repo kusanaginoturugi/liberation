@@ -195,6 +195,16 @@ body.number-shadow-disabled .serial-grid td {
   text-transform: uppercase;
 }
 
+.page-context {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.page-context strong {
+  color: var(--text);
+}
+
 .setting-card,
 .panel,
 .flash {

@@ -5,6 +5,7 @@
     <div>
       <p class="eyebrow">Ceremony Report</p>
       <h1>挙行報告</h1>
+      <p class="page-context">対象超抜式: <strong><%= @selected_event.name %></strong></p>
     </div>
     <div class="page-header-actions">
       <%= link_to "CSV出力", export_chobatsu_reports_path(format: :csv, event_id: @selected_event&.id, region_id: current_user.region_id), class: "button-secondary compact-button" %>
@@ -55,14 +56,9 @@
             <%= form.collection_select :evangelism_meeting_id, @evangelism_meetings, :id, :name, { prompt: "選択してください" } %>
           </div>
 
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:event].any? || @chobatsu_report.errors[:event_id].any? %>">
-            <%= form.label :event_id, "超抜式" %>
-            <%= form.collection_select :event_id, @events, :id, :name, { prompt: false, selected: @chobatsu_report.event_id || @selected_event&.id } %>
-          </div>
-
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
             <%= form.label :participant_count, "超抜人数" %>
-            <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, data: { calc_target: "participant", action: "input->report-form#update" } %>
+            <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "participant", action: "input->report-form#update" } %>
             <% @chobatsu_report.errors.full_messages_for(:participant_count).each do |message| %>
               <p class="field-error"><%= message %></p>
             <% end %>
@@ -70,7 +66,7 @@
 
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_from].any? %>">
             <%= form.label :serial_number_from, "使用修霊番号(始)" %>
-            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_from.presence, data: { calc_target: "from", action: "input->report-form#update" } %>
+            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_from.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "from", action: "input->report-form#update" } %>
             <% @chobatsu_report.errors.full_messages_for(:serial_number_from).each do |message| %>
               <p class="field-error"><%= message %></p>
             <% end %>
@@ -78,7 +74,7 @@
 
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_to].any? %>">
             <%= form.label :serial_number_to, "使用修霊番号(終)" %>
-            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_to.presence, data: { calc_target: "to", action: "input->report-form#update" } %>
+            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_to.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "to", action: "input->report-form#update" } %>
             <% @chobatsu_report.errors.full_messages_for(:serial_number_to).each do |message| %>
               <p class="field-error"><%= message %></p>
             <% end %>
@@ -86,7 +82,7 @@
 
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:noah_card_count].any? %>">
             <%= form.label :noah_card_count, "ノアカード分" %>
-            <%= form.number_field :noah_card_count, min: 0, value: @chobatsu_report.noah_card_count.presence %>
+            <%= form.number_field :noah_card_count, min: 0, value: @chobatsu_report.noah_card_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
             <% @chobatsu_report.errors.full_messages_for(:noah_card_count).each do |message| %>
               <p class="field-error"><%= message %></p>
             <% end %>

@@ -21,6 +21,13 @@
           <%= form.label :name, "超抜式名" %>
           <%= form.text_field :name, required: true, autofocus: true %>
         </div>
+
+        <% if single_region_mode? %>
+          <div class="field">
+            <%= form.label :total_serial_count, "修霊合計数" %>
+            <%= number_field_tag "event[total_serial_count]", @total_serial_count_input, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+          </div>
+        <% end %>
       </div>
 
       <div class="actions">

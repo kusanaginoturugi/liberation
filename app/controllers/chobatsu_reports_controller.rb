@@ -47,6 +47,7 @@ class ChobatsuReportsController < ApplicationController
   def create
     @chobatsu_report = ChobatsuReport.new(chobatsu_report_params)
     @chobatsu_report.user = current_user
+    ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.evangelism_meeting&.region)
 
     if @chobatsu_report.save
       redirect_to root_path, notice: "挙行報告を登録しました"
@@ -59,7 +60,10 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def update
-    if @chobatsu_report.update(chobatsu_report_params)
+    @chobatsu_report.assign_attributes(chobatsu_report_params)
+    ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.evangelism_meeting&.region)
+
+    if @chobatsu_report.save
       redirect_to summary_chobatsu_reports_path(event_id: @chobatsu_report.event_id), notice: "挙行報告を更新しました"
     else
       render :edit, status: :unprocessable_content
@@ -88,14 +92,15 @@ class ChobatsuReportsController < ApplicationController
   def chobatsu_report_params
     params.require(:chobatsu_report).permit(
       :ceremony_date,
-      :event_id,
       :evangelism_meeting_id,
       :participant_count,
       :serial_number_from,
       :serial_number_to,
       :noah_card_count,
       :notes
-    )
+    ).tap do |attrs|
+      attrs[:event_id] = @selected_event.id if action_name == "create" && @selected_event&.id.present?
+    end
   end
 
   def load_index_collections
@@ -118,11 +123,13 @@ class ChobatsuReportsController < ApplicationController
   def load_form_collections
     @events = Event.open.recent_first
     @selected_event = selected_event_for_form
-    region_meetings = current_user.region.evangelism_meetings
+    region = current_operational_region
+    ensure_event_detail_for(@selected_event, region)
+    region_meetings = region.evangelism_meetings
     @evangelism_meetings = region_meetings.active.display_sorted
     @legend_evangelism_meetings = region_meetings.display_sorted
-    @chobatsu_reports = reports_for_region_and_event(current_user.region_id, @selected_event.id)
-    @total_serial_count = total_serial_count_for(@selected_event, current_user.region)
+    @chobatsu_reports = reports_for_region_and_event(region.id, @selected_event.id)
+    @total_serial_count = total_serial_count_for(@selected_event, region)
   rescue ActiveRecord::RecordNotFound
     @events = []
     @total_serial_count = 0
@@ -190,9 +197,6 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def selected_event_for_form
-    return Event.find(chobatsu_report_params[:event_id]) if action_name == "create" && chobatsu_report_params[:event_id].present?
-    return Event.find(params[:event_id]) if params[:event_id].present?
-
     Event.open.recent_first.first || Event.recent_first.first || Event.new(name: "未設定")
   end
 
@@ -201,7 +205,21 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def total_serial_count_for(event, region)
-    EventDetail.find_by!(event: event, region: region).total_serial_count
+    EventDetail.find_by(event: event, region: region)&.total_serial_count.to_i
+  end
+
+  def current_operational_region
+    return Region.find(primary_region_id) if single_region_mode?
+
+    current_user.region
+  end
+
+  def ensure_event_detail_for(event, region)
+    return if event.blank? || region.blank?
+
+    EventDetail.find_or_create_by!(event: event, region: region) do |detail|
+      detail.total_serial_count = EventDetail::DEFAULT_TOTAL_SERIAL_COUNT
+    end
   end
 
   def generate_csv(reports)

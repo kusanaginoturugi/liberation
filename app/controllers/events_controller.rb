@@ -8,31 +8,65 @@ class EventsController < ApplicationController
 
   def new
     @event = Event.new
+    @total_serial_count_input = default_total_serial_count
   end
 
   def edit
+    @total_serial_count_input = current_total_serial_count_for(@event)
   end
 
   def create
     @event = Event.new(event_params)
+    @total_serial_count_input = total_serial_count_input
 
-    if @event.save
-      Region.order(:id).find_each do |region|
-        EventDetail.find_or_create_by!(event: @event, region: region) do |detail|
-          detail.total_serial_count = EventDetail::DEFAULT_TOTAL_SERIAL_COUNT
+    unless valid_total_serial_count_input?
+      @event.errors.add(:base, "修霊合計数は1以上の半角数字で入力してください")
+      render :new, status: :unprocessable_content
+      return
+    end
+
+    ActiveRecord::Base.transaction do
+      if @event.save
+        Region.order(:id).find_each do |region|
+          EventDetail.find_or_create_by!(event: @event, region: region) do |detail|
+            detail.total_serial_count = default_total_serial_count
+          end
         end
-      end
 
-      redirect_to events_path, notice: "超抜式を追加しました"
-    else
+        update_primary_event_detail!(@event, @total_serial_count_input.to_i) if single_region_mode?
+        close_other_events!(@event) unless @event.closed?
+        redirect_to events_path, notice: "超抜式を追加しました"
+      else
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    unless performed?
       render :new, status: :unprocessable_content
     end
   end
 
   def update
-    if @event.update(event_params)
-      redirect_to events_path, notice: "超抜式を更新しました"
-    else
+    @total_serial_count_input = total_serial_count_input
+
+    unless valid_total_serial_count_input?
+      @event.assign_attributes(event_params)
+      @event.errors.add(:base, "修霊合計数は1以上の半角数字で入力してください")
+      render :edit, status: :unprocessable_content
+      return
+    end
+
+    ActiveRecord::Base.transaction do
+      if @event.update(event_params)
+        update_primary_event_detail!(@event, @total_serial_count_input.to_i) if single_region_mode?
+        close_other_events!(@event) unless @event.closed?
+        redirect_to events_path, notice: "超抜式を更新しました"
+      else
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    unless performed?
       render :edit, status: :unprocessable_content
     end
   end
@@ -45,5 +79,36 @@ class EventsController < ApplicationController
 
   def event_params
     params.require(:event).permit(:name, :closed)
+  end
+
+  def total_serial_count_input
+    params.dig(:event, :total_serial_count).presence || @total_serial_count_input
+  end
+
+  def valid_total_serial_count_input?
+    return true unless single_region_mode?
+
+    value = total_serial_count_input.to_s
+    value.match?(/\A[1-9][0-9]*\z/)
+  end
+
+  def current_total_serial_count_for(event)
+    return default_total_serial_count unless single_region_mode?
+
+    event.event_details.find_by(region_id: primary_region_id)&.total_serial_count || default_total_serial_count
+  end
+
+  def update_primary_event_detail!(event, total_serial_count)
+    detail = event.event_details.find_or_initialize_by(region_id: primary_region_id)
+    detail.total_serial_count = total_serial_count
+    detail.save!
+  end
+
+  def default_total_serial_count
+    EventDetail::DEFAULT_TOTAL_SERIAL_COUNT
+  end
+
+  def close_other_events!(event)
+    Event.where.not(id: event.id).update_all(closed: true)
   end
 end
