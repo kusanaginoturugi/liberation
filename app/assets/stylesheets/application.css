@@ -154,6 +154,11 @@ body.number-shadow-disabled .serial-grid td {
   color: var(--muted);
 }
 
+.user-edit-summary {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
 .page-shell {
   width: min(1280px, calc(100% - 32px));
   margin: 32px auto 48px;

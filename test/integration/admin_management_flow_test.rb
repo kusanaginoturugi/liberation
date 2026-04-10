@@ -80,6 +80,58 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_equal "追加ユーザー", User.find_by!(email: "added@example.com").name
   end
 
+  test "admin can update own profile without changing password" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get edit_user_path(@admin)
+    assert_response :success
+    assert_includes response.body, "プロフィール編集"
+
+    patch user_path(@admin), params: {
+      user: {
+        name: "管理者更新",
+        email: "admin-updated@example.com",
+        region_id: @other_region.id,
+        password: "",
+        password_confirmation: ""
+      }
+    }
+
+    assert_redirected_to root_path
+    @admin.reload
+    assert_equal "管理者更新", @admin.name
+    assert_equal "admin-updated@example.com", @admin.email
+    assert_equal @other_region.id, @admin.region_id
+    assert @admin.authenticate("password123")
+  end
+
+  test "admin can update another user and admin role" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    get edit_user_path(@user)
+    assert_response :success
+    assert_includes response.body, "ユーザー編集"
+
+    patch user_path(@user), params: {
+      user: {
+        name: "一般更新",
+        email: "user-updated@example.com",
+        region_id: @other_region.id,
+        admin: "1",
+        password: "",
+        password_confirmation: ""
+      }
+    }
+
+    assert_redirected_to users_path
+    @user.reload
+    assert_equal "一般更新", @user.name
+    assert_equal "user-updated@example.com", @user.email
+    assert_equal @other_region.id, @user.region_id
+    assert @user.admin?
+    assert @user.authenticate("password123")
+  end
+
   test "admin can update event" do
     post session_path, params: { email: @admin.email, password: "password123" }
 
@@ -216,5 +268,44 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     get edit_settings_path
     assert_redirected_to root_path
+  end
+
+  test "non admin can update own profile but cannot edit another user" do
+    post session_path, params: { email: @user.email, password: "password123" }
+
+    get edit_user_path(@user)
+    assert_response :success
+    assert_includes response.body, "プロフィール編集"
+
+    patch user_path(@user), params: {
+      user: {
+        name: "一般更新",
+        email: "user-updated@example.com",
+        password: "",
+        password_confirmation: ""
+      }
+    }
+
+    assert_redirected_to root_path
+    @user.reload
+    assert_equal "一般更新", @user.name
+    assert_equal "user-updated@example.com", @user.email
+    assert_equal @region.id, @user.region_id
+    assert @user.authenticate("password123")
+
+    get edit_user_path(@admin)
+    assert_redirected_to root_path
+
+    patch user_path(@admin), params: {
+      user: {
+        name: "不正更新",
+        email: "hijack@example.com"
+      }
+    }
+
+    assert_redirected_to root_path
+    @admin.reload
+    assert_equal "管理者", @admin.name
+    assert_equal "admin@example.com", @admin.email
   end
 end

@@ -5,7 +5,7 @@
   <section class="panel form-panel auth-panel">
     <h1><%= editing_self ? "プロフィール編集" : "ユーザー編集" %></h1>
     <% unless editing_self %>
-      <p style="color: var(--muted); margin: 0 0 16px;"><%= @user.name %> (<%= @user.email %>)</p>
+      <p class="user-edit-summary"><%= @user.name %> (<%= @user.email %>)</p>
     <% end %>
 
     <% if @user.errors.any? %>
