@@ -59,10 +59,11 @@
           <th>挙行日</th>
           <th>伝道会名</th>
           <th>超抜霊数</th>
+          <th>(内)ノアカード分</th>
           <th>功徳費合計</th>
-          <th>みろく寺分</th>
+          <th>みろく寺分<br><small style="font-size: 0.75em; font-weight: normal">(ノア分勘案せず)</small></th>
           <th>聖院還付金</th>
-          <th>伝道会還付金</th>
+          <th>備考欄</th>
           <th>入力者名</th>
         </tr>
       </thead>
@@ -73,10 +74,11 @@
             <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
             <td><%= report.evangelism_meeting.name %></td>
             <td><%= report.participant_count %></td>
+            <td><%= report.noah_card_count.present? ? report.noah_card_count : "-" %></td>
             <td><%= report.calculated_merit_fee_total %></td>
             <td><%= report.mirokuji_share %></td>
             <td><%= report.region_refund %></td>
-            <td><%= report.evangelism_meeting_refund %></td>
+            <td><%= report.notes %></td>
             <td><%= report.user&.name || "未設定" %></td>
           </tr>
         <% end %>
