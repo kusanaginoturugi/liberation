@@ -5,6 +5,10 @@ class ChobatsuReportsController < ApplicationController
   before_action :load_summary_collections, only: [:summary]
   before_action :load_form_collections, only: [:new, :create]
   before_action :load_export_collections, only: [:export]
+  before_action :set_report, only: [:edit, :update, :destroy]
+  before_action :authorize_report_edit!, only: [:edit, :update]
+  before_action :require_admin!, only: [:destroy]
+  before_action :load_edit_collections, only: [:edit, :update]
 
   def index
   end
@@ -51,7 +55,35 @@ class ChobatsuReportsController < ApplicationController
     end
   end
 
+  def edit
+  end
+
+  def update
+    if @chobatsu_report.update(chobatsu_report_params)
+      redirect_to summary_chobatsu_reports_path(event_id: @chobatsu_report.event_id), notice: "挙行報告を更新しました"
+    else
+      render :edit, status: :unprocessable_content
+    end
+  end
+
+  def destroy
+    event_id = @chobatsu_report.event_id
+    @chobatsu_report.destroy!
+    redirect_to summary_chobatsu_reports_path(event_id: event_id), notice: "挙行報告を削除しました"
+  end
+
   private
+
+  def set_report
+    @chobatsu_report = ChobatsuReport.find(params[:id])
+  end
+
+  def authorize_report_edit!
+    return if current_user&.admin?
+    return if @chobatsu_report.user_id == current_user&.id
+
+    redirect_to root_path, alert: "編集権限がありません"
+  end
 
   def chobatsu_report_params
     params.require(:chobatsu_report).permit(
@@ -84,13 +116,27 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def load_form_collections
-    @events = Event.recent_first
+    @events = Event.open.recent_first
     @selected_event = selected_event_for_form
     region_meetings = current_user.region.evangelism_meetings
     @evangelism_meetings = region_meetings.active.display_sorted
     @legend_evangelism_meetings = region_meetings.display_sorted
     @chobatsu_reports = reports_for_region_and_event(current_user.region_id, @selected_event.id)
     @total_serial_count = total_serial_count_for(@selected_event, current_user.region)
+  rescue ActiveRecord::RecordNotFound
+    @events = []
+    @total_serial_count = 0
+  end
+
+  def load_edit_collections
+    @selected_event = @chobatsu_report.event
+    region = @chobatsu_report.region
+    @events = Event.recent_first
+    region_meetings = region.evangelism_meetings
+    @evangelism_meetings = region_meetings.active.display_sorted
+    @legend_evangelism_meetings = region_meetings.display_sorted
+    @chobatsu_reports = reports_for_region_and_event(region.id, @selected_event.id)
+    @total_serial_count = total_serial_count_for(@selected_event, region)
   rescue ActiveRecord::RecordNotFound
     @events = []
     @total_serial_count = 0
@@ -145,8 +191,9 @@ class ChobatsuReportsController < ApplicationController
 
   def selected_event_for_form
     return Event.find(chobatsu_report_params[:event_id]) if action_name == "create" && chobatsu_report_params[:event_id].present?
+    return Event.find(params[:event_id]) if params[:event_id].present?
 
-    selected_event_for_index
+    Event.open.recent_first.first || Event.recent_first.first || Event.new(name: "未設定")
   end
 
   def summary_sort_direction

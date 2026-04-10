@@ -6,4 +6,5 @@ class Event < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+  scope :open, -> { where(closed: false) }
 end

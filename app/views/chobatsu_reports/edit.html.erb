@@ -1,0 +1,171 @@
+<% content_for :title, "挙行報告 編集" %>
+
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Ceremony Report</p>
+      <h1>挙行報告 編集</h1>
+    </div>
+    <div class="page-header-actions">
+      <%= link_to "一覧に戻る", summary_chobatsu_reports_path(event_id: @chobatsu_report.event_id), class: "button-secondary compact-button" %>
+      <div class="setting-card">
+        <span>修霊合計数</span>
+        <strong><%= @total_serial_count %></strong>
+      </div>
+    </div>
+  </header>
+
+  <% if @chobatsu_report.errors.any? %>
+    <div class="flash flash-alert">
+      <strong>更新できませんでした</strong>
+      <ul>
+        <% @chobatsu_report.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="page-grid">
+    <section class="panel form-panel">
+      <h2>編集フォーム</h2>
+
+      <%= form_with model: @chobatsu_report, class: "report-form" do |form| %>
+        <div class="field-grid">
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:ceremony_date].any? %>">
+            <%= form.label :ceremony_date, "挙行日" %>
+            <%= form.date_field :ceremony_date %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:evangelism_meeting].any? || @chobatsu_report.errors[:evangelism_meeting_id].any? %>">
+            <%= form.label :evangelism_meeting_id, "伝道会名" %>
+            <%= form.collection_select :evangelism_meeting_id, @evangelism_meetings, :id, :name, { prompt: "選択してください" } %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:event].any? || @chobatsu_report.errors[:event_id].any? %>">
+            <%= form.label :event_id, "超抜式" %>
+            <%= form.collection_select :event_id, @events, :id, :name, { prompt: false, selected: @chobatsu_report.event_id } %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
+            <%= form.label :participant_count, "超抜人数" %>
+            <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, data: { calc_target: "participant", action: "input->report-form#update" } %>
+            <% @chobatsu_report.errors.full_messages_for(:participant_count).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_from].any? %>">
+            <%= form.label :serial_number_from, "使用修霊番号(始)" %>
+            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_from.presence, data: { calc_target: "from", action: "input->report-form#update" } %>
+            <% @chobatsu_report.errors.full_messages_for(:serial_number_from).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_to].any? %>">
+            <%= form.label :serial_number_to, "使用修霊番号(終)" %>
+            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_to.presence, data: { calc_target: "to", action: "input->report-form#update" } %>
+            <% @chobatsu_report.errors.full_messages_for(:serial_number_to).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:noah_card_count].any? %>">
+            <%= form.label :noah_card_count, "ノアカード分" %>
+            <%= form.number_field :noah_card_count, min: 0, value: @chobatsu_report.noah_card_count.presence %>
+            <% @chobatsu_report.errors.full_messages_for(:noah_card_count).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:notes].any? %>">
+            <%= form.label :notes, "備考欄" %>
+            <%= form.text_area :notes %>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">使用数</span>
+            <div class="usage-count" data-calc-target="usageOutput"><%= @chobatsu_report.usage_count %></div>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">功徳費合計</span>
+            <div class="usage-count" data-calc-target="meritOutput"><%= @chobatsu_report.calculated_merit_fee_total %></div>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">みろく寺分</span>
+            <div class="usage-count" data-calc-target="mirokujiOutput"><%= @chobatsu_report.mirokuji_share %></div>
+          </div>
+
+          <div class="field usage-field">
+            <span class="field-label">聖院還付金</span>
+            <div class="usage-count" data-calc-target="regionRefundOutput"><%= @chobatsu_report.region_refund %></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <%= form.submit "更新する", class: "button-primary" %>
+        </div>
+      <% end %>
+    </section>
+
+    <%= render "report_grid",
+        chobatsu_reports: @chobatsu_reports,
+        legend_evangelism_meetings: @legend_evangelism_meetings,
+        total_serial_count: @total_serial_count %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const participantField = document.querySelector("[data-calc-target='participant']");
+    const fromField = document.querySelector("[data-calc-target='from']");
+    const toField = document.querySelector("[data-calc-target='to']");
+    const usageOutput = document.querySelector("[data-calc-target='usageOutput']");
+    const meritOutput = document.querySelector("[data-calc-target='meritOutput']");
+    const mirokujiOutput = document.querySelector("[data-calc-target='mirokujiOutput']");
+    const regionRefundOutput = document.querySelector("[data-calc-target='regionRefundOutput']");
+
+    const updateTotals = () => {
+      const fromValue = Number.parseInt(fromField.value, 10);
+      const toValue = Number.parseInt(toField.value, 10);
+      let usageCount = 0;
+      let meritTotal = 0;
+
+      if (usageOutput) {
+        if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
+          usageOutput.textContent = "0";
+        } else {
+          usageCount = toValue - fromValue + 1;
+          usageOutput.textContent = String(usageCount);
+        }
+      }
+
+      if (meritOutput) {
+        meritTotal = usageCount * 5000;
+        meritOutput.textContent = String(meritTotal);
+      }
+
+      if (mirokujiOutput) {
+        mirokujiOutput.textContent = String(Math.floor(meritTotal * 0.65));
+      }
+
+      if (regionRefundOutput) {
+        regionRefundOutput.textContent = String(Math.floor(meritTotal * 0.15));
+      }
+    };
+
+    [participantField, fromField, toField].forEach((field) => {
+      if (field) field.addEventListener("input", updateTotals);
+    });
+
+    const firstInvalidField = document.querySelector(".field-with-error input, .field-with-error select, .field-with-error textarea");
+    if (firstInvalidField) {
+      firstInvalidField.focus();
+    }
+
+    updateTotals();
+  });
+</script>

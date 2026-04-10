@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   end
   resources :evangelism_meetings, only: [:index, :new, :create, :edit, :update]
   root "chobatsu_reports#index"
-  resources :chobatsu_reports, only: [:index, :new, :create] do
+  resources :chobatsu_reports, only: [:index, :new, :create, :edit, :update, :destroy] do
     collection do
       get :export
       get :summary

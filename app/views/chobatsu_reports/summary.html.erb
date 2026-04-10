@@ -18,6 +18,13 @@
     </div>
   </header>
 
+  <% if flash[:notice].present? %>
+    <div class="flash flash-notice"><%= flash[:notice] %></div>
+  <% end %>
+  <% if flash[:alert].present? %>
+    <div class="flash flash-alert"><%= flash[:alert] %></div>
+  <% end %>
+
   <section class="panel region-filter-panel">
     <%= form_with url: summary_chobatsu_reports_path, method: :get, class: "region-filter-form" do |form| %>
       <% unless single_region_mode? %>
@@ -66,6 +73,9 @@
             <th class="summary-number" style="width: 6em">聖院還付金</th>
             <th>備考欄</th>
             <th style="width: 6em">入力者名</th>
+            <% if user_signed_in? %>
+              <th style="width: 7em">操作</th>
+            <% end %>
           </tr>
         </thead>
         <tbody>
@@ -81,14 +91,41 @@
               <td class="summary-number"><%= number_with_delimiter(report.region_refund) %></td>
               <td><%= report.notes %></td>
               <td><%= report.user&.name || "未設定" %></td>
+              <% if user_signed_in? %>
+                <td class="summary-actions">
+                  <% if current_user.admin? || report.user_id == current_user.id %>
+                    <%= link_to "編集", edit_chobatsu_report_path(report), class: "text-link" %>
+                  <% end %>
+                  <% if current_user.admin? %>
+                    <%= button_to "削除", chobatsu_report_path(report), method: :delete,
+                        class: "button-danger",
+                        form: { data: { turbo_confirm: "この挙行報告を削除しますか？" } } %>
+                  <% end %>
+                </td>
+              <% end %>
             </tr>
           <% end %>
           <% if @summary_reports.empty? %>
             <tr>
-              <td colspan="10" class="summary-empty">該当する超抜報告はありません</td>
+              <td colspan="<%= user_signed_in? ? 11 : 10 %>" class="summary-empty">該当する超抜報告はありません</td>
             </tr>
           <% end %>
         </tbody>
+        <% unless @summary_reports.empty? %>
+          <tfoot>
+            <tr class="summary-total-row">
+              <td colspan="3" class="summary-total-label">合計</td>
+              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></td>
+              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum { |r| r.noah_card_count.to_i }) %></td>
+              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:calculated_merit_fee_total)) %></td>
+              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:mirokuji_share)) %></td>
+              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:region_refund)) %></td>
+              <td></td>
+              <td></td>
+              <% if user_signed_in? %><td></td><% end %>
+            </tr>
+          </tfoot>
+        <% end %>
       </table>
     </div>
   </section>

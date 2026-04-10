@@ -17,6 +17,7 @@ class ChobatsuReport < ApplicationRecord
   validate :serial_number_range_is_within_total
   validate :region_matches_evangelism_meeting
   validate :serial_number_range_does_not_overlap
+  validate :event_is_open, on: :create
 
   def usage_count
     return 0 if serial_number_from.blank? || serial_number_to.blank?
@@ -82,6 +83,12 @@ class ChobatsuReport < ApplicationRecord
     return if evangelism_meeting.region_id == region_id
 
     errors.add(:region, "は伝道会の聖院と一致させてください")
+  end
+
+  def event_is_open
+    return unless event&.closed?
+
+    errors.add(:event, "は終了した超抜式のため登録できません")
   end
 
   def event_detail_total_serial_count
