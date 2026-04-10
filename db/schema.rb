@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_09_133000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_10_100000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -24,6 +24,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_133000) do
     t.integer "region_id", default: 1, null: false
     t.integer "event_id", default: 1, null: false
     t.integer "user_id"
+    t.integer "noah_card_count"
+    t.text "notes"
     t.index ["ceremony_date"], name: "index_chobatsu_reports_on_ceremony_date"
     t.index ["evangelism_meeting_id"], name: "index_chobatsu_reports_on_evangelism_meeting_id"
     t.index ["event_id"], name: "index_chobatsu_reports_on_event_id"

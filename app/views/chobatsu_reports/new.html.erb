@@ -84,6 +84,19 @@
             <% end %>
           </div>
 
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:noah_card_count].any? %>">
+            <%= form.label :noah_card_count, "ノアカード分" %>
+            <%= form.number_field :noah_card_count, min: 0, value: @chobatsu_report.noah_card_count.presence %>
+            <% @chobatsu_report.errors.full_messages_for(:noah_card_count).each do |message| %>
+              <p class="field-error"><%= message %></p>
+            <% end %>
+          </div>
+
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:notes].any? %>">
+            <%= form.label :notes, "備考欄" %>
+            <%= form.text_area :notes %>
+          </div>
+
           <div class="field usage-field">
             <span class="field-label">使用数</span>
             <div class="usage-count" data-calc-target="usageOutput"><%= @chobatsu_report.usage_count %></div>

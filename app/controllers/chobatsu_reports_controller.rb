@@ -60,7 +60,9 @@ class ChobatsuReportsController < ApplicationController
       :evangelism_meeting_id,
       :participant_count,
       :serial_number_from,
-      :serial_number_to
+      :serial_number_to,
+      :noah_card_count,
+      :notes
     )
   end
 

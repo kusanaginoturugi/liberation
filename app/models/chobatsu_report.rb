@@ -8,7 +8,7 @@ class ChobatsuReport < ApplicationRecord
   before_validation :assign_merit_fee_total
 
   validates :ceremony_date, :participant_count, :serial_number_from, :serial_number_to, presence: true
-  validates :participant_count, :merit_fee_total,
+  validates :participant_count, :merit_fee_total, :noah_card_count,
             numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
   validates :serial_number_from, :serial_number_to,
             numericality: { only_integer: true, greater_than: 0, allow_nil: true }

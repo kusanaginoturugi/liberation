@@ -43,8 +43,8 @@
       <table class="admin-table summary-table">
         <thead>
           <tr>
-            <th>No.</th>
-            <th>
+            <th style="width: 3em">No.</th>
+            <th style="width: 7em">
               <%= link_to summary_chobatsu_reports_path(
                     event_id: @selected_event&.id,
                     region_id: @selected_region&.id,
@@ -56,12 +56,16 @@
               <% end %>
             </th>
             <th>伝道会名</th>
-            <th class="summary-number">超抜霊数</th>
-            <th class="summary-number">功徳費合計</th>
-            <th class="summary-number">みろく寺分</th>
-            <th class="summary-number">聖院還付金</th>
-            <th class="summary-number">伝道会還付金</th>
-            <th>入力者名</th>
+            <th class="summary-number" style="width: 6em">超抜霊数</th>
+            <th class="summary-number" style="width: 7em">(内)ノアカード分</th>
+            <th class="summary-number" style="width: 7em">功徳費合計</th>
+            <th class="summary-number" style="width: 7em">
+              みろく寺分
+              <br><small style="font-size: 0.75em; font-weight: normal">(ノア分勘案せず)</small>
+            </th>
+            <th class="summary-number" style="width: 6em">聖院還付金</th>
+            <th>備考欄</th>
+            <th style="width: 6em">入力者名</th>
           </tr>
         </thead>
         <tbody>
@@ -71,16 +75,17 @@
               <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
               <td><%= report.evangelism_meeting.name %></td>
               <td class="summary-number"><%= number_with_delimiter(report.participant_count) %></td>
+              <td class="summary-number"><%= report.noah_card_count.present? ? number_with_delimiter(report.noah_card_count) : "-" %></td>
               <td class="summary-number"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
               <td class="summary-number"><%= number_with_delimiter(report.mirokuji_share) %></td>
               <td class="summary-number"><%= number_with_delimiter(report.region_refund) %></td>
-              <td class="summary-number"><%= number_with_delimiter(report.evangelism_meeting_refund) %></td>
+              <td><%= report.notes %></td>
               <td><%= report.user&.name || "未設定" %></td>
             </tr>
           <% end %>
           <% if @summary_reports.empty? %>
             <tr>
-              <td colspan="9" class="summary-empty">該当する超抜報告はありません</td>
+              <td colspan="10" class="summary-empty">該当する超抜報告はありません</td>
             </tr>
           <% end %>
         </tbody>
