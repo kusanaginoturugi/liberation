@@ -37,6 +37,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "修霊番号一覧"
+    assert_includes response.body, "対象聖院"
+    assert_includes response.body, @region.name
     assert_includes response.body, "修霊合計数"
     assert_includes response.body, "挙行報告"
     assert_includes response.body, "大江戸"
@@ -49,6 +51,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">1664<"
     assert_not_includes response.body, "札幌会場"
     assert_not_includes response.body, "<label for=\"region_id\">聖院</label>"
+    assert_not_includes response.body, "<label for=\"event_id\">超抜式</label>"
   end
 
   test "root page switches displayed reports by event in single region mode" do
@@ -124,6 +127,10 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "挙行一覧"
+    assert_includes response.body, "対象聖院"
+    assert_includes response.body, @region.name
+    assert_includes response.body, "対象超抜式"
+    assert_includes response.body, @event.name
     assert_includes response.body, "CSV出力"
     assert_includes response.body, "PDF出力"
     assert_includes response.body, "2026/04/09"

@@ -5,6 +5,8 @@
     <div>
       <p class="eyebrow">Chobatsu Report</p>
       <h1>修霊番号一覧</h1>
+      <p class="page-context">対象聖院: <strong><%= @selected_region.name %></strong></p>
+      <p class="page-context">対象超抜式: <strong><%= @selected_event.name %></strong></p>
     </div>
     <div class="page-header-actions">
       <div class="setting-card">
@@ -34,10 +36,12 @@
           <%= form.collection_select :region_id, @regions, :id, :name, { selected: @selected_region&.id }, { onchange: "this.form.requestSubmit()" } %>
         </div>
       <% end %>
-      <div class="field">
-        <%= form.label :event_id, "超抜式" %>
-        <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event&.id }, { onchange: "this.form.requestSubmit()" } %>
-      </div>
+      <% unless single_region_mode? %>
+        <div class="field">
+          <%= form.label :event_id, "超抜式" %>
+          <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event&.id }, { onchange: "this.form.requestSubmit()" } %>
+        </div>
+      <% end %>
     <% end %>
   </section>
 
