@@ -1,7 +1,7 @@
 class EvangelismMeetingsController < ApplicationController
   before_action :require_admin!
-  before_action :set_evangelism_meeting, only: [:edit, :update]
-  before_action :load_regions, only: [:new, :create, :edit, :update]
+  before_action :set_evangelism_meeting, only: [ :edit, :update ]
+  before_action :load_regions, only: [ :new, :create, :edit, :update ]
 
   def index
     @evangelism_meetings = EvangelismMeeting.includes(:region).display_sorted

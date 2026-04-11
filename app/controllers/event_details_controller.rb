@@ -2,7 +2,7 @@ class EventDetailsController < ApplicationController
   before_action :require_admin!
   before_action :set_event
   before_action :ensure_event_details!
-  before_action :set_event_detail, only: [:edit, :update]
+  before_action :set_event_detail, only: [ :edit, :update ]
 
   def index
     @event_details = @event.event_details.includes(:region).references(:region).order("regions.name")

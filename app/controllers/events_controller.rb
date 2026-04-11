@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   before_action :require_admin!
-  before_action :set_event, only: [:edit, :update, :destroy]
+  before_action :set_event, only: [ :edit, :update, :destroy ]
 
   def index
     @events = Event.recent_first

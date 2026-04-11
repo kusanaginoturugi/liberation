@@ -1,6 +1,6 @@
 class RegionsController < ApplicationController
   before_action :require_admin!
-  before_action :set_region, only: [:edit, :update]
+  before_action :set_region, only: [ :edit, :update ]
 
   def index
     @regions = Region.left_joins(:evangelism_meetings)
