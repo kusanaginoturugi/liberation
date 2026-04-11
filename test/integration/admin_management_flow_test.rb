@@ -159,6 +159,46 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert other_event.reload.closed?
   end
 
+  test "admin can delete event without reports" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    deletable_event = Event.create!(name: "削除対象")
+    EventDetail.create!(event: deletable_event, region: @region, total_serial_count: 1667)
+
+    assert_difference("Event.count", -1) do
+      delete event_path(deletable_event)
+    end
+
+    assert_redirected_to events_path
+    assert_nil Event.find_by(id: deletable_event.id)
+  end
+
+  test "admin cannot delete event with reports" do
+    post session_path, params: { email: @admin.email, password: "password123" }
+
+    ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      region: @region,
+      event: @event,
+      user: @admin,
+      evangelism_meeting: @meeting,
+      participant_count: 1,
+      serial_number_from: 1,
+      serial_number_to: 1,
+      merit_fee_total: 5000
+    )
+
+    get edit_event_path(@event)
+    assert_includes response.body, "削除できません"
+    assert_includes response.body, "超抜報告が紐づいている超抜式は削除できません"
+
+    assert_no_difference("Event.count") do
+      delete event_path(@event)
+    end
+
+    assert_redirected_to edit_event_path(@event)
+  end
+
   test "admin can create event with event details" do
     post session_path, params: { email: @admin.email, password: "password123" }
 

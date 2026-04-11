@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   resource :settings, only: [:edit, :update]
   resources :users, only: [:index, :new, :create, :edit, :update]
   resources :regions, only: [:index, :edit, :update]
-  resources :events, only: [:index, :new, :create, :edit, :update] do
+  resources :events, only: [:index, :new, :create, :edit, :update, :destroy] do
     resources :event_details, only: [:index, :edit, :update]
   end
   resources :evangelism_meetings, only: [:index, :new, :create, :edit, :update]

@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   before_action :require_admin!
-  before_action :set_event, only: [:edit, :update]
+  before_action :set_event, only: [:edit, :update, :destroy]
 
   def index
     @events = Event.recent_first
@@ -71,6 +71,18 @@ class EventsController < ApplicationController
     end
   end
 
+  def destroy
+    unless deletable_event?(@event)
+      redirect_to edit_event_path(@event), alert: "超抜報告が紐づいているため削除できません"
+      return
+    end
+
+    was_open = !@event.closed?
+    @event.destroy!
+    open_fallback_event! if was_open
+    redirect_to events_path, notice: "超抜式を削除しました"
+  end
+
   private
 
   def set_event
@@ -110,5 +122,16 @@ class EventsController < ApplicationController
 
   def close_other_events!(event)
     Event.where.not(id: event.id).update_all(closed: true)
+  end
+
+  def deletable_event?(event)
+    !event.chobatsu_reports.exists?
+  end
+
+  def open_fallback_event!
+    fallback_event = Event.recent_first.first
+    return if fallback_event.blank? || !fallback_event.closed?
+
+    fallback_event.update_column(:closed, false)
   end
 end

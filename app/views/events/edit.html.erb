@@ -41,5 +41,16 @@
         <%= form.submit "更新する", class: "button-primary" %>
       </div>
     <% end %>
+
+    <div class="actions">
+      <% if @event.chobatsu_reports.exists? %>
+        <button type="button" class="button-secondary" disabled>削除できません</button>
+        <p class="field-hint">超抜報告が紐づいている超抜式は削除できません</p>
+      <% else %>
+        <%= button_to "削除する", event_path(@event), method: :delete,
+            class: "button-danger",
+            form: { data: { turbo_confirm: "この超抜式を削除しますか？" } } %>
+      <% end %>
+    </div>
   </section>
 </div>
