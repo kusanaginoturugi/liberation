@@ -1,6 +1,6 @@
 namespace :events do
   desc "超抜式を追加し、全聖院の event_details を作成する"
-  task :create, [:name] => :environment do |_task, args|
+  task :create, [ :name ] => :environment do |_task, args|
     name = args[:name].to_s.strip
 
     if name.blank?

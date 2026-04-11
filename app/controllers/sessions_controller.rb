@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  allow_unauthenticated_access only: [:new, :create, :destroy]
+  allow_unauthenticated_access only: [ :new, :create, :destroy ]
 
   def new
   end

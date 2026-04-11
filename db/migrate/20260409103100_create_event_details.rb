@@ -8,6 +8,6 @@ class CreateEventDetails < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :event_details, [:event_id, :region_id], unique: true
+    add_index :event_details, [ :event_id, :region_id ], unique: true
   end
 end

@@ -13,6 +13,6 @@ class CreateChobatsuReports < ActiveRecord::Migration[8.0]
     end
 
     add_index :chobatsu_reports, :ceremony_date
-    add_index :chobatsu_reports, [:serial_number_from, :serial_number_to]
+    add_index :chobatsu_reports, [ :serial_number_from, :serial_number_to ]
   end
 end

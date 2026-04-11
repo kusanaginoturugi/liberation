@@ -7,7 +7,7 @@ class EvangelismMeetingTest < ActiveSupport::TestCase
     late = EvangelismMeeting.create!(name: "B会場", color_code: "#222222", display_order: 20, active: true, region:)
     early = EvangelismMeeting.create!(name: "A会場", color_code: "#333333", display_order: 10, active: true, region:)
 
-    assert_equal [early, late], EvangelismMeeting.active.display_sorted.to_a
+    assert_equal [ early, late ], EvangelismMeeting.active.display_sorted.to_a
     assert_not_includes EvangelismMeeting.active.display_sorted, inactive
   end
 end

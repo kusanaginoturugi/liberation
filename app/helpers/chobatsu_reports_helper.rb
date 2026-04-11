@@ -21,6 +21,6 @@ module ChobatsuReportsHelper
   end
 
   def remaining_serial_count(total_serial_count, reports)
-    [total_serial_count.to_i - used_serial_count(reports), 0].max
+    [ total_serial_count.to_i - used_serial_count(reports), 0 ].max
   end
 end

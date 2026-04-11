@@ -2,7 +2,7 @@ require "yaml"
 
 namespace :meetings do
   desc "Sync evangelism meetings from YAML. Usage: bin/rails 'meetings:sync[config/meetings.yml]'"
-  task :sync, [:path] => :environment do |_task, args|
+  task :sync, [ :path ] => :environment do |_task, args|
     path = args[:path].presence || "config/meetings.yml"
     config = YAML.load_file(Rails.root.join(path))
     rows = config.fetch("meetings")

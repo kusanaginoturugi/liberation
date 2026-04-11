@@ -213,7 +213,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     event = Event.find_by!(name: "第2回超抜式")
     assert_redirected_to events_path
-    assert_equal [@region.id, @other_region.id].sort, event.event_details.pluck(:region_id).sort
+    assert_equal [ @region.id, @other_region.id ].sort, event.event_details.pluck(:region_id).sort
     assert_equal 1777, event.event_details.find_by!(region_id: @region.id).total_serial_count
     assert_equal 1667, event.event_details.find_by!(region_id: @other_region.id).total_serial_count
     assert_not event.closed?
@@ -247,7 +247,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, @region.name
     assert_includes response.body, @other_region.name
-    assert_equal [@region.id, @other_region.id].sort, @event.event_details.reload.pluck(:region_id).sort
+    assert_equal [ @region.id, @other_region.id ].sort, @event.event_details.reload.pluck(:region_id).sort
   end
 
   test "numeric inputs advertise numeric-only hints" do
