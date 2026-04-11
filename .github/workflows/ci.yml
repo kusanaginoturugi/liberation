@@ -23,7 +23,6 @@ jobs:
         run: bin/brakeman --no-pager
 
   scan_js:
-    if: ${{ hashFiles('config/importmap.rb') != '' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +36,12 @@ jobs:
           bundler-cache: true
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: bin/importmap audit
+        run: |
+          if [ -f config/importmap.rb ]; then
+            bin/importmap audit
+          else
+            echo "No importmap config; skipping audit"
+          fi
 
   lint:
     runs-on: ubuntu-latest
