@@ -1,14 +1,14 @@
 class ChobatsuReportsController < ApplicationController
-  allow_unauthenticated_access only: [:index, :summary, :export]
+  allow_unauthenticated_access only: [ :index, :summary, :export ]
 
-  before_action :load_index_collections, only: [:index]
-  before_action :load_summary_collections, only: [:summary]
-  before_action :load_form_collections, only: [:new, :create]
-  before_action :load_export_collections, only: [:export]
-  before_action :set_report, only: [:edit, :update, :destroy]
-  before_action :authorize_report_edit!, only: [:edit, :update]
-  before_action :require_admin!, only: [:destroy]
-  before_action :load_edit_collections, only: [:edit, :update]
+  before_action :load_index_collections, only: [ :index ]
+  before_action :load_summary_collections, only: [ :summary ]
+  before_action :load_form_collections, only: [ :new, :create ]
+  before_action :load_export_collections, only: [ :export ]
+  before_action :set_report, only: [ :edit, :update, :destroy ]
+  before_action :authorize_report_edit!, only: [ :edit, :update ]
+  before_action :require_admin!, only: [ :destroy ]
+  before_action :load_edit_collections, only: [ :edit, :update ]
 
   def index
   end
@@ -224,7 +224,7 @@ class ChobatsuReportsController < ApplicationController
 
   def generate_csv(reports)
     lines = []
-    lines << csv_line(["挙行日", "伝道会名", "超抜霊数", "(内)ノアカード分", "功徳費合計", "みろく寺分(ノア分勘案せず)", "聖院還付金", "備考欄", "入力者名"])
+    lines << csv_line([ "挙行日", "伝道会名", "超抜霊数", "(内)ノアカード分", "功徳費合計", "みろく寺分(ノア分勘案せず)", "聖院還付金", "備考欄", "入力者名" ])
 
     reports.each do |report|
       lines << csv_line([

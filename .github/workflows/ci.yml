@@ -23,6 +23,7 @@ jobs:
         run: bin/brakeman --no-pager
 
   scan_js:
+    if: ${{ hashFiles('config/importmap.rb') != '' }}
     runs-on: ubuntu-latest
 
     steps:

@@ -1,11 +1,11 @@
 class UsersController < ApplicationController
-  allow_unauthenticated_access only: [:new, :create]
+  allow_unauthenticated_access only: [ :new, :create ]
 
-  before_action :require_admin!, only: [:index]
-  before_action :ensure_user_creation_allowed!, only: [:new, :create]
-  before_action :set_user, only: [:edit, :update]
-  before_action :authorize_user_edit!, only: [:edit, :update]
-  before_action :load_regions, only: [:new, :create, :edit, :update]
+  before_action :require_admin!, only: [ :index ]
+  before_action :ensure_user_creation_allowed!, only: [ :new, :create ]
+  before_action :set_user, only: [ :edit, :update ]
+  before_action :authorize_user_edit!, only: [ :edit, :update ]
+  before_action :load_regions, only: [ :new, :create, :edit, :update ]
 
   def index
     @users = User.includes(:region).order(:id)
@@ -60,18 +60,16 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    permitted = [:email, :password, :password_confirmation, :name, :region_id]
-    permitted << :admin if current_user&.admin?
-    params.require(:user).permit(*permitted)
+    attrs = params.require(:user).permit(:email, :password, :password_confirmation, :name, :region_id)
+    attrs[:admin] = admin_flag_param if current_user&.admin?
+    attrs
   end
 
   def user_update_params
-    permitted = [:email, :name, :password, :password_confirmation]
-    if current_user&.admin?
-      permitted << :region_id
-      permitted << :admin unless @user == current_user
-    end
+    permitted = [ :email, :name, :password, :password_confirmation ]
+    permitted << :region_id if current_user&.admin?
     attrs = params.require(:user).permit(*permitted)
+    attrs[:admin] = admin_flag_param if current_user&.admin? && @user != current_user
     if attrs[:password].blank?
       attrs.delete(:password)
       attrs.delete(:password_confirmation)
@@ -88,5 +86,9 @@ class UsersController < ApplicationController
 
   def load_regions
     @regions = Region.order(:name)
+  end
+
+  def admin_flag_param
+    ActiveModel::Type::Boolean.new.cast(params.dig(:user, :admin))
   end
 end
