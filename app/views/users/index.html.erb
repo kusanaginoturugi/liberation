@@ -14,6 +14,7 @@
     <table class="admin-table">
       <thead>
         <tr>
+          <th>ログインID</th>
           <th>名前</th>
           <th>メールアドレス</th>
           <th>聖院</th>
@@ -23,6 +24,7 @@
       <tbody>
         <% @users.each do |user| %>
           <tr class="clickable-row" data-href="<%= edit_user_path(user) %>" tabindex="0" role="link" aria-label="<%= "#{user.name}を編集" %>">
+            <td><%= user.login_id %></td>
             <td><%= user.name %></td>
             <td><%= user.email %></td>
             <td><%= user.region.name %></td>

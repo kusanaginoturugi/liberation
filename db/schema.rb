@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_10_110000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_15_120000) do
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "evangelism_meeting_id", null: false
@@ -90,7 +90,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_110000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "admin", default: false, null: false
+    t.string "login_id", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["login_id"], name: "index_users_on_login_id", unique: true
     t.index ["region_id"], name: "index_users_on_region_id"
   end
 

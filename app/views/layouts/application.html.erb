@@ -69,10 +69,31 @@
           value
             .replace(/[０-９]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xFEE0))
             .replace(/\D/g, "");
+        const normalizeEmailValue = (value) =>
+          value
+            .normalize("NFKC")
+            .replace(/\s+/g, "")
+            .toLowerCase();
+        const normalizeLoginIdValue = (value) =>
+          value
+            .normalize("NFKC")
+            .replace(/\s+/g, "");
 
         const numericOnlyField = (target) => {
           if (!(target instanceof HTMLInputElement)) return null;
           if (target.dataset.numericOnly !== "true") return null;
+
+          return target;
+        };
+        const emailNormalizeField = (target) => {
+          if (!(target instanceof HTMLInputElement)) return null;
+          if (target.dataset.emailNormalize !== "true") return null;
+
+          return target;
+        };
+        const loginIdNormalizeField = (target) => {
+          if (!(target instanceof HTMLInputElement)) return null;
+          if (target.dataset.loginIdNormalize !== "true") return null;
 
           return target;
         };
@@ -83,29 +104,84 @@
             field.value = normalizedValue;
           }
         };
+        const sanitizeEmailField = (field) => {
+          const normalizedValue = normalizeEmailValue(field.value);
+          if (field.value !== normalizedValue) {
+            field.value = normalizedValue;
+          }
+        };
+        const sanitizeLoginIdField = (field) => {
+          const normalizedValue = normalizeLoginIdValue(field.value);
+          if (field.value !== normalizedValue) {
+            field.value = normalizedValue;
+          }
+        };
 
         document.addEventListener("compositionstart", (event) => {
-          const field = numericOnlyField(event.target);
+          const field = numericOnlyField(event.target) || emailNormalizeField(event.target) || loginIdNormalizeField(event.target);
           if (!field) return;
 
           field.dataset.composing = "true";
         });
 
         document.addEventListener("compositionend", (event) => {
-          const field = numericOnlyField(event.target);
-          if (!field) return;
+          const numericField = numericOnlyField(event.target);
+          if (numericField) {
+            delete numericField.dataset.composing;
+            sanitizeNumericField(numericField);
+            return;
+          }
 
-          delete field.dataset.composing;
-          sanitizeNumericField(field);
+          const emailField = emailNormalizeField(event.target);
+          if (emailField) {
+            delete emailField.dataset.composing;
+            sanitizeEmailField(emailField);
+            return;
+          }
+
+          const loginIdField = loginIdNormalizeField(event.target);
+          if (!loginIdField) return;
+
+          delete loginIdField.dataset.composing;
+          sanitizeLoginIdField(loginIdField);
         });
 
         document.addEventListener("input", (event) => {
-          const field = numericOnlyField(event.target);
-          if (!field) return;
-          if (field.dataset.composing === "true") return;
+          const numericField = numericOnlyField(event.target);
+          if (numericField) {
+            if (numericField.dataset.composing === "true") return;
 
-          sanitizeNumericField(field);
+            sanitizeNumericField(numericField);
+            return;
+          }
+
+          const emailField = emailNormalizeField(event.target);
+          if (emailField) {
+            if (emailField.dataset.composing === "true") return;
+
+            sanitizeEmailField(emailField);
+            return;
+          }
+
+          const loginIdField = loginIdNormalizeField(event.target);
+          if (!loginIdField) return;
+          if (loginIdField.dataset.composing === "true") return;
+
+          sanitizeLoginIdField(loginIdField);
         });
+
+        document.addEventListener("blur", (event) => {
+          const emailField = emailNormalizeField(event.target);
+          if (emailField) {
+            sanitizeEmailField(emailField);
+            return;
+          }
+
+          const loginIdField = loginIdNormalizeField(event.target);
+          if (!loginIdField) return;
+
+          sanitizeLoginIdField(loginIdField);
+        }, true);
       });
     </script>
   </body>

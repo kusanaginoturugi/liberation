@@ -1,4 +1,7 @@
 class ApplicationController < ActionController::Base
+  REMEMBER_USER_COOKIE_KEY = :remember_user_id
+  REMEMBER_USER_COOKIE_TTL = 90.days
+
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -9,7 +12,7 @@ class ApplicationController < ActionController::Base
   private
 
   def current_user
-    @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
+    @current_user ||= find_current_user
   end
 
   def user_signed_in?
@@ -23,12 +26,23 @@ class ApplicationController < ActionController::Base
     redirect_to User.exists? ? new_session_path : new_user_path
   end
 
-  def start_session_for(user)
+  def start_session_for(user, remember_me: true)
     reset_session
     session[:user_id] = user.id
+    if remember_me
+      cookies.signed[REMEMBER_USER_COOKIE_KEY] = {
+        value: user.id,
+        expires: REMEMBER_USER_COOKIE_TTL.from_now,
+        httponly: true,
+        same_site: :lax
+      }
+    else
+      cookies.delete(REMEMBER_USER_COOKIE_KEY)
+    end
   end
 
   def terminate_session
+    cookies.delete(REMEMBER_USER_COOKIE_KEY)
     reset_session
   end
 
@@ -60,5 +74,20 @@ class ApplicationController < ActionController::Base
 
   def self.allow_unauthenticated_actions
     @allow_unauthenticated_actions || []
+  end
+
+  def find_current_user
+    if session[:user_id]
+      return User.find_by(id: session[:user_id])
+    end
+
+    remembered_user = User.find_by(id: cookies.signed[REMEMBER_USER_COOKIE_KEY])
+    if remembered_user
+      session[:user_id] = remembered_user.id
+      return remembered_user
+    end
+
+    cookies.delete(REMEMBER_USER_COOKIE_KEY)
+    nil
   end
 end

@@ -15,7 +15,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       password_confirmation: "password123",
       region: @region
     )
-    post session_path, params: { email: @user.email, password: "password123" }
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
   end
 
   test "root page is accessible" do

@@ -5,7 +5,7 @@
   <section class="panel form-panel auth-panel">
     <h1><%= editing_self ? "プロフィール編集" : "ユーザー編集" %></h1>
     <% unless editing_self %>
-      <p class="user-edit-summary"><%= @user.name %> (<%= @user.email %>)</p>
+      <p class="user-edit-summary"><%= @user.name %> (ID: <%= @user.login_id %>, <%= @user.email %>)</p>
     <% end %>
 
     <% if @user.errors.any? %>
@@ -22,13 +22,19 @@
     <%= form_with model: @user, class: "report-form" do |form| %>
       <div class="field-grid">
         <div class="field">
+          <%= form.label :login_id, "ログインID" %>
+          <%= form.text_field :login_id, value: @user.login_id, disabled: true %>
+          <p class="field-hint">ログインIDは自動で割り当てられます。</p>
+        </div>
+
+        <div class="field">
           <%= form.label :name, "名前" %>
           <%= form.text_field :name, required: true %>
         </div>
 
         <div class="field">
           <%= form.label :email, "メールアドレス" %>
-          <%= form.email_field :email, required: true %>
+          <%= form.email_field :email, required: true, autocomplete: "username", autocapitalize: "none", autocorrect: "off", spellcheck: false, inputmode: "email", data: { email_normalize: true } %>
         </div>
 
         <% if current_user.admin? %>

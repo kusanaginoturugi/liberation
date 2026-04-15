@@ -15,14 +15,23 @@
     <%= form_with url: session_path, class: "report-form" do |form| %>
       <div class="field-grid">
         <div class="field">
-          <%= form.label :email, "メールアドレス" %>
-          <%= form.email_field :email, required: true, autofocus: true %>
+          <%= form.label :login_id, "ログインID" %>
+          <%= form.text_field :login_id, value: params[:login_id], required: true, autofocus: true, autocomplete: "username", autocapitalize: "none", autocorrect: "off", spellcheck: false, data: { login_id_normalize: true } %>
+          <small class="field-hint">全角英数字や空白は自動で半角に直します。</small>
         </div>
 
         <div class="field">
           <%= form.label :password, "パスワード" %>
-          <%= form.password_field :password, required: true %>
+          <%= form.password_field :password, required: true, autocomplete: "current-password" %>
         </div>
+      </div>
+
+      <div class="field">
+        <label>
+          <%= check_box_tag :remember_me, "1", params.fetch(:remember_me, "1") != "0" %>
+          ログイン状態を保持する
+        </label>
+        <small class="field-hint">共有の端末では、使い終わったあとに必ずログアウトしてください。</small>
       </div>
 
       <div class="actions">

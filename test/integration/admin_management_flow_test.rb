@@ -26,7 +26,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin sees only meeting management link in single region mode" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get root_path
     assert_includes response.body, "修霊番号一覧"
@@ -38,7 +38,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can update settings" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get edit_settings_path
     assert_response :success
@@ -58,7 +58,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can create user" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get users_path
     assert_includes response.body, "ユーザー追加"
@@ -81,7 +81,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can update own profile without changing password" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get edit_user_path(@admin)
     assert_response :success
@@ -106,7 +106,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can update another user and admin role" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get edit_user_path(@user)
     assert_response :success
@@ -133,7 +133,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can update event" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     other_event = Event.create!(name: "別超抜式", closed: true)
     EventDetail.create!(event: other_event, region: @region, total_serial_count: 1667)
@@ -160,7 +160,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can delete event without reports" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     deletable_event = Event.create!(name: "削除対象")
     EventDetail.create!(event: deletable_event, region: @region, total_serial_count: 1667)
@@ -174,7 +174,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin cannot delete event with reports" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     ChobatsuReport.create!(
       ceremony_date: Date.current,
@@ -200,7 +200,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can create event with event details" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     assert_difference("Event.count", 1) do
       post events_path, params: {
@@ -221,7 +221,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can update event detail" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get event_event_details_path(@event)
     assert_includes response.body, @region.name
@@ -238,7 +238,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "event detail index recreates missing region settings" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     EventDetail.delete_all
 
@@ -251,7 +251,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "numeric inputs advertise numeric-only hints" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get new_chobatsu_report_path
     assert_response :success
@@ -272,7 +272,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can still update region directly" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get regions_path
     assert_includes response.body, "登録伝道会数"
@@ -286,7 +286,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can update evangelism meeting" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     get evangelism_meetings_path
     assert_not_includes response.body, ">編集<"
@@ -315,7 +315,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can create evangelism meeting" do
-    post session_path, params: { email: @admin.email, password: "password123" }
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
     assert_difference("EvangelismMeeting.count", 1) do
       post evangelism_meetings_path, params: {
@@ -334,7 +334,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "non admin cannot access management pages" do
-    post session_path, params: { email: @user.email, password: "password123" }
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
 
     get regions_path
     assert_redirected_to root_path
@@ -359,7 +359,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "non admin can update own profile but cannot edit another user" do
-    post session_path, params: { email: @user.email, password: "password123" }
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
 
     get edit_user_path(@user)
     assert_response :success
