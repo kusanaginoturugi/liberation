@@ -58,6 +58,7 @@
           <th>No.</th>
           <th>挙行日</th>
           <th>伝道会名</th>
+          <th>超抜人数</th>
           <th>超抜霊数</th>
           <th>(内)ノアカード分</th>
           <th>功徳費合計</th>
@@ -74,6 +75,7 @@
             <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
             <td><%= report.evangelism_meeting.name %></td>
             <td><%= report.participant_count %></td>
+            <td><%= report.usage_count %></td>
             <td><%= report.noah_card_count.present? ? report.noah_card_count : "-" %></td>
             <td><%= report.calculated_merit_fee_total %></td>
             <td><%= report.mirokuji_share %></td>

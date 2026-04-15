@@ -224,13 +224,14 @@ class ChobatsuReportsController < ApplicationController
 
   def generate_csv(reports)
     lines = []
-    lines << csv_line([ "挙行日", "伝道会名", "超抜霊数", "(内)ノアカード分", "功徳費合計", "みろく寺分(ノア分勘案せず)", "聖院還付金", "備考欄", "入力者名" ])
+    lines << csv_line([ "挙行日", "伝道会名", "超抜人数", "超抜霊数", "(内)ノアカード分", "功徳費合計", "みろく寺分(ノア分勘案せず)", "聖院還付金", "備考欄", "入力者名" ])
 
     reports.each do |report|
       lines << csv_line([
         report.ceremony_date.strftime("%Y/%m/%d"),
         report.evangelism_meeting.name,
         report.participant_count,
+        report.usage_count,
         report.noah_card_count,
         report.calculated_merit_fee_total,
         report.mirokuji_share,
