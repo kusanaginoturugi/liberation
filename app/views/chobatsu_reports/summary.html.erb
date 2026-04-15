@@ -78,6 +78,7 @@
               <% end %>
             </th>
             <th>伝道会名</th>
+            <th class="summary-number" style="width: 6em">超抜人数</th>
             <th class="summary-number" style="width: 6em">超抜霊数</th>
             <th class="summary-number" style="width: 7em">(内)ノアカード分</th>
             <th class="summary-number" style="width: 7em">功徳費合計</th>
@@ -100,6 +101,7 @@
               <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
               <td><%= report.evangelism_meeting.name %></td>
               <td class="summary-number"><%= number_with_delimiter(report.participant_count) %></td>
+              <td class="summary-number"><%= number_with_delimiter(report.usage_count) %></td>
               <td class="summary-number"><%= report.noah_card_count.present? ? number_with_delimiter(report.noah_card_count) : "-" %></td>
               <td class="summary-number"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
               <td class="summary-number"><%= number_with_delimiter(report.mirokuji_share) %></td>
@@ -122,7 +124,7 @@
           <% end %>
           <% if @summary_reports.empty? %>
             <tr>
-              <td colspan="<%= user_signed_in? ? 11 : 10 %>" class="summary-empty">該当する超抜報告はありません</td>
+              <td colspan="<%= user_signed_in? ? 12 : 11 %>" class="summary-empty">該当する超抜報告はありません</td>
             </tr>
           <% end %>
         </tbody>
@@ -131,6 +133,7 @@
             <tr class="summary-total-row">
               <td colspan="3" class="summary-total-label">合計</td>
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></td>
+              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:usage_count)) %></td>
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum { |r| r.noah_card_count.to_i }) %></td>
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:calculated_merit_fee_total)) %></td>
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:mirokuji_share)) %></td>
