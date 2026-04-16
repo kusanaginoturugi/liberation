@@ -66,7 +66,7 @@ class UsersController < ApplicationController
   end
 
   def user_update_params
-    permitted = [ :email, :name, :password, :password_confirmation ]
+    permitted = [ :login_id, :email, :name, :password, :password_confirmation ]
     permitted << :region_id if current_user&.admin?
     attrs = params.require(:user).permit(*permitted)
     attrs[:admin] = admin_flag_param if current_user&.admin? && @user != current_user
