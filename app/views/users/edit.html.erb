@@ -44,11 +44,18 @@
           </div>
 
           <% unless editing_self %>
-            <div class="field checkbox-field">
-              <label>
-                <%= form.check_box :admin %>
-                管理者
-              </label>
+            <div class="field">
+              <span class="field-label">権限</span>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <%= form.radio_button :admin, false %>
+                  一般
+                </label>
+                <label class="radio-option">
+                  <%= form.radio_button :admin, true %>
+                  管理者
+                </label>
+              </div>
             </div>
           <% end %>
         <% end %>

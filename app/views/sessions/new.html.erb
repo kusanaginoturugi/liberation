@@ -27,10 +27,17 @@
       </div>
 
       <div class="field">
-        <label>
-          <%= check_box_tag :remember_me, "1", params.fetch(:remember_me, "1") != "0" %>
-          ログイン状態を保持する
-        </label>
+        <span class="field-label">ログイン状態</span>
+        <div class="radio-group">
+          <label class="radio-option">
+            <%= radio_button_tag :remember_me, "1", params.fetch(:remember_me, "1") != "0" %>
+            保持する
+          </label>
+          <label class="radio-option">
+            <%= radio_button_tag :remember_me, "0", params.fetch(:remember_me, "1") == "0" %>
+            今回のみ
+          </label>
+        </div>
         <small class="field-hint">共有の端末では、使い終わったあとに必ずログアウトしてください。</small>
       </div>
 

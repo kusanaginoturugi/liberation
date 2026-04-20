@@ -29,11 +29,19 @@
           </div>
         <% end %>
 
-        <div class="field checkbox-field">
-          <%= form.label :closed do %>
-            <%= form.check_box :closed %>
-            終了済みにする（新規報告を受け付けない）
-          <% end %>
+        <div class="field">
+          <span class="field-label">状態</span>
+          <div class="radio-group">
+            <label class="radio-option">
+              <%= form.radio_button :closed, false %>
+              開催中
+            </label>
+            <label class="radio-option">
+              <%= form.radio_button :closed, true %>
+              終了
+            </label>
+          </div>
+          <p class="field-hint">開催中にすると、他の超抜式は自動で終了になります。</p>
         </div>
       </div>
 

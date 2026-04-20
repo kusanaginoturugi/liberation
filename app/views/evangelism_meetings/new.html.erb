@@ -40,11 +40,18 @@
           <%= form.number_field :display_order, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
         </div>
 
-        <div class="field checkbox-field">
-          <label>
-            <%= form.check_box :active %>
-            有効
-          </label>
+        <div class="field">
+          <span class="field-label">状態</span>
+          <div class="radio-group">
+            <label class="radio-option">
+              <%= form.radio_button :active, true %>
+              有効
+            </label>
+            <label class="radio-option">
+              <%= form.radio_button :active, false %>
+              無効
+            </label>
+          </div>
         </div>
       </div>
 

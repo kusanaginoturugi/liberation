@@ -42,8 +42,10 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     get edit_settings_path
     assert_response :success
-    assert_includes response.body, "配色のグラデーションを有効にする"
-    assert_includes response.body, "数字にドロップシャドウを付ける"
+    assert_includes response.body, "配色のグラデーション"
+    assert_includes response.body, "数字のドロップシャドウ"
+    assert_includes response.body, "有効"
+    assert_includes response.body, "無効"
 
     patch settings_path, params: {
       settings: {

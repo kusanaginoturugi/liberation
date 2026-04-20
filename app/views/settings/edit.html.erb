@@ -10,17 +10,31 @@
 
     <%= form_with url: settings_path, method: :patch, scope: :settings, class: "report-form" do |form| %>
       <div class="field-grid">
-        <div class="field checkbox-field">
-          <label>
-            <%= form.check_box :gradient_enabled, { checked: @gradient_enabled }, "true", "false" %>
-            配色のグラデーションを有効にする
-          </label>
+        <div class="field">
+          <span class="field-label">配色のグラデーション</span>
+          <div class="radio-group">
+            <label class="radio-option">
+              <%= form.radio_button :gradient_enabled, "true", checked: @gradient_enabled %>
+              有効
+            </label>
+            <label class="radio-option">
+              <%= form.radio_button :gradient_enabled, "false", checked: !@gradient_enabled %>
+              無効
+            </label>
+          </div>
         </div>
-        <div class="field checkbox-field">
-          <label>
-            <%= form.check_box :number_shadow_enabled, { checked: @number_shadow_enabled }, "true", "false" %>
-            数字にドロップシャドウを付ける
-          </label>
+        <div class="field">
+          <span class="field-label">数字のドロップシャドウ</span>
+          <div class="radio-group">
+            <label class="radio-option">
+              <%= form.radio_button :number_shadow_enabled, "true", checked: @number_shadow_enabled %>
+              有効
+            </label>
+            <label class="radio-option">
+              <%= form.radio_button :number_shadow_enabled, "false", checked: !@number_shadow_enabled %>
+              無効
+            </label>
+          </div>
         </div>
       </div>
 

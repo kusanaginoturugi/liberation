@@ -57,7 +57,9 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'autocomplete="username"'
     assert_includes response.body, 'autocapitalize="none"'
     assert_includes response.body, 'data-login-id-normalize="true"'
-    assert_includes response.body, "ログイン状態を保持する"
+    assert_includes response.body, "ログイン状態"
+    assert_includes response.body, "保持する"
+    assert_includes response.body, "今回のみ"
   end
 
   test "remember me cookie restores login after session cookie is cleared" do
