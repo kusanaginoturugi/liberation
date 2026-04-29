@@ -148,6 +148,42 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal report.user, @user
   end
 
+  test "summary page groups by evangelism meeting by default" do
+    @meeting.update!(display_order: 2)
+    first_meeting = EvangelismMeeting.create!(name: "一番会場", color_code: "#111111", display_order: 1, region: @region)
+
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 10),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: @meeting,
+      participant_count: 1,
+      serial_number_from: 1,
+      serial_number_to: 1,
+      merit_fee_total: 5000
+    )
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 8),
+      region: @region,
+      event: @event,
+      user: @user,
+      evangelism_meeting: first_meeting,
+      participant_count: 1,
+      serial_number_from: 2,
+      serial_number_to: 2,
+      merit_fee_total: 5000
+    )
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id }
+
+    assert_response :success
+    meeting_names = response.body.scan(%r{<td>(#{Regexp.escape(first_meeting.name)}|#{Regexp.escape(@meeting.name)})</td>}).flatten
+    assert_equal [ first_meeting.name, @meeting.name ], meeting_names.first(2)
+    assert_includes response.body, "伝道会名"
+    assert_includes response.body, "▼"
+  end
+
   test "summary page sorts by ceremony date" do
     older_report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 8),
@@ -172,7 +208,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       merit_fee_total: 5000
     )
 
-    get summary_chobatsu_reports_path, params: { event_id: @event.id }
+    get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date }
 
     assert_response :success
     ascending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten
@@ -181,7 +217,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "挙行日"
     assert_includes response.body, "↑"
 
-    get summary_chobatsu_reports_path, params: { event_id: @event.id, direction: :desc }
+    get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date, direction: :desc }
 
     assert_response :success
     descending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten

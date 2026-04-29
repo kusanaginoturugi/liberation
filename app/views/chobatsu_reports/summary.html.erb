@@ -70,14 +70,28 @@
               <%= link_to summary_chobatsu_reports_path(
                     event_id: @selected_event&.id,
                     region_id: @selected_region&.id,
+                    sort: :ceremony_date,
                     direction: @summary_sort_direction == :asc ? :desc : :asc
                   ),
                   class: "summary-sort-link" do %>
                 挙行日
-                <span><%= @summary_sort_direction == :asc ? "↑" : "↓" %></span>
+                <% if @summary_sort_column == :ceremony_date %>
+                  <span><%= @summary_sort_direction == :asc ? "↑" : "↓" %></span>
+                <% end %>
               <% end %>
             </th>
-            <th>伝道会名</th>
+            <th>
+              <%= link_to summary_chobatsu_reports_path(
+                    event_id: @selected_event&.id,
+                    region_id: @selected_region&.id,
+                    sort: :evangelism_meeting,
+                    direction: @summary_sort_column == :evangelism_meeting && @summary_sort_direction == :asc ? :desc : :asc
+                  ),
+                  class: "summary-sort-link" do %>
+                伝道会名
+                <span><%= @summary_sort_column == :evangelism_meeting && @summary_sort_direction == :desc ? "▲" : "▼" %></span>
+              <% end %>
+            </th>
             <th class="summary-number" style="width: 6em">超抜人数</th>
             <th class="summary-number" style="width: 6em">超抜霊数</th>
             <th class="summary-number" style="width: 7em">(内)ノアカード分</th>
