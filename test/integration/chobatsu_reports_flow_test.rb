@@ -215,7 +215,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ older_report.ceremony_date.strftime("%Y/%m/%d"), newer_report.ceremony_date.strftime("%Y/%m/%d") ],
                  ascending_dates.first(2)
     assert_includes response.body, "挙行日"
-    assert_includes response.body, "↑"
+    assert_includes response.body, "▼"
 
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date, direction: :desc }
 
@@ -223,7 +223,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     descending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten
     assert_equal [ newer_report.ceremony_date.strftime("%Y/%m/%d"), older_report.ceremony_date.strftime("%Y/%m/%d") ],
                  descending_dates.first(2)
-    assert_includes response.body, "↓"
+    assert_includes response.body, "▲"
   end
 
   test "new page shows refund summary fields" do
