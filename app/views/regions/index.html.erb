@@ -21,7 +21,7 @@
         <% @regions.each do |region| %>
           <tr class="clickable-row" data-href="<%= edit_region_path(region) %>" tabindex="0" role="link" aria-label="<%= "#{region.name}を編集" %>">
             <td><%= region.name %></td>
-            <td><%= region.try(:evangelism_meetings_count) || region.evangelism_meetings.count %></td>
+            <td><%= region.try(:fellowships_count) || region.fellowships.count %></td>
           </tr>
         <% end %>
       </tbody>

@@ -7,7 +7,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     @next_event = Event.create!(name: "第2回超抜式")
     EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
     EventDetail.create!(event: @next_event, region: @region, total_serial_count: 1667)
-    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
+    @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region, enabled: true)
     @user = User.create!(
       name: "管理者",
       email: "admin@example.com",
@@ -19,14 +19,14 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "root page is accessible" do
-    EvangelismMeeting.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99, region: @region)
+    Fellowship.create!(name: "旧会場", color_code: "#999999", active: false, display_order: 99, region: @region, enabled: true)
     other_region = Region.create!(name: "札幌")
-    EvangelismMeeting.create!(name: "札幌会場", color_code: "#111111", region: other_region)
+    Fellowship.create!(name: "札幌会場", color_code: "#111111", region: other_region, enabled: true)
     ChobatsuReport.create!(
       ceremony_date: Date.current,
       region: @region,
       event: @event,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 3,
@@ -57,12 +57,12 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
   test "root page switches displayed reports by event in single region mode" do
     other_region = Region.create!(name: "札幌")
     EventDetail.create!(event: @event, region: other_region, total_serial_count: 1667)
-    other_meeting = EvangelismMeeting.create!(name: "札幌会場", color_code: "#111111", region: other_region)
+    other_meeting = Fellowship.create!(name: "札幌会場", color_code: "#111111", region: other_region, enabled: true)
     ChobatsuReport.create!(
       ceremony_date: Date.current,
       region: other_region,
       event: @event,
-      evangelism_meeting: other_meeting,
+      fellowship: other_meeting,
       participant_count: 1,
       serial_number_from: 50,
       serial_number_to: 50,
@@ -72,7 +72,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       ceremony_date: Date.current,
       region: @region,
       event: @next_event,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 88,
       serial_number_to: 88,
@@ -93,7 +93,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          evangelism_meeting_id: @meeting.id,
+          fellowship_id: @meeting.id,
           participant_count: 4,
           serial_number_from: 1,
           serial_number_to: 4
@@ -116,7 +116,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 4,
@@ -150,14 +150,14 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
   test "summary page groups by evangelism meeting by default" do
     @meeting.update!(display_order: 2)
-    first_meeting = EvangelismMeeting.create!(name: "一番会場", color_code: "#111111", display_order: 1, region: @region)
+    first_meeting = Fellowship.create!(name: "一番会場", color_code: "#111111", display_order: 1, region: @region, enabled: true)
 
     ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 10),
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 1,
       serial_number_to: 1,
@@ -168,7 +168,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: first_meeting,
+      fellowship: first_meeting,
       participant_count: 1,
       serial_number_from: 2,
       serial_number_to: 2,
@@ -190,7 +190,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 1,
       serial_number_to: 1,
@@ -201,7 +201,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 2,
       serial_number_to: 2,
@@ -259,7 +259,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 4,
@@ -282,7 +282,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 4,
@@ -302,7 +302,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 4,
@@ -322,7 +322,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @user,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 1,
       serial_number_to: 4,
@@ -346,7 +346,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       ceremony_date: Date.current,
       region: @region,
       event: @next_event,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 10,
       serial_number_to: 12,
@@ -357,7 +357,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          evangelism_meeting_id: @meeting.id,
+          fellowship_id: @meeting.id,
           participant_count: 1,
           serial_number_from: 12,
           serial_number_to: 15
@@ -374,7 +374,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       ceremony_date: Date.current,
       region: @region,
       event: @event,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 10,
       serial_number_to: 12,
@@ -385,7 +385,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          evangelism_meeting_id: @meeting.id,
+          fellowship_id: @meeting.id,
           participant_count: 1,
           serial_number_from: 10,
           serial_number_to: 12
@@ -401,7 +401,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       post chobatsu_reports_path, params: {
         chobatsu_report: {
           ceremony_date: Date.current,
-          evangelism_meeting_id: @meeting.id
+          fellowship_id: @meeting.id
         }
       }
     end

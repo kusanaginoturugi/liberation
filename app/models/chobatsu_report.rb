@@ -2,7 +2,7 @@ class ChobatsuReport < ApplicationRecord
   belongs_to :region
   belongs_to :event
   belongs_to :user, optional: true
-  belongs_to :evangelism_meeting
+  belongs_to :fellowship
 
   before_validation :assign_region_from_meeting
   before_validation :assign_merit_fee_total
@@ -15,7 +15,7 @@ class ChobatsuReport < ApplicationRecord
   validates :event, :region, presence: true
   validate :serial_number_range_is_valid
   validate :serial_number_range_is_within_total
-  validate :region_matches_evangelism_meeting
+  validate :region_matches_fellowship
   validate :serial_number_range_does_not_overlap
   validate :event_is_open, on: :create
 
@@ -40,7 +40,7 @@ class ChobatsuReport < ApplicationRecord
   private
 
   def assign_region_from_meeting
-    self.region = evangelism_meeting.region if evangelism_meeting.present?
+    self.region = fellowship.region if fellowship.present?
   end
 
   def assign_merit_fee_total
@@ -78,9 +78,9 @@ class ChobatsuReport < ApplicationRecord
     errors.add(:base, "使用修霊番号が既存データと重複しています (#{overlap.serial_number_from}〜#{overlap.serial_number_to})")
   end
 
-  def region_matches_evangelism_meeting
-    return if evangelism_meeting.blank? || region.blank?
-    return if evangelism_meeting.region_id == region_id
+  def region_matches_fellowship
+    return if fellowship.blank? || region.blank?
+    return if fellowship.region_id == region_id
 
     errors.add(:region, "は伝道会の聖院と一致させてください")
   end

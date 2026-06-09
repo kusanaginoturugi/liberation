@@ -625,6 +625,59 @@ body.number-shadow-disabled .serial-grid td {
   flex-shrink: 0;
 }
 
+.masters-sync {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.masters-sync > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.masters-sync[open] > summary {
+  margin-bottom: 0.75rem;
+}
+
+.masters-sync-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.masters-sync-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.masters-sync-form {
+  margin-top: 1rem;
+}
+
+.fellowship-enabled-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.fellowship-enabled-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
 @media (max-width: 960px) {
   .page-grid {
     grid-template-columns: 1fr;

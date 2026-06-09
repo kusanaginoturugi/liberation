@@ -7,7 +7,12 @@ Rails.application.routes.draw do
   resources :events, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     resources :event_details, only: [ :index, :edit, :update ]
   end
-  resources :evangelism_meetings, only: [ :index, :new, :create, :edit, :update ]
+  resources :fellowships, only: [ :index, :new, :create, :edit, :update ] do
+    collection do
+      post :sync
+      patch :bulk_update_enabled
+    end
+  end
   root "chobatsu_reports#index"
   resources :chobatsu_reports, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     collection do

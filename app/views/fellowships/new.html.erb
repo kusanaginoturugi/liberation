@@ -4,18 +4,18 @@
   <section class="panel form-panel auth-panel">
     <h1>伝道会追加</h1>
 
-    <% if @evangelism_meeting.errors.any? %>
+    <% if @fellowship.errors.any? %>
       <div class="flash flash-alert">
         <strong>追加できませんでした</strong>
         <ul>
-          <% @evangelism_meeting.errors.full_messages.each do |message| %>
+          <% @fellowship.errors.full_messages.each do |message| %>
             <li><%= message %></li>
           <% end %>
         </ul>
       </div>
     <% end %>
 
-    <%= form_with model: @evangelism_meeting, class: "report-form" do |form| %>
+    <%= form_with model: @fellowship, class: "report-form" do |form| %>
       <div class="field-grid">
         <div class="field">
           <%= form.label :name, "伝道会名" %>

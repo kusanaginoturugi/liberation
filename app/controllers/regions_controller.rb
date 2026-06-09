@@ -3,8 +3,8 @@ class RegionsController < ApplicationController
   before_action :set_region, only: [ :edit, :update ]
 
   def index
-    @regions = Region.left_joins(:evangelism_meetings)
-                     .select("regions.*, COUNT(evangelism_meetings.id) AS evangelism_meetings_count")
+    @regions = Region.left_joins(:fellowships)
+                     .select("regions.*, COUNT(fellowships.id) AS fellowships_count")
                      .group("regions.id")
                      .order(:name)
   end

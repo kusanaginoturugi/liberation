@@ -84,12 +84,12 @@
               <%= link_to summary_chobatsu_reports_path(
                     event_id: @selected_event&.id,
                     region_id: @selected_region&.id,
-                    sort: :evangelism_meeting,
-                    direction: @summary_sort_column == :evangelism_meeting && @summary_sort_direction == :asc ? :desc : :asc
+                    sort: :fellowship,
+                    direction: @summary_sort_column == :fellowship && @summary_sort_direction == :asc ? :desc : :asc
                   ),
                   class: "summary-sort-link" do %>
                 伝道会名
-                <span><%= @summary_sort_column == :evangelism_meeting && @summary_sort_direction == :desc ? "▲" : "▼" %></span>
+                <span><%= @summary_sort_column == :fellowship && @summary_sort_direction == :desc ? "▲" : "▼" %></span>
               <% end %>
             </th>
             <th class="summary-number" style="width: 6em">超抜人数</th>
@@ -113,7 +113,7 @@
             <tr>
               <td><%= index + 1 %></td>
               <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
-              <td><%= report.evangelism_meeting.name %></td>
+              <td><%= report.fellowship.name %></td>
               <td class="summary-number"><%= number_with_delimiter(report.participant_count) %></td>
               <td class="summary-number"><%= number_with_delimiter(report.usage_count) %></td>
               <td class="summary-number"><%= report.noah_card_count.present? ? number_with_delimiter(report.noah_card_count) : "-" %></td>

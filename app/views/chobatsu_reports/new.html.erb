@@ -58,9 +58,9 @@
             <%= form.date_field :ceremony_date %>
           </div>
 
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:evangelism_meeting].any? || @chobatsu_report.errors[:evangelism_meeting_id].any? %>">
-            <%= form.label :evangelism_meeting_id, "伝道会名" %>
-            <%= form.collection_select :evangelism_meeting_id, @evangelism_meetings, :id, :name, { prompt: "選択してください" } %>
+          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:fellowship].any? || @chobatsu_report.errors[:fellowship_id].any? %>">
+            <%= form.label :fellowship_id, "伝道会名" %>
+            <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { prompt: "選択してください" } %>
           </div>
 
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
@@ -130,7 +130,7 @@
 
     <%= render "report_grid",
         chobatsu_reports: @chobatsu_reports,
-        legend_evangelism_meetings: @legend_evangelism_meetings,
+        legend_fellowships: @legend_fellowships,
         total_serial_count: @total_serial_count %>
   </div>
 </div>

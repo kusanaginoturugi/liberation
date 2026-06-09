@@ -6,7 +6,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     @other_region = Region.create!(name: "札幌")
     @event = Event.create!(name: "第1回超抜式")
     @event_detail = EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
-    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
+    @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region, enabled: true)
     @admin = User.create!(
       name: "管理者",
       email: "admin@example.com",
@@ -183,7 +183,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
       region: @region,
       event: @event,
       user: @admin,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 1,
       serial_number_to: 1,
@@ -267,9 +267,9 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'name="event_detail[total_serial_count]"'
     assert_includes response.body, 'data-numeric-only="true"'
 
-    get new_evangelism_meeting_path
+    get new_fellowship_path
     assert_response :success
-    assert_includes response.body, 'name="evangelism_meeting[display_order]"'
+    assert_includes response.body, 'name="fellowship[display_order]"'
     assert_includes response.body, 'data-numeric-only="true"'
   end
 
@@ -290,15 +290,15 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   test "admin can update evangelism meeting" do
     post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
-    get evangelism_meetings_path
+    get fellowships_path
     assert_not_includes response.body, ">編集<"
-    assert_includes response.body, edit_evangelism_meeting_path(@meeting)
+    assert_includes response.body, edit_fellowship_path(@meeting)
 
-    get edit_evangelism_meeting_path(@meeting)
+    get edit_fellowship_path(@meeting)
     assert_includes response.body, "type=\"color\""
 
-    patch evangelism_meeting_path(@meeting), params: {
-      evangelism_meeting: {
+    patch fellowship_path(@meeting), params: {
+      fellowship: {
         name: "新大江戸",
         color_code: "#123456",
         region_id: @other_region.id,
@@ -307,7 +307,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to evangelism_meetings_path
+    assert_redirected_to fellowships_path
     @meeting.reload
     assert_equal "新大江戸", @meeting.name
     assert_equal "#123456", @meeting.color_code
@@ -319,9 +319,9 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   test "admin can create evangelism meeting" do
     post session_path, params: { login_id: @admin.login_id, password: "password123" }
 
-    assert_difference("EvangelismMeeting.count", 1) do
-      post evangelism_meetings_path, params: {
-        evangelism_meeting: {
+    assert_difference("Fellowship.count", 1) do
+      post fellowships_path, params: {
+        fellowship: {
           name: "新会場",
           color_code: "#654321",
           region_id: @region.id,
@@ -331,8 +331,8 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to evangelism_meetings_path
-    assert_equal "新会場", EvangelismMeeting.find_by!(name: "新会場").name
+    assert_redirected_to fellowships_path
+    assert_equal "新会場", Fellowship.find_by!(name: "新会場").name
   end
 
   test "non admin cannot access management pages" do
@@ -341,7 +341,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get regions_path
     assert_redirected_to root_path
 
-    get evangelism_meetings_path
+    get fellowships_path
     assert_redirected_to root_path
 
     get events_path

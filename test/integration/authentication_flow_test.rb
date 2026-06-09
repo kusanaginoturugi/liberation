@@ -13,7 +13,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
       password_confirmation: "password123",
       region: @region
     )
-    EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
+    Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region, enabled: true)
   end
 
   test "unauthenticated users can view root page" do

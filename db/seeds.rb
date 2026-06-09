@@ -13,7 +13,7 @@ default_region = Region.find_or_create_by!(name: "共通")
 default_event = Event.find_or_create_by!(name: "第1回超抜式")
 
 rows.each do |row|
-  EvangelismMeeting.find_or_initialize_by(name: row.fetch("name")).tap do |meeting|
+  Fellowship.find_or_initialize_by(name: row.fetch("name")).tap do |meeting|
     meeting.region = Region.find_or_create_by!(name: row.fetch("region_name", "共通"))
     meeting.color_code = row.fetch("color_code")
     meeting.display_order = row["display_order"]

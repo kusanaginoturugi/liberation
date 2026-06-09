@@ -1,0 +1,79 @@
+<% content_for :title, "伝道会一覧" %>
+
+<div class="page-shell">
+  <div class="panel">
+    <div class="panel-header">
+      <h1>伝道会一覧</h1>
+      <%= link_to "伝道会追加", new_fellowship_path, class: "button-secondary" %>
+    </div>
+
+    <% if flash[:notice].present? %>
+      <div class="flash flash-notice"><%= flash[:notice] %></div>
+    <% end %>
+    <% if flash[:alert].present? %>
+      <div class="flash flash-alert"><%= flash[:alert] %></div>
+    <% end %>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>伝道会名</th>
+          <th>聖院</th>
+          <th>色</th>
+          <th>表示順</th>
+          <th>有効</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @fellowships.each do |meeting| %>
+          <tr class="clickable-row" data-href="<%= edit_fellowship_path(meeting) %>" tabindex="0" role="link" aria-label="<%= "#{meeting.name}を編集" %>">
+            <td><%= meeting.name %></td>
+            <td><%= meeting.region.name %></td>
+            <td><span class="legend-swatch" style="<%= "--swatch-color: #{meeting.color_code}" %>"></span> <%= meeting.color_code %></td>
+            <td><%= meeting.display_order %></td>
+            <td><%= meeting.active? ? "有効" : "無効" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <details class="masters-sync">
+    <summary>マスタ連携 (普段は閉じておく)</summary>
+
+    <div class="masters-sync-actions">
+      <%= button_to "マスタ同期", sync_fellowships_path, method: :post, class: "button-secondary", data: { turbo_submits_with: "同期中…" } %>
+      <p class="masters-sync-note">osystem-masters から伝道会一覧を取得して、liberation の fellowships に反映する。enabled は触らない。</p>
+    </div>
+
+    <%= form_with url: bulk_update_enabled_fellowships_path, method: :patch, class: "masters-sync-form" do |form| %>
+      <p class="masters-sync-note">表示対象とする伝道会にチェックを入れて「対象を保存」を押す。チェックを外しても master 側は変わらない。</p>
+      <div class="fellowship-enabled-list">
+        <% @all_fellowships.each do |fellowship| %>
+          <label class="fellowship-enabled-item">
+            <%= check_box_tag "enabled[]", fellowship.id, fellowship.enabled, id: "enabled_#{fellowship.id}" %>
+            <span><%= fellowship.name %></span>
+          </label>
+        <% end %>
+      </div>
+      <%= form.submit "対象を保存", class: "button-secondary", data: { turbo_submits_with: "保存中…" } %>
+    <% end %>
+  </details>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
+      row.addEventListener("click", () => {
+        window.location.href = row.dataset.href;
+      });
+
+      row.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.location.href = row.dataset.href;
+        }
+      });
+    });
+  });
+</script>

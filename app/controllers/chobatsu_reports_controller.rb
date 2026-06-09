@@ -47,7 +47,7 @@ class ChobatsuReportsController < ApplicationController
   def create
     @chobatsu_report = ChobatsuReport.new(chobatsu_report_params)
     @chobatsu_report.user = current_user
-    ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.evangelism_meeting&.region)
+    ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.fellowship&.region)
 
     if @chobatsu_report.save
       redirect_to root_path, notice: "挙行報告を登録しました"
@@ -61,7 +61,7 @@ class ChobatsuReportsController < ApplicationController
 
   def update
     @chobatsu_report.assign_attributes(chobatsu_report_params)
-    ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.evangelism_meeting&.region)
+    ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.fellowship&.region)
 
     if @chobatsu_report.save
       redirect_to summary_chobatsu_reports_path(event_id: @chobatsu_report.event_id), notice: "挙行報告を更新しました"
@@ -92,7 +92,7 @@ class ChobatsuReportsController < ApplicationController
   def chobatsu_report_params
     params.require(:chobatsu_report).permit(
       :ceremony_date,
-      :evangelism_meeting_id,
+      :fellowship_id,
       :participant_count,
       :serial_number_from,
       :serial_number_to,
@@ -108,14 +108,14 @@ class ChobatsuReportsController < ApplicationController
     @events = Event.recent_first
     @selected_region = selected_region_for_index
     @selected_event = selected_event_for_index
-    region_meetings = @selected_region.evangelism_meetings
-    @legend_evangelism_meetings = region_meetings.display_sorted
+    region_meetings = @selected_region.fellowships
+    @legend_fellowships = region_meetings.enabled.display_sorted
     @chobatsu_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
     @total_serial_count = total_serial_count_for(@selected_event, @selected_region)
   rescue ActiveRecord::RecordNotFound
     @regions = []
     @events = []
-    @legend_evangelism_meetings = []
+    @legend_fellowships = []
     @chobatsu_reports = ChobatsuReport.none
     @total_serial_count = 0
   end
@@ -125,9 +125,9 @@ class ChobatsuReportsController < ApplicationController
     @selected_event = selected_event_for_form
     region = current_operational_region
     ensure_event_detail_for(@selected_event, region)
-    region_meetings = region.evangelism_meetings
-    @evangelism_meetings = region_meetings.active.display_sorted
-    @legend_evangelism_meetings = region_meetings.display_sorted
+    region_meetings = region.fellowships
+    @fellowships = region_meetings.active.enabled.display_sorted
+    @legend_fellowships = region_meetings.enabled.display_sorted
     @chobatsu_reports = reports_for_region_and_event(region.id, @selected_event.id)
     @total_serial_count = total_serial_count_for(@selected_event, region)
   rescue ActiveRecord::RecordNotFound
@@ -139,9 +139,9 @@ class ChobatsuReportsController < ApplicationController
     @selected_event = @chobatsu_report.event
     region = @chobatsu_report.region
     @events = Event.recent_first
-    region_meetings = region.evangelism_meetings
-    @evangelism_meetings = region_meetings.active.display_sorted
-    @legend_evangelism_meetings = region_meetings.display_sorted
+    region_meetings = region.fellowships
+    @fellowships = region_meetings.active.enabled.display_sorted
+    @legend_fellowships = region_meetings.enabled.display_sorted
     @chobatsu_reports = reports_for_region_and_event(region.id, @selected_event.id)
     @total_serial_count = total_serial_count_for(@selected_event, region)
   rescue ActiveRecord::RecordNotFound
@@ -179,7 +179,7 @@ class ChobatsuReportsController < ApplicationController
 
   def reports_for_region_and_event(region_id, event_id)
     ChobatsuReport.where(region_id: region_id, event_id: event_id)
-                  .includes(:evangelism_meeting)
+                  .includes(:fellowship)
                   .order(:serial_number_from)
   end
 
@@ -206,7 +206,7 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def summary_sort_column
-    params[:sort] == "ceremony_date" ? :ceremony_date : :evangelism_meeting
+    params[:sort] == "ceremony_date" ? :ceremony_date : :fellowship
   end
 
   def ordered_summary_reports(reports)
@@ -214,10 +214,10 @@ class ChobatsuReportsController < ApplicationController
     when :ceremony_date
       reports.reorder(ceremony_date: @summary_sort_direction, id: @summary_sort_direction)
     else
-      reports.joins(:evangelism_meeting)
+      reports.joins(:fellowship)
              .reorder(
-               EvangelismMeeting.arel_table[:display_order].public_send(@summary_sort_direction),
-               EvangelismMeeting.arel_table[:id].public_send(@summary_sort_direction),
+               Fellowship.arel_table[:display_order].public_send(@summary_sort_direction),
+               Fellowship.arel_table[:id].public_send(@summary_sort_direction),
                ChobatsuReport.arel_table[:ceremony_date].asc,
                ChobatsuReport.arel_table[:id].asc
              )
@@ -249,7 +249,7 @@ class ChobatsuReportsController < ApplicationController
     reports.each do |report|
       lines << csv_line([
         report.ceremony_date.strftime("%Y/%m/%d"),
-        report.evangelism_meeting.name,
+        report.fellowship.name,
         report.participant_count,
         report.usage_count,
         report.noah_card_count,

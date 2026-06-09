@@ -110,11 +110,11 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           port: ${{ secrets.EC2_PORT }}
-          username: ubuntu
+          username: admin
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/liberation
+            cd /home/admin/liberation
             git config core.fileMode false
             git fetch origin
             git checkout origin/main -- scripts/deploy.sh
-            bash /home/ubuntu/liberation/scripts/deploy.sh
+            bash /home/admin/liberation/scripts/deploy.sh

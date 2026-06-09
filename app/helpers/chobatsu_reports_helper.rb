@@ -9,7 +9,7 @@ module ChobatsuReportsHelper
 
   def color_map_for_reports(reports)
     reports.each_with_object({}) do |report, map|
-      color = report.evangelism_meeting.color_code
+      color = report.fellowship.color_code
       (report.serial_number_from..report.serial_number_to).each do |number|
         map[number] = color
       end

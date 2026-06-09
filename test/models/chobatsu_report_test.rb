@@ -7,7 +7,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
     @next_event = Event.create!(name: "第2回超抜式")
     EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
     EventDetail.create!(event: @next_event, region: @region, total_serial_count: 1667)
-    @meeting = EvangelismMeeting.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
+    @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
   end
 
   test "usage_count is calculated from serial number range" do
@@ -15,7 +15,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 3,
       serial_number_from: 10,
       serial_number_to: 15,
@@ -30,7 +30,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 3,
       serial_number_from: 10,
       serial_number_to: 15,
@@ -46,7 +46,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting
+      fellowship: @meeting
     )
 
     assert_not report.valid?
@@ -60,7 +60,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 20,
       serial_number_to: 25,
@@ -71,7 +71,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 25,
       serial_number_to: 30,
@@ -87,7 +87,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 2,
       serial_number_from: 20,
       serial_number_to: 25,
@@ -98,7 +98,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @next_event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 20,
       serial_number_to: 25,
@@ -113,7 +113,7 @@ class ChobatsuReportTest < ActiveSupport::TestCase
       ceremony_date: Date.current,
       event: @event,
       region: @region,
-      evangelism_meeting: @meeting,
+      fellowship: @meeting,
       participant_count: 1,
       serial_number_from: 1660,
       serial_number_to: 1668,
