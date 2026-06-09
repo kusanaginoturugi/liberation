@@ -75,5 +75,21 @@
         }
       });
     });
+
+    document.querySelectorAll(".masters-sync form").forEach((form) => {
+      form.addEventListener("submit", () => {
+        form.querySelectorAll("button[type=submit], input[type=submit]").forEach((btn) => {
+          const submitsWith = btn.dataset.turboSubmitsWith;
+          if (submitsWith) {
+            if (btn.tagName === "INPUT") {
+              btn.value = submitsWith;
+            } else {
+              btn.textContent = submitsWith;
+            }
+          }
+          btn.disabled = true;
+        });
+      });
+    });
   });
 </script>
