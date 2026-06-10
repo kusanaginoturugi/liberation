@@ -1,21 +1,23 @@
 :root {
-  --bg: #f5efe6;
-  --panel: rgba(255, 252, 248, 0.92);
-  --panel-border: rgba(127, 108, 81, 0.18);
-  --text: #2f2418;
-  --muted: #74624f;
-  --accent: #8d5a2f;
-  --accent-strong: #6f431f;
-  --danger-bg: #fff1ef;
-  --danger-text: #912f2b;
-  --notice-bg: #eef8f0;
-  --notice-text: #2d6a38;
-  --shadow: 0 18px 45px rgba(71, 44, 18, 0.12);
+  /* 値は osystem/design/base.css の色味に寄せたもの (紫アクセント + 青みグレー)。
+     変数名と用途は liberation 独自のものを維持。 */
+  --bg: #edf2fb;
+  --panel: rgba(255, 253, 253, 0.92);
+  --panel-border: rgba(127, 136, 160, 0.25);
+  --text: #495567;
+  --muted: #7d88a0;
+  --accent: #b7a6d9;
+  --accent-strong: #907fc0;
+  --danger-bg: #f8eaea;
+  --danger-text: #774545;
+  --notice-bg: #eef2f8;
+  --notice-text: #3f5b80;
+  --shadow: 0 18px 45px rgba(45, 36, 29, 0.12);
   --body-background:
-    radial-gradient(circle at top left, rgba(239, 209, 165, 0.55), transparent 28%),
-    radial-gradient(circle at top right, rgba(173, 211, 169, 0.4), transparent 24%),
-    linear-gradient(180deg, #fbf7f1 0%, var(--bg) 100%);
-  --usage-background: linear-gradient(135deg, rgba(141, 90, 47, 0.12), rgba(239, 177, 132, 0.2));
+    radial-gradient(circle at top left, rgba(183, 166, 217, 0.45), transparent 28%),
+    radial-gradient(circle at top right, rgba(199, 196, 233, 0.4), transparent 24%),
+    linear-gradient(180deg, #faf7f1 0%, var(--bg) 100%);
+  --usage-background: linear-gradient(135deg, rgba(183, 166, 217, 0.15), rgba(199, 196, 233, 0.25));
   --button-background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   --serial-cell-overlay: rgba(255, 255, 255, 0.9);
 }
@@ -33,14 +35,14 @@ body {
 }
 
 body.gradient-disabled {
-  --body-background: #fbf7f1;
-  --usage-background: rgba(239, 177, 132, 0.2);
+  --body-background: #f7f9fd;
+  --usage-background: rgba(183, 166, 217, 0.18);
   --button-background: var(--accent);
   --serial-cell-overlay: rgba(255, 255, 255, 0);
 }
 
 body.gradient-disabled .usage-count {
-  background: rgba(239, 177, 132, 0.2);
+  background: rgba(183, 166, 217, 0.18);
 }
 
 body.gradient-disabled .button-primary {
@@ -64,7 +66,7 @@ body.gradient-disabled .nav-dropdown__menu {
 body.number-shadow-enabled .serial-grid td {
   text-shadow:
     0 0 10px rgba(255, 255, 255, 0.85),
-    0 2px 6px rgba(70, 45, 20, 0.1);
+    0 2px 6px rgba(45, 36, 29, 0.1);
 }
 
 body.number-shadow-disabled .serial-grid td {
@@ -111,7 +113,7 @@ body.number-shadow-disabled .serial-grid td {
   right: 0;
   min-width: 180px;
   padding: 8px;
-  border: 1px solid rgba(115, 97, 73, 0.2);
+  border: 1px solid rgba(127, 136, 160, 0.28);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: var(--shadow);
@@ -127,7 +129,7 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .nav-dropdown__item:hover {
-  background: rgba(141, 90, 47, 0.08);
+  background: rgba(183, 166, 217, 0.1);
 }
 
 .app-nav__inner span {
@@ -145,7 +147,7 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .nav-user-link:hover {
-  background: rgba(141, 90, 47, 0.08);
+  background: rgba(183, 166, 217, 0.1);
 }
 
 .field-hint {
@@ -317,7 +319,7 @@ body.number-shadow-disabled .serial-grid td {
 .field select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(115, 97, 73, 0.2);
+  border: 1px solid rgba(127, 136, 160, 0.28);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.88);
   color: var(--text);
@@ -326,8 +328,8 @@ body.number-shadow-disabled .serial-grid td {
 
 .field input:focus,
 .field select:focus {
-  outline: 2px solid rgba(141, 90, 47, 0.2);
-  border-color: rgba(141, 90, 47, 0.5);
+  outline: 2px solid rgba(144, 127, 192, 0.22);
+  border-color: rgba(144, 127, 192, 0.5);
 }
 
 .usage-field {
@@ -382,7 +384,7 @@ body.number-shadow-disabled .serial-grid td {
 .button-secondary {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(115, 97, 73, 0.2);
+  border: 1px solid rgba(127, 136, 160, 0.28);
   border-radius: 12px;
   padding: 10px 16px;
   background: rgba(255, 255, 255, 0.85);
@@ -408,7 +410,7 @@ body.number-shadow-disabled .serial-grid td {
 .admin-table th,
 .admin-table td {
   padding: 12px 10px;
-  border-bottom: 1px solid rgba(115, 97, 73, 0.12);
+  border-bottom: 1px solid rgba(127, 136, 160, 0.18);
   text-align: left;
 }
 
@@ -448,8 +450,8 @@ body.number-shadow-disabled .serial-grid td {
 
 .summary-total-row td {
   font-weight: 700;
-  border-top: 2px solid rgba(115, 97, 73, 0.3);
-  background: rgba(141, 90, 47, 0.04);
+  border-top: 2px solid rgba(127, 136, 160, 0.4);
+  background: rgba(183, 166, 217, 0.07);
 }
 
 .summary-total-label {
@@ -477,7 +479,7 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .button-danger:hover {
-  background: #fce0de;
+  background: #f1d5d5;
 }
 
 .status-badge {
@@ -494,7 +496,7 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .status-badge--closed {
-  background: rgba(115, 97, 73, 0.12);
+  background: rgba(127, 136, 160, 0.18);
   color: var(--muted);
 }
 
@@ -504,7 +506,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .clickable-row:hover,
 .clickable-row:focus {
-  background: rgba(141, 90, 47, 0.06);
+  background: rgba(183, 166, 217, 0.08);
   outline: none;
 }
 
@@ -572,7 +574,7 @@ body.number-shadow-disabled .serial-grid td {
   overflow: auto;
   max-height: 70vh;
   border-radius: 16px;
-  border: 1px solid rgba(115, 97, 73, 0.12);
+  border: 1px solid rgba(127, 136, 160, 0.18);
   background: rgba(255, 255, 255, 0.6);
 }
 
@@ -585,7 +587,7 @@ body.number-shadow-disabled .serial-grid td {
 .serial-grid td {
   min-width: 70px;
   padding: 12px 8px;
-  border: 1px solid rgba(115, 97, 73, 0.12);
+  border: 1px solid rgba(127, 136, 160, 0.18);
   background: linear-gradient(135deg, var(--cell-color), var(--serial-cell-overlay));
   text-align: center;
   font-size: 0.98rem;
