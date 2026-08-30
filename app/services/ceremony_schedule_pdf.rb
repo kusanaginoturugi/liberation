@@ -2,7 +2,7 @@ require "prawn"
 require "prawn/table"
 
 class CeremonySchedulePdf
-  FONT_PATH = Rails.root.join("app/assets/fonts/NotoSansCJKjp-Regular.otf").freeze
+  FONT_PATH = Rails.root.join("app/assets/fonts/NotoSansJP-Regular.ttf").freeze
 
   def initialize(event:, schedules:, allocation_rows:)
     @event = event
