@@ -248,6 +248,33 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "▲"
   end
 
+  test "past event reports cannot be edited or deleted" do
+    report = ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      region: @region,
+      event: @event,
+      fellowship: @meeting,
+      user: @user,
+      participant_count: 1,
+      serial_number_from: 1,
+      serial_number_to: 1,
+      merit_fee_total: 5000
+    )
+    @event.update!(closed: true)
+    @next_event.update!(closed: false)
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id }
+
+    assert_response :success
+    assert_not_includes response.body, "操作"
+    assert_not_includes response.body, "編集"
+    assert_not_includes response.body, "削除"
+
+    get edit_chobatsu_report_path(report)
+
+    assert_redirected_to summary_chobatsu_reports_path(event_id: @event.id)
+  end
+
   test "new page shows refund summary fields" do
     get new_chobatsu_report_path
 

@@ -6,6 +6,7 @@ class ChobatsuReportsController < ApplicationController
   before_action :load_form_collections, only: [ :new, :create ]
   before_action :load_export_collections, only: [ :export ]
   before_action :set_report, only: [ :edit, :update, :destroy ]
+  before_action :require_open_report_event!, only: [ :edit, :update, :destroy ]
   before_action :authorize_report_edit!, only: [ :edit, :update ]
   before_action :require_admin!, only: [ :destroy ]
   before_action :load_edit_collections, only: [ :edit, :update ]
@@ -87,6 +88,12 @@ class ChobatsuReportsController < ApplicationController
     return if @chobatsu_report.user_id == current_user&.id
 
     redirect_to root_path, alert: "編集権限がありません"
+  end
+
+  def require_open_report_event!
+    return unless @chobatsu_report.event.closed?
+
+    redirect_to summary_chobatsu_reports_path(event_id: @chobatsu_report.event_id), alert: "終了した超抜式の報告は編集・削除できません"
   end
 
   def chobatsu_report_params
