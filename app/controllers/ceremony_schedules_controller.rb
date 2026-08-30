@@ -9,6 +9,10 @@ class CeremonySchedulesController < ApplicationController
 
   def index
     @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
+    @allocation_rows = @ceremony_schedules.group_by(&:fellowship).map do |fellowship, schedules|
+      allocation = CeremonyScheduleAllocation.find_or_initialize_by(event: @selected_event, fellowship: fellowship)
+      { fellowship:, spirit_count: schedules.sum(&:spirit_count), allocation: }
+    end.sort_by { |row| [ row[:fellowship].display_order || Float::INFINITY, row[:fellowship].id ] }
   end
 
   def new
@@ -105,10 +109,12 @@ class CeremonySchedulesController < ApplicationController
   def set_selected_event
     @selected_event = if @ceremony_schedule
       @ceremony_schedule.event
+    elsif action_name.in?(%w[new create])
+      Event.open.recent_first.first || Event.recent_first.first
     elsif params[:event_id].present?
       Event.find(params[:event_id])
     else
-      Event.open.recent_first.first || Event.recent_first.first
+      selected_event_from_navigation
     end
   end
 end

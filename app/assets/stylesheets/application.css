@@ -261,6 +261,55 @@ body.number-shadow-disabled .serial-grid td {
   align-items: stretch;
 }
 
+.schedule-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.8fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.allocation-list {
+  display: grid;
+  gap: 12px;
+}
+
+.allocation-row {
+  padding: 12px;
+  border: 1px solid rgba(127, 136, 160, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.allocation-row__heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.allocation-row__heading span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  margin-top: 10px;
+}
+
+.allocation-form .field input {
+  padding: 9px 10px;
+}
+
+.allocation-row__numbers {
+  margin: 10px 0 0;
+  color: var(--text);
+  font-weight: 700;
+}
+
 .panel {
   padding: 24px;
 }
@@ -456,67 +505,67 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(1),
 .ceremony-schedule-table--with-actions td:nth-child(1) {
-  width: 13%;
+  width: 14%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(2),
 .ceremony-schedule-table--with-actions td:nth-child(2) {
-  width: 17%;
+  width: 16%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(3),
 .ceremony-schedule-table--with-actions td:nth-child(3) {
-  width: 19%;
+  width: 24%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(4),
 .ceremony-schedule-table--with-actions td:nth-child(4) {
-  width: 15%;
+  width: 12%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(5),
 .ceremony-schedule-table--with-actions td:nth-child(5) {
-  width: 15%;
+  width: 10%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(6),
 .ceremony-schedule-table--with-actions td:nth-child(6) {
-  width: 15%;
+  width: 14%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(7),
 .ceremony-schedule-table--with-actions td:nth-child(7) {
-  width: 6%;
+  width: 10%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(1),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(1) {
-  width: 14%;
+  width: 16%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(2),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(2) {
-  width: 18%;
+  width: 20%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(3),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(3) {
-  width: 22%;
+  width: 28%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(4),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(4) {
-  width: 16%;
+  width: 13%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(5),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(5) {
-  width: 16%;
+  width: 11%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(6),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(6) {
-  width: 14%;
+  width: 12%;
 }
 
 .summary-table th {
@@ -906,6 +955,10 @@ body.number-shadow-disabled .serial-grid td {
     grid-template-columns: 1fr;
   }
 
+  .schedule-workspace {
+    grid-template-columns: 1fr;
+  }
+
   .page-header {
     align-items: start;
     flex-direction: column;
@@ -995,6 +1048,16 @@ body.number-shadow-disabled .serial-grid td {
   .panel {
     border-radius: 12px;
     padding: 16px;
+  }
+
+  .allocation-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .allocation-form .button-secondary {
+    grid-column: 1 / -1;
+    justify-content: center;
+    width: 100%;
   }
 
   .summary-table-wrapper {

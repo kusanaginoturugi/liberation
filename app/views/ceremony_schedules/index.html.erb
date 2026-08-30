@@ -28,7 +28,8 @@
     <% end %>
   </section>
 
-  <section class="panel">
+  <div class="schedule-workspace">
+  <section class="panel schedule-workspace__schedule">
     <div class="panel-header">
       <h2>予定一覧</h2>
       <p>霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
@@ -94,4 +95,45 @@
       <p class="mobile-summary-total">霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
     <% end %>
   </section>
+  <section class="panel schedule-workspace__allocations">
+    <div class="panel-header">
+      <h2>番号割り振り</h2>
+      <p>伝道会ごとの霊数合計</p>
+    </div>
+
+    <% if @allocation_rows.empty? %>
+      <p class="summary-empty">挙行予定を入力すると、ここに伝道会ごとの合計が表示されます</p>
+    <% else %>
+      <div class="allocation-list">
+        <% @allocation_rows.each do |row| %>
+          <% fellowship = row[:fellowship] %>
+          <% allocation = row[:allocation] %>
+          <article class="allocation-row">
+            <div class="allocation-row__heading">
+              <strong><%= fellowship.name %></strong>
+              <span><%= number_with_delimiter(row[:spirit_count]) %> 霊</span>
+            </div>
+            <% if current_user&.admin? %>
+              <%= form_with model: allocation, class: "allocation-form" do |form| %>
+                <%= form.hidden_field :event_id %>
+                <%= form.hidden_field :fellowship_id %>
+                <div class="field">
+                  <%= form.label :serial_number_from, "始" %>
+                  <%= form.number_field :serial_number_from, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+                </div>
+                <div class="field">
+                  <%= form.label :serial_number_to, "終" %>
+                  <%= form.number_field :serial_number_to, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+                </div>
+                <%= form.submit "保存", class: "button-secondary compact-button" %>
+              <% end %>
+            <% else %>
+              <p class="allocation-row__numbers"><%= allocation.persisted? ? "#{allocation.serial_number_from} 〜 #{allocation.serial_number_to}" : "未割り振り" %></p>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+  </div>
 </div>

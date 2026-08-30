@@ -1,13 +1,15 @@
 class ApplicationController < ActionController::Base
   REMEMBER_USER_COOKIE_KEY = :remember_user_id
   REMEMBER_USER_COOKIE_TTL = 90.days
+  SELECTED_EVENT_SESSION_KEY = :selected_event_id
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  before_action :remember_selected_event_from_request
   before_action :authenticate_user!
 
-  helper_method :current_user, :user_signed_in?, :single_region_mode?, :gradient_enabled?, :number_shadow_enabled?
+  helper_method :current_user, :user_signed_in?, :single_region_mode?, :gradient_enabled?, :number_shadow_enabled?, :selected_event_id
 
   private
 
@@ -68,6 +70,14 @@ class ApplicationController < ActionController::Base
     SystemSetting.number_shadow_enabled?
   end
 
+  def selected_event_id
+    session[SELECTED_EVENT_SESSION_KEY]
+  end
+
+  def selected_event_from_navigation
+    Event.find_by(id: selected_event_id) || Event.open.recent_first.first || Event.recent_first.first
+  end
+
   def self.allow_unauthenticated_access(only: nil)
     @allow_unauthenticated_actions = Array(only || action_methods).map(&:to_sym)
   end
@@ -89,5 +99,12 @@ class ApplicationController < ActionController::Base
 
     cookies.delete(REMEMBER_USER_COOKIE_KEY)
     nil
+  end
+
+  def remember_selected_event_from_request
+    return unless params[:event_id].present?
+
+    event = Event.find_by(id: params[:event_id])
+    session[SELECTED_EVENT_SESSION_KEY] = event.id if event
   end
 end

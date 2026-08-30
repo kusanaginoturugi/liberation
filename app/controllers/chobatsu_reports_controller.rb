@@ -195,7 +195,7 @@ class ChobatsuReportsController < ApplicationController
   def selected_event_for_index
     return Event.find(params[:event_id]) if params[:event_id].present?
 
-    Event.recent_first.first || Event.new(name: "未設定")
+    selected_event_from_navigation || Event.new(name: "未設定")
   end
 
   def selected_event_for_form
