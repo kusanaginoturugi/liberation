@@ -118,6 +118,28 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_operator allocation_section.index("山梨"), :<, allocation_section.index("大江戸")
   end
 
+  test "schedule page exports a printable A4 schedule and allocation sheet" do
+    CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
+      place: "大江戸会館",
+      assistant_count: 2,
+      spirit_count: 20,
+      minister_name: "山田点伝師"
+    )
+
+    get export_ceremony_schedules_path(event_id: @event.id)
+
+    assert_response :success
+    assert_equal "text/html", response.media_type
+    assert_includes response.body, "A4 portrait"
+    assert_includes response.body, "挙行予定表・番号割り振り"
+    assert_includes response.body, "大江戸会館"
+    assert_includes response.body, "1 〜 20"
+    assert_includes response.body, "window.print()"
+  end
+
   test "assigned user can create and edit own meeting schedule" do
     post session_path, params: { login_id: @user.login_id, password: "password123" }
 

@@ -1,5 +1,5 @@
 class CeremonySchedulesController < ApplicationController
-  allow_unauthenticated_access only: [ :index ]
+  allow_unauthenticated_access only: [ :index, :export ]
 
   before_action :set_ceremony_schedule, only: [ :edit, :update, :destroy ]
   before_action :load_events
@@ -12,6 +12,14 @@ class CeremonySchedulesController < ApplicationController
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
+  end
+
+  def export
+    @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
+    @allocation_sort_direction = allocation_sort_direction
+    @allocation_rows = allocation_rows_for(@ceremony_schedules)
+
+    render :export, layout: false
   end
 
   def new

@@ -4,7 +4,11 @@ Rails.application.routes.draw do
   get "auth/authentik", to: "sessions#authentik", as: :authentik_login
   get "auth/callback", to: "sessions#callback", as: :authentik_callback
   resource :settings, only: [ :edit, :update ]
-  resources :ceremony_schedules, only: [ :index, :new, :create, :edit, :update, :destroy ]
+  resources :ceremony_schedules, only: [ :index, :new, :create, :edit, :update, :destroy ] do
+    collection do
+      get :export
+    end
+  end
   resources :ceremony_schedule_allocations, only: [ :create, :update ]
   resources :users, only: [ :index, :new, :create, :edit, :update ]
   resources :regions, only: [ :index, :edit, :update ]
