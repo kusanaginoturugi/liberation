@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_09_050000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_000100) do
+  create_table "ceremony_schedules", force: :cascade do |t|
+    t.integer "fellowship_id", null: false
+    t.datetime "ceremony_at", null: false
+    t.string "place", null: false
+    t.integer "assistant_count", null: false
+    t.integer "spirit_count", null: false
+    t.string "minister_name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
+    t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"
+  end
   create_table "chobatsu_reports", force: :cascade do |t|
     t.string "assistant_name"
     t.date "ceremony_date", null: false
@@ -92,11 +104,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_050000) do
     t.string "password_digest", null: false
     t.integer "region_id", null: false
     t.datetime "updated_at", null: false
+    t.integer "fellowship_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["fellowship_id"], name: "index_users_on_fellowship_id"
     t.index ["login_id"], name: "index_users_on_login_id", unique: true
     t.index ["region_id"], name: "index_users_on_region_id"
   end
 
+  add_foreign_key "ceremony_schedules", "fellowships"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"
   add_foreign_key "chobatsu_reports", "regions"
@@ -104,5 +119,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_050000) do
   add_foreign_key "event_details", "events"
   add_foreign_key "event_details", "regions"
   add_foreign_key "fellowships", "regions"
+  add_foreign_key "users", "fellowships"
   add_foreign_key "users", "regions"
 end

@@ -1,6 +1,8 @@
 class Fellowship < ApplicationRecord
   belongs_to :region
   has_many :chobatsu_reports, dependent: :restrict_with_exception
+  has_many :ceremony_schedules, dependent: :destroy
+  has_many :users, dependent: :nullify
 
   scope :active, -> { where(active: true) }
   scope :enabled, -> { where(enabled: true) }

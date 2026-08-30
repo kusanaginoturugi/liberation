@@ -38,6 +38,11 @@
 
         <% if current_user&.admin? %>
           <div class="field">
+            <%= form.label :fellowship_id, "担当伝道会" %>
+            <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { prompt: "未設定" } %>
+          </div>
+
+          <div class="field">
             <span class="field-label">権限</span>
             <div class="radio-group">
               <label class="radio-option">

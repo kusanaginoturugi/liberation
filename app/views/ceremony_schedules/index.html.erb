@@ -1,0 +1,81 @@
+<% content_for :title, "挙行予定表" %>
+
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Ceremony Schedule</p>
+      <h1>挙行予定表</h1>
+    </div>
+    <% if user_signed_in? && (current_user.admin? || current_user.fellowship.present?) %>
+      <%= link_to "予定追加", new_ceremony_schedule_path, class: "button-secondary" %>
+    <% end %>
+  </header>
+
+  <% if flash[:notice].present? %>
+    <div class="flash flash-notice"><%= flash[:notice] %></div>
+  <% end %>
+  <% if flash[:alert].present? %>
+    <div class="flash flash-alert"><%= flash[:alert] %></div>
+  <% end %>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>予定一覧</h2>
+      <p>霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
+    </div>
+
+    <div class="summary-table-wrapper">
+      <table class="admin-table ceremony-schedule-table">
+        <thead>
+          <tr>
+            <th>伝道会名</th>
+            <th>挙行日時</th>
+            <th>場所</th>
+            <th class="summary-number">引保師数</th>
+            <th class="summary-number">霊数</th>
+            <th>超抜点伝師</th>
+            <% if user_signed_in? %>
+              <th style="width: 6em">操作</th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% @ceremony_schedules.each_with_index do |schedule, index| %>
+            <tr class="<%= index.even? ? "schedule-row-even" : "schedule-row-odd" %>">
+              <td><%= schedule.fellowship.name %></td>
+              <td><%= l(schedule.ceremony_at, format: :schedule) %></td>
+              <td><%= schedule.place %></td>
+              <td class="summary-number"><%= number_with_delimiter(schedule.assistant_count) %></td>
+              <td class="summary-number"><%= number_with_delimiter(schedule.spirit_count) %></td>
+              <td><%= schedule.minister_name %></td>
+              <% if user_signed_in? %>
+                <td>
+                  <% if current_user.admin? || schedule.fellowship_id == current_user.fellowship_id %>
+                    <%= link_to "編集", edit_ceremony_schedule_path(schedule), class: "text-link" %>
+                  <% else %>
+                    -
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          <% if @ceremony_schedules.empty? %>
+            <tr>
+              <td colspan="<%= user_signed_in? ? 7 : 6 %>" class="summary-empty">挙行予定はまだありません</td>
+            </tr>
+          <% end %>
+        </tbody>
+        <% unless @ceremony_schedules.empty? %>
+          <tfoot>
+            <tr class="summary-total-row">
+              <td colspan="4" class="summary-total-label">合計</td>
+              <td class="summary-number"><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></td>
+              <td></td>
+              <% if user_signed_in? %><td></td><% end %>
+            </tr>
+          </tfoot>
+        <% end %>
+      </table>
+    </div>
+  </section>
+</div>

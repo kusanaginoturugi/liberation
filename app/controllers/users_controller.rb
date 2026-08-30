@@ -6,6 +6,7 @@ class UsersController < ApplicationController
   before_action :set_user, only: [ :edit, :update ]
   before_action :authorize_user_edit!, only: [ :edit, :update ]
   before_action :load_regions, only: [ :new, :create, :edit, :update ]
+  before_action :load_fellowships, only: [ :new, :create, :edit, :update ]
 
   def index
     @users = User.includes(:region).order(:id)
@@ -61,15 +62,16 @@ class UsersController < ApplicationController
 
   def user_params
     attrs = params.require(:user).permit(:email, :password, :password_confirmation, :name, :region_id)
-    attrs[:admin] = admin_flag_param if current_user&.admin?
+    attrs[:fellowship_id] = params.dig(:user, :fellowship_id) if current_user&.admin?
+    attrs[:admin] = admin_flag_param if current_user&.admin? && user_param_present?(:admin)
     attrs
   end
 
   def user_update_params
     permitted = [ :login_id, :email, :name, :password, :password_confirmation ]
-    permitted << :region_id if current_user&.admin?
+    permitted += [ :region_id, :fellowship_id ] if current_user&.admin?
     attrs = params.require(:user).permit(*permitted)
-    attrs[:admin] = admin_flag_param if current_user&.admin? && @user != current_user
+    attrs[:admin] = admin_flag_param if current_user&.admin? && @user != current_user && user_param_present?(:admin)
     if attrs[:password].blank?
       attrs.delete(:password)
       attrs.delete(:password_confirmation)
@@ -88,7 +90,15 @@ class UsersController < ApplicationController
     @regions = Region.order(:name)
   end
 
+  def load_fellowships
+    @fellowships = Fellowship.includes(:region).display_sorted
+  end
+
   def admin_flag_param
     ActiveModel::Type::Boolean.new.cast(params.dig(:user, :admin))
+  end
+
+  def user_param_present?(key)
+    params[:user]&.key?(key)
   end
 end

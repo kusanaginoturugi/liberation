@@ -35,6 +35,7 @@
           </div>
         <% end %>
         <div class="app-nav__actions">
+          <%= link_to "挙行予定表", ceremony_schedules_path, class: "button-secondary" %>
           <%= link_to "修霊番号一覧", root_path, class: "button-secondary" %>
           <% if user_signed_in? %>
             <%= link_to "挙行報告", new_chobatsu_report_path, class: "button-secondary" %>

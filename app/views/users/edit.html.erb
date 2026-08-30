@@ -43,6 +43,11 @@
             <%= form.collection_select :region_id, @regions, :id, :name, { prompt: "選択してください" }, { required: true } %>
           </div>
 
+          <div class="field">
+            <%= form.label :fellowship_id, "担当伝道会" %>
+            <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { prompt: "未設定" } %>
+          </div>
+
           <% unless editing_self %>
             <div class="field">
               <span class="field-label">権限</span>
