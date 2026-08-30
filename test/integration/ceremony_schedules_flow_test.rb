@@ -118,7 +118,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_operator allocation_section.index("山梨"), :<, allocation_section.index("大江戸")
   end
 
-  test "schedule page downloads an A4 schedule and allocation PDF" do
+  test "schedule page reports when Cloudflare PDF is not configured" do
     CeremonySchedule.create!(
       fellowship: @meeting,
       event: @event,
@@ -131,10 +131,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     get export_ceremony_schedules_path(event_id: @event.id)
 
-    assert_response :success
-    assert_equal "application/pdf", response.media_type
-    assert_includes response.headers["Content-Disposition"], "attachment"
-    assert response.body.start_with?("%PDF")
+    assert_response :service_unavailable
+    assert_includes response.body, "Cloudflare PDFの設定がありません"
   end
 
   test "assigned user can create and edit own meeting schedule" do

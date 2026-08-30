@@ -19,14 +19,12 @@ class CeremonySchedulesController < ApplicationController
     @allocation_sort_direction = allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
 
-    send_data CeremonySchedulePdf.new(
-      event: @selected_event,
-      schedules: @ceremony_schedules,
-      allocation_rows: @allocation_rows
-    ).render,
+    send_data CloudflarePdfClient.render(html: render_to_string(template: "ceremony_schedules/export", layout: false)),
               filename: "#{@selected_event.name}_挙行予定表.pdf",
               type: "application/pdf",
               disposition: "attachment"
+  rescue CloudflarePdfClient::Error => e
+    render plain: e.message, status: :service_unavailable
   end
 
   def new

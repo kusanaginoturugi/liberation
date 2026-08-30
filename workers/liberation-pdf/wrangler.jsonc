@@ -1,0 +1,10 @@
+{
+  "name": "liberation-pdf",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-30",
+  "account_id": "11491cf81519cdab52ed4cd993a11a2b",
+  "workers_dev": true,
+  "browser": {
+    "binding": "BROWSER"
+  }
+}
