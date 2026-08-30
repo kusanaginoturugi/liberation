@@ -456,67 +456,67 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(1),
 .ceremony-schedule-table--with-actions td:nth-child(1) {
-  width: 14%;
+  width: 13%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(2),
 .ceremony-schedule-table--with-actions td:nth-child(2) {
-  width: 16%;
+  width: 17%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(3),
 .ceremony-schedule-table--with-actions td:nth-child(3) {
-  width: 24%;
+  width: 19%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(4),
 .ceremony-schedule-table--with-actions td:nth-child(4) {
-  width: 12%;
+  width: 15%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(5),
 .ceremony-schedule-table--with-actions td:nth-child(5) {
-  width: 10%;
+  width: 15%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(6),
 .ceremony-schedule-table--with-actions td:nth-child(6) {
-  width: 14%;
+  width: 15%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(7),
 .ceremony-schedule-table--with-actions td:nth-child(7) {
-  width: 10%;
+  width: 6%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(1),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(1) {
-  width: 16%;
+  width: 14%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(2),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(2) {
-  width: 20%;
+  width: 18%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(3),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(3) {
-  width: 28%;
+  width: 22%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(4),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(4) {
-  width: 13%;
+  width: 16%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(5),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(5) {
-  width: 11%;
+  width: 16%;
 }
 
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(6),
 .ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(6) {
-  width: 12%;
+  width: 14%;
 }
 
 .summary-table th {
