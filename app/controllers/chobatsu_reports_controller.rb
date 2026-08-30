@@ -97,7 +97,8 @@ class ChobatsuReportsController < ApplicationController
       :serial_number_from,
       :serial_number_to,
       :noah_card_count,
-      :notes
+      :notes,
+      serial_number_ranges_attributes: [ :id, :serial_number_from, :serial_number_to, :_destroy ]
     ).tap do |attrs|
       attrs[:event_id] = @selected_event.id if action_name == "create" && @selected_event&.id.present?
     end

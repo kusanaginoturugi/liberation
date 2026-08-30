@@ -302,6 +302,28 @@ body.number-shadow-disabled .serial-grid td {
   align-content: start;
 }
 
+.number-range-list {
+  display: grid;
+  gap: 12px;
+}
+
+.serial-number-range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.serial-number-range .field {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .serial-number-range {
+    grid-template-columns: 1fr;
+  }
+}
+
 .field {
   display: flex;
   flex-direction: column;

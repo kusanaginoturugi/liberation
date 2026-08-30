@@ -10,9 +10,7 @@ module ChobatsuReportsHelper
   def color_map_for_reports(reports)
     reports.each_with_object({}) do |report, map|
       color = report.fellowship.color_code
-      (report.serial_number_from..report.serial_number_to).each do |number|
-        map[number] = color
-      end
+      report.number_ranges.each { |from, to| (from..to).each { |number| map[number] = color } }
     end
   end
 

@@ -1,0 +1,39 @@
+<div class="number-range-list" data-number-range-list>
+  <div class="serial-number-range" data-number-range>
+    <div class="field <%= "field-with-error" if report.errors[:serial_number_from].any? %>">
+      <%= form.label :serial_number_from, "使用修霊番号(始)" %>
+      <%= form.number_field :serial_number_from, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, number_range_from: true } %>
+    </div>
+    <div class="field <%= "field-with-error" if report.errors[:serial_number_to].any? %>">
+      <%= form.label :serial_number_to, "使用修霊番号(終)" %>
+      <%= form.number_field :serial_number_to, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, number_range_to: true } %>
+    </div>
+  </div>
+
+  <div data-additional-number-ranges>
+    <%= form.fields_for :serial_number_ranges do |range_form| %>
+      <div class="serial-number-range" data-number-range data-persisted-number-range="<%= range_form.object.persisted? %>">
+        <%= range_form.hidden_field :_destroy, value: "0", data: { destroy_number_range: true } %>
+        <div class="field">
+          <%= range_form.label :serial_number_from, "使用修霊番号(始)" %>
+          <%= range_form.number_field :serial_number_from, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, number_range_from: true } %>
+        </div>
+        <div class="field">
+          <%= range_form.label :serial_number_to, "使用修霊番号(終)" %>
+          <%= range_form.number_field :serial_number_to, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, number_range_to: true } %>
+        </div>
+        <button type="button" class="button-secondary compact-button" data-remove-number-range>削除</button>
+      </div>
+    <% end %>
+  </div>
+
+  <button type="button" class="button-secondary compact-button" data-add-number-range>番号を追加</button>
+  <template data-number-range-template>
+    <div class="serial-number-range" data-number-range>
+      <input type="hidden" value="0" name="chobatsu_report[serial_number_ranges_attributes][NEW_RECORD][_destroy]" data-destroy-number-range="true">
+      <div class="field"><label>使用修霊番号(始)</label><input type="number" min="1" max="<%= total_serial_count %>" inputmode="numeric" pattern="[0-9]*" name="chobatsu_report[serial_number_ranges_attributes][NEW_RECORD][serial_number_from]" data-numeric-only="true" data-number-range-from="true"></div>
+      <div class="field"><label>使用修霊番号(終)</label><input type="number" min="1" max="<%= total_serial_count %>" inputmode="numeric" pattern="[0-9]*" name="chobatsu_report[serial_number_ranges_attributes][NEW_RECORD][serial_number_to]" data-numeric-only="true" data-number-range-to="true"></div>
+      <button type="button" class="button-secondary compact-button" data-remove-number-range>削除</button>
+    </div>
+  </template>
+</div>

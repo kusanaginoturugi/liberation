@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_000500) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_000600) do
   create_table "ceremony_schedules", force: :cascade do |t|
     t.integer "assistant_count", null: false
     t.datetime "ceremony_at", null: false
@@ -90,6 +90,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_000500) do
     t.index ["name"], name: "index_regions_on_name", unique: true
   end
 
+  create_table "serial_number_ranges", force: :cascade do |t|
+    t.integer "chobatsu_report_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "serial_number_from", null: false
+    t.integer "serial_number_to", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chobatsu_report_id"], name: "index_serial_number_ranges_on_chobatsu_report_id"
+  end
+
   create_table "system_settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key", null: false
@@ -123,6 +132,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_000500) do
   add_foreign_key "event_details", "events"
   add_foreign_key "event_details", "regions"
   add_foreign_key "fellowships", "regions"
+  add_foreign_key "serial_number_ranges", "chobatsu_reports"
   add_foreign_key "users", "fellowships"
   add_foreign_key "users", "regions"
 end

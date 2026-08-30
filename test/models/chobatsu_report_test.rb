@@ -52,7 +52,39 @@ class ChobatsuReportTest < ActiveSupport::TestCase
     assert_not report.valid?
     assert_includes report.errors[:participant_count], "can't be blank"
     assert_includes report.errors[:serial_number_from], "can't be blank"
-    assert_includes report.errors[:serial_number_to], "can't be blank"
+  end
+
+  test "serial number to defaults to serial number from" do
+    report = ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      event: @event,
+      region: @region,
+      fellowship: @meeting,
+      participant_count: 1,
+      serial_number_from: 50
+    )
+
+    assert_equal 50, report.serial_number_to
+    assert_equal 1, report.usage_count
+  end
+
+  test "usage count includes additional serial number ranges" do
+    report = ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      event: @event,
+      region: @region,
+      fellowship: @meeting,
+      participant_count: 2,
+      serial_number_from: 10,
+      serial_number_to: 12,
+      serial_number_ranges_attributes: {
+        "0" => { serial_number_from: 20, serial_number_to: 21 }
+      }
+    )
+
+    assert_equal 5, report.usage_count
+    assert_equal 25_000, report.merit_fee_total
+    assert_equal [ [ 10, 12 ], [ 20, 21 ] ], report.number_ranges
   end
 
   test "serial number ranges cannot overlap" do

@@ -110,6 +110,28 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal @user, ChobatsuReport.last.user
   end
 
+  test "creating a report saves additional serial number ranges" do
+    assert_difference([ "ChobatsuReport.count", "SerialNumberRange.count" ], 1) do
+      post chobatsu_reports_path, params: {
+        chobatsu_report: {
+          ceremony_date: Date.current,
+          fellowship_id: @meeting.id,
+          participant_count: 2,
+          serial_number_from: 10,
+          serial_number_to: 12,
+          serial_number_ranges_attributes: {
+            "0" => { serial_number_from: 20, serial_number_to: 21 }
+          }
+        }
+      }
+    end
+
+    report = ChobatsuReport.last
+    assert_equal 5, report.usage_count
+    assert_equal 25_000, report.merit_fee_total
+    assert_equal [ [ 20, 21 ] ], report.serial_number_ranges.pluck(:serial_number_from, :serial_number_to)
+  end
+
   test "summary page shows registered report data" do
     report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 9),
@@ -409,6 +431,5 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     assert_includes response.body, "Participant count can&#39;t be blank"
     assert_includes response.body, "Serial number from can&#39;t be blank"
-    assert_includes response.body, "Serial number to can&#39;t be blank"
   end
 end

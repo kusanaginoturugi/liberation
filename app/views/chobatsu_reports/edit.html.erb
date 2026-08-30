@@ -51,21 +51,7 @@
             <% end %>
           </div>
 
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_from].any? %>">
-            <%= form.label :serial_number_from, "使用修霊番号(始)" %>
-            <%= form.number_field :serial_number_from, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_from.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "from", action: "input->report-form#update" } %>
-            <% @chobatsu_report.errors.full_messages_for(:serial_number_from).each do |message| %>
-              <p class="field-error"><%= message %></p>
-            <% end %>
-          </div>
-
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:serial_number_to].any? %>">
-            <%= form.label :serial_number_to, "使用修霊番号(終)" %>
-            <%= form.number_field :serial_number_to, min: 1, max: @total_serial_count, value: @chobatsu_report.serial_number_to.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "to", action: "input->report-form#update" } %>
-            <% @chobatsu_report.errors.full_messages_for(:serial_number_to).each do |message| %>
-              <p class="field-error"><%= message %></p>
-            <% end %>
-          </div>
+          <%= render "number_ranges", form: form, report: @chobatsu_report, total_serial_count: @total_serial_count %>
 
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:noah_card_count].any? %>">
             <%= form.label :noah_card_count, "ノアカード分" %>
@@ -117,26 +103,22 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const participantField = document.querySelector("[data-calc-target='participant']");
-    const fromField = document.querySelector("[data-calc-target='from']");
-    const toField = document.querySelector("[data-calc-target='to']");
     const usageOutput = document.querySelector("[data-calc-target='usageOutput']");
     const meritOutput = document.querySelector("[data-calc-target='meritOutput']");
     const mirokujiOutput = document.querySelector("[data-calc-target='mirokujiOutput']");
     const regionRefundOutput = document.querySelector("[data-calc-target='regionRefundOutput']");
 
     const updateTotals = () => {
-      const fromValue = Number.parseInt(fromField.value, 10);
-      const toValue = Number.parseInt(toField.value, 10);
-      let usageCount = 0;
+      const usageCount = Array.from(document.querySelectorAll("[data-number-range]")).reduce((total, range) => {
+        const from = Number.parseInt(range.querySelector("[data-number-range-from]").value, 10);
+        const toField = range.querySelector("[data-number-range-to]");
+        const to = Number.parseInt(toField.value || from, 10);
+        return Number.isNaN(from) || Number.isNaN(to) || to < from ? total : total + to - from + 1;
+      }, 0);
       let meritTotal = 0;
 
       if (usageOutput) {
-        if (Number.isNaN(fromValue) || Number.isNaN(toValue) || toValue < fromValue) {
-          usageOutput.textContent = "0";
-        } else {
-          usageCount = toValue - fromValue + 1;
-          usageOutput.textContent = String(usageCount);
-        }
+        usageOutput.textContent = String(usageCount);
       }
 
       if (meritOutput) {
@@ -153,8 +135,30 @@
       }
     };
 
-    [participantField, fromField, toField].forEach((field) => {
-      if (field) field.addEventListener("input", updateTotals);
+    participantField?.addEventListener("input", updateTotals);
+    document.addEventListener("input", (event) => {
+      if (event.target.matches("[data-number-range-from], [data-number-range-to]")) updateTotals();
+    });
+
+    document.querySelectorAll("[data-number-range-list]").forEach((list) => {
+      const additions = list.querySelector("[data-additional-number-ranges]");
+      const template = list.querySelector("[data-number-range-template]");
+      list.querySelector("[data-add-number-range]").addEventListener("click", () => {
+        additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
+      });
+      list.addEventListener("click", (event) => {
+        if (!event.target.matches("[data-remove-number-range]")) return;
+
+        const range = event.target.closest("[data-number-range]");
+        const destroyField = range.querySelector("[data-destroy-number-range]");
+        if (range.dataset.persistedNumberRange === "true") {
+          destroyField.value = "1";
+          range.hidden = true;
+        } else {
+          range.remove();
+        }
+        updateTotals();
+      });
     });
 
     const firstInvalidField = document.querySelector(".field-with-error input, .field-with-error select, .field-with-error textarea");
