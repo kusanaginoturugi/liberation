@@ -108,8 +108,8 @@
         <div class="allocation-list__header">
           <%= link_to ceremony_schedules_path(
                 event_id: @selected_event.id,
-                allocation_sort: :fellowship,
-                allocation_direction: @allocation_sort_direction == :asc ? :desc : :asc
+                allocation_sort: @next_allocation_sort_direction ? :fellowship : nil,
+                allocation_direction: @next_allocation_sort_direction
               ),
               class: "allocation-sort-link" do %>
             伝道会名

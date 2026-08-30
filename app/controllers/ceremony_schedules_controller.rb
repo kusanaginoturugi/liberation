@@ -10,6 +10,7 @@ class CeremonySchedulesController < ApplicationController
   def index
     @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
     @allocation_sort_direction = allocation_sort_direction
+    @next_allocation_sort_direction = next_allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
   end
 
@@ -120,6 +121,14 @@ class CeremonySchedulesController < ApplicationController
     return nil unless params[:allocation_sort] == "fellowship"
 
     params[:allocation_direction] == "desc" ? :desc : :asc
+  end
+
+  def next_allocation_sort_direction
+    case @allocation_sort_direction
+    when nil then :asc
+    when :asc then :desc
+    else nil
+    end
   end
 
   def allocation_rows_for(schedules)

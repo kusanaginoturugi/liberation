@@ -104,6 +104,18 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     allocation_section = response.body.split("番号割り振り", 2).last
     assert_operator allocation_section.index("大江戸"), :<, allocation_section.index("山梨")
+
+    get ceremony_schedules_path, params: { allocation_sort: :fellowship, allocation_direction: :desc }
+
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("山梨"), :<, allocation_section.index("大江戸")
+    assert_includes allocation_section, "event_id=#{@event.id}\""
+    assert_not_includes allocation_section, "allocation_sort=fellowship"
+
+    get ceremony_schedules_path
+
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("山梨"), :<, allocation_section.index("大江戸")
   end
 
   test "assigned user can create and edit own meeting schedule" do
