@@ -124,7 +124,9 @@ class CeremonySchedulesController < ApplicationController
 
   def allocation_rows_for(schedules)
     rows = schedules.group_by(&:fellowship).map do |fellowship, fellowship_schedules|
-      { fellowship:, spirit_count: fellowship_schedules.sum(&:spirit_count) }
+      allocation = CeremonyScheduleAllocation.find_or_initialize_by(event: @selected_event, fellowship: fellowship)
+      allocation.spirit_count ||= fellowship_schedules.sum(&:spirit_count)
+      { fellowship:, spirit_count: allocation.spirit_count, allocation: }
     end
     rows = rows.sort_by { |row| row[:fellowship].name } if @allocation_sort_direction == :asc
     rows = rows.sort_by { |row| row[:fellowship].name }.reverse if @allocation_sort_direction == :desc

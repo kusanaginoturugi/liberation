@@ -122,7 +122,15 @@
           <% fellowship = row[:fellowship] %>
           <article class="allocation-row">
             <strong><%= fellowship.name %></strong>
-            <span><%= number_with_delimiter(row[:spirit_count]) %></span>
+            <% if current_user&.admin? %>
+              <%= form_with model: row[:allocation], class: "allocation-count-form" do |form| %>
+                <%= form.hidden_field :event_id %>
+                <%= form.hidden_field :fellowship_id %>
+                <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onchange: "this.form.requestSubmit()" %>
+              <% end %>
+            <% else %>
+              <span><%= number_with_delimiter(row[:spirit_count]) %></span>
+            <% end %>
             <span><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></span>
           </article>
         <% end %>
