@@ -35,7 +35,7 @@
             <th class="summary-number">霊数</th>
             <th>超抜点伝師</th>
             <% if user_signed_in? %>
-              <th style="width: 6em">操作</th>
+              <th style="width: 10em">操作</th>
             <% end %>
           </tr>
         </thead>
@@ -49,9 +49,12 @@
               <td class="summary-number"><%= number_with_delimiter(schedule.spirit_count) %></td>
               <td><%= schedule.minister_name %></td>
               <% if user_signed_in? %>
-                <td>
+                <td class="summary-actions">
                   <% if current_user.admin? || schedule.fellowship_id == current_user.fellowship_id %>
                     <%= link_to "編集", edit_ceremony_schedule_path(schedule), class: "text-link" %>
+                    <%= button_to "削除", ceremony_schedule_path(schedule), method: :delete,
+                        class: "button-danger",
+                        form: { data: { turbo_confirm: "この挙行予定を削除しますか？" } } %>
                   <% else %>
                     -
                   <% end %>

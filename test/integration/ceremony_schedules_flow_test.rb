@@ -68,7 +68,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
           place: "大江戸会館",
           assistant_count: 3,
           spirit_count: 25,
-          minister_name: "田中点伝師"
+          minister_name: ""
         }
       }
     end
@@ -106,6 +106,35 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     post session_path, params: { login_id: @user.login_id, password: "password123" }
     get edit_ceremony_schedule_path(schedule)
 
+    assert_redirected_to ceremony_schedules_path
+  end
+
+  test "assigned user can delete own meeting schedule but not another meeting schedule" do
+    own_schedule = CeremonySchedule.create!(
+      fellowship: @meeting,
+      ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
+      place: "大江戸会館",
+      assistant_count: 1,
+      spirit_count: 15
+    )
+    other_schedule = CeremonySchedule.create!(
+      fellowship: @other_meeting,
+      ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
+      place: "札幌会館",
+      assistant_count: 1,
+      spirit_count: 15
+    )
+
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
+
+    assert_difference("CeremonySchedule.count", -1) do
+      delete ceremony_schedule_path(own_schedule)
+    end
+    assert_redirected_to ceremony_schedules_path
+
+    assert_no_difference("CeremonySchedule.count") do
+      delete ceremony_schedule_path(other_schedule)
+    end
     assert_redirected_to ceremony_schedules_path
   end
 

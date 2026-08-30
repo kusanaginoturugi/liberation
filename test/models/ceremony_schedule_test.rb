@@ -26,5 +26,6 @@ class CeremonyScheduleTest < ActiveSupport::TestCase
     )
 
     assert_predicate schedule, :valid?
+    assert_predicate schedule, :save
   end
 end

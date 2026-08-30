@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_000300) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_000400) do
   create_table "ceremony_schedules", force: :cascade do |t|
     t.datetime "ceremony_at", null: false
     t.datetime "created_at", null: false
     t.integer "fellowship_id", null: false
     t.integer "assistant_count", null: false
-    t.string "minister_name", null: false
+    t.string "minister_name"
     t.string "place", null: false
     t.integer "spirit_count", null: false
     t.datetime "updated_at", null: false

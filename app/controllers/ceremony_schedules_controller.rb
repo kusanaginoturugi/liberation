@@ -1,8 +1,8 @@
 class CeremonySchedulesController < ApplicationController
   allow_unauthenticated_access only: [ :index ]
 
-  before_action :set_ceremony_schedule, only: [ :edit, :update ]
-  before_action :authorize_ceremony_schedule_edit!, only: [ :edit, :update ]
+  before_action :set_ceremony_schedule, only: [ :edit, :update, :destroy ]
+  before_action :authorize_ceremony_schedule_edit!, only: [ :edit, :update, :destroy ]
   before_action :load_fellowships, only: [ :new, :create, :edit, :update ]
 
   def index
@@ -38,6 +38,11 @@ class CeremonySchedulesController < ApplicationController
       @ceremony_schedule.errors.add(:fellowship, "の予定を編集する権限がありません") unless authorized_fellowship?(@ceremony_schedule.fellowship)
       render :edit, status: :unprocessable_content
     end
+  end
+
+  def destroy
+    @ceremony_schedule.destroy!
+    redirect_to ceremony_schedules_path, notice: "挙行予定を削除しました"
   end
 
   private
