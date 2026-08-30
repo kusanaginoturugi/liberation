@@ -446,6 +446,77 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table {
   min-width: 900px;
+  table-layout: fixed;
+}
+
+.ceremony-schedule-table th,
+.ceremony-schedule-table td {
+  overflow-wrap: anywhere;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(1),
+.ceremony-schedule-table--with-actions td:nth-child(1) {
+  width: 14%;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(2),
+.ceremony-schedule-table--with-actions td:nth-child(2) {
+  width: 16%;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(3),
+.ceremony-schedule-table--with-actions td:nth-child(3) {
+  width: 24%;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(4),
+.ceremony-schedule-table--with-actions td:nth-child(4) {
+  width: 12%;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(5),
+.ceremony-schedule-table--with-actions td:nth-child(5) {
+  width: 10%;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(6),
+.ceremony-schedule-table--with-actions td:nth-child(6) {
+  width: 14%;
+}
+
+.ceremony-schedule-table--with-actions th:nth-child(7),
+.ceremony-schedule-table--with-actions td:nth-child(7) {
+  width: 10%;
+}
+
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(1),
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(1) {
+  width: 16%;
+}
+
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(2),
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(2) {
+  width: 20%;
+}
+
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(3),
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(3) {
+  width: 28%;
+}
+
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(4),
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(4) {
+  width: 13%;
+}
+
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(5),
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(5) {
+  width: 11%;
+}
+
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) th:nth-child(6),
+.ceremony-schedule-table:not(.ceremony-schedule-table--with-actions) td:nth-child(6) {
+  width: 12%;
 }
 
 .summary-table th {
@@ -968,6 +1039,10 @@ body.number-shadow-disabled .serial-grid td {
     border-bottom: 1px solid rgba(127, 136, 160, 0.14);
     text-align: right;
     overflow-wrap: anywhere;
+  }
+
+  .ceremony-schedule-table tbody td {
+    width: 100% !important;
   }
 
   .summary-table tbody td:last-child,

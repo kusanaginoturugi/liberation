@@ -35,7 +35,7 @@
     </div>
 
     <div class="summary-table-wrapper">
-      <table class="admin-table ceremony-schedule-table">
+      <table class="admin-table ceremony-schedule-table <%= "ceremony-schedule-table--with-actions" if user_signed_in? %>">
         <thead>
           <tr>
             <th>伝道会名</th>
