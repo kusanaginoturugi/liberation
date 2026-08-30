@@ -126,7 +126,7 @@
               <%= form_with model: row[:allocation], class: "allocation-count-form" do |form| %>
                 <%= form.hidden_field :event_id %>
                 <%= form.hidden_field :fellowship_id %>
-                <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onchange: "this.form.requestSubmit()" %>
+                <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onfocus: "this.select()", onchange: "this.form.requestSubmit()" %>
               <% end %>
             <% else %>
               <span><%= number_with_delimiter(row[:spirit_count]) %></span>
