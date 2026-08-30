@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_000600) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_000700) do
   create_table "ceremony_schedules", force: :cascade do |t|
     t.integer "assistant_count", null: false
     t.datetime "ceremony_at", null: false

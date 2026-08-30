@@ -3,8 +3,8 @@ require "test_helper"
 class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   setup do
     @region = Region.create!(name: "共通")
-    @event = Event.create!(name: "第75回超抜式")
-    @previous_event = Event.create!(name: "第74回超抜式", closed: true)
+    @event = Event.create!(name: "第75次超抜式")
+    @previous_event = Event.create!(name: "第74次超抜式", closed: true)
     @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", display_order: 2, region: @region)
     @other_meeting = Fellowship.create!(name: "札幌会場", color_code: "#111111", display_order: 1, region: @region)
     @user = User.create!(
@@ -49,8 +49,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "挙行予定表"
-    assert_includes response.body, "第75回超抜式"
-    assert_includes response.body, "第74回超抜式"
+    assert_includes response.body, "第75次超抜式"
+    assert_includes response.body, "第74次超抜式"
     assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, older_schedule.place
     assert_includes response.body, newer_schedule.place
@@ -154,7 +154,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
       fellowship: @meeting,
       event: @event,
       ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
-      place: "第75回会場",
+      place: "第75次会場",
       assistant_count: 1,
       spirit_count: 15
     )
@@ -162,7 +162,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
       fellowship: @meeting,
       event: @previous_event,
       ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
-      place: "第74回会場",
+      place: "第74次会場",
       assistant_count: 1,
       spirit_count: 15
     )
