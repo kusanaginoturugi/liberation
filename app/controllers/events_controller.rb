@@ -73,7 +73,7 @@ class EventsController < ApplicationController
 
   def destroy
     unless deletable_event?(@event)
-      redirect_to edit_event_path(@event), alert: "超抜報告が紐づいているため削除できません"
+      redirect_to edit_event_path(@event), alert: "超抜報告または挙行予定が紐づいているため削除できません"
       return
     end
 
@@ -125,7 +125,7 @@ class EventsController < ApplicationController
   end
 
   def deletable_event?(event)
-    !event.chobatsu_reports.exists?
+    !event.chobatsu_reports.exists? && !event.ceremony_schedules.exists?
   end
 
   def open_fallback_event!

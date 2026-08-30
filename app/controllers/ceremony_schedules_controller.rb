@@ -2,23 +2,26 @@ class CeremonySchedulesController < ApplicationController
   allow_unauthenticated_access only: [ :index ]
 
   before_action :set_ceremony_schedule, only: [ :edit, :update, :destroy ]
+  before_action :load_events
+  before_action :set_selected_event
   before_action :authorize_ceremony_schedule_edit!, only: [ :edit, :update, :destroy ]
   before_action :load_fellowships, only: [ :new, :create, :edit, :update ]
 
   def index
-    @ceremony_schedules = CeremonySchedule.chronological
+    @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
   end
 
   def new
-    @ceremony_schedule = CeremonySchedule.new(fellowship: editable_fellowship)
+    @ceremony_schedule = CeremonySchedule.new(fellowship: editable_fellowship, event: @selected_event)
   end
 
   def create
     @ceremony_schedule = CeremonySchedule.new(ceremony_schedule_params)
+    @ceremony_schedule.event = @selected_event
     assign_fellowship_for_non_admin
 
     if authorized_fellowship?(@ceremony_schedule.fellowship) && @ceremony_schedule.save
-      redirect_to ceremony_schedules_path, notice: "挙行予定を追加しました"
+      redirect_to ceremony_schedules_path(event_id: @selected_event.id), notice: "挙行予定を追加しました"
     else
       @ceremony_schedule.errors.add(:fellowship, "の予定を入力する権限がありません") unless authorized_fellowship?(@ceremony_schedule.fellowship)
       render :new, status: :unprocessable_content
@@ -33,7 +36,7 @@ class CeremonySchedulesController < ApplicationController
     assign_fellowship_for_non_admin
 
     if authorized_fellowship?(@ceremony_schedule.fellowship) && @ceremony_schedule.save
-      redirect_to ceremony_schedules_path, notice: "挙行予定を更新しました"
+      redirect_to ceremony_schedules_path(event_id: @ceremony_schedule.event_id), notice: "挙行予定を更新しました"
     else
       @ceremony_schedule.errors.add(:fellowship, "の予定を編集する権限がありません") unless authorized_fellowship?(@ceremony_schedule.fellowship)
       render :edit, status: :unprocessable_content
@@ -42,7 +45,7 @@ class CeremonySchedulesController < ApplicationController
 
   def destroy
     @ceremony_schedule.destroy!
-    redirect_to ceremony_schedules_path, notice: "挙行予定を削除しました"
+    redirect_to ceremony_schedules_path(event_id: @ceremony_schedule.event_id), notice: "挙行予定を削除しました"
   end
 
   private
@@ -92,6 +95,20 @@ class CeremonySchedulesController < ApplicationController
       Fellowship.available.includes(:region)
     else
       Array(current_user.fellowship)
+    end
+  end
+
+  def load_events
+    @events = Event.recent_first
+  end
+
+  def set_selected_event
+    @selected_event = if @ceremony_schedule
+      @ceremony_schedule.event
+    elsif params[:event_id].present?
+      Event.find(params[:event_id])
+    else
+      Event.open.recent_first.first || Event.recent_first.first
     end
   end
 end

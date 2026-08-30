@@ -10,17 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_000400) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_000500) do
   create_table "ceremony_schedules", force: :cascade do |t|
+    t.integer "assistant_count", null: false
     t.datetime "ceremony_at", null: false
     t.datetime "created_at", null: false
+    t.integer "event_id", null: false
     t.integer "fellowship_id", null: false
-    t.integer "assistant_count", null: false
     t.string "minister_name"
     t.string "place", null: false
     t.integer "spirit_count", null: false
     t.datetime "updated_at", null: false
     t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
+    t.index ["event_id"], name: "index_ceremony_schedules_on_event_id"
     t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"
   end
 
@@ -112,6 +114,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_000400) do
     t.index ["region_id"], name: "index_users_on_region_id"
   end
 
+  add_foreign_key "ceremony_schedules", "events"
   add_foreign_key "ceremony_schedules", "fellowships"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"

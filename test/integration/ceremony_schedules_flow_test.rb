@@ -3,6 +3,8 @@ require "test_helper"
 class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   setup do
     @region = Region.create!(name: "共通")
+    @event = Event.create!(name: "第75回超抜式")
+    @previous_event = Event.create!(name: "第74回超抜式", closed: true)
     @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", display_order: 2, region: @region)
     @other_meeting = Fellowship.create!(name: "札幌会場", color_code: "#111111", display_order: 1, region: @region)
     @user = User.create!(
@@ -26,6 +28,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   test "public can view schedules ordered by ceremony date with spirit total" do
     newer_schedule = CeremonySchedule.create!(
       fellowship: @meeting,
+      event: @event,
       ceremony_at: Time.zone.local(2026, 5, 2, 14, 0),
       place: "大江戸会館",
       assistant_count: 2,
@@ -34,6 +37,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     )
     older_schedule = CeremonySchedule.create!(
       fellowship: @other_meeting,
+      event: @event,
       ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
       place: "札幌会館",
       assistant_count: 1,
@@ -45,6 +49,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "挙行予定表"
+    assert_includes response.body, "第75回超抜式"
+    assert_includes response.body, "第74回超抜式"
     assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, older_schedule.place
     assert_includes response.body, newer_schedule.place
@@ -62,6 +68,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_difference("CeremonySchedule.count", 1) do
       post ceremony_schedules_path, params: {
+        event_id: @event.id,
         ceremony_schedule: {
           fellowship_id: @other_meeting.id,
           ceremony_at: "2026-05-03T09:00",
@@ -74,8 +81,9 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     end
 
     schedule = CeremonySchedule.order(:id).last
-    assert_redirected_to ceremony_schedules_path
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
     assert_equal @meeting, schedule.fellowship
+    assert_equal @event, schedule.event
 
     patch ceremony_schedule_path(schedule), params: {
       ceremony_schedule: {
@@ -87,7 +95,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
       }
     }
 
-    assert_redirected_to ceremony_schedules_path
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
     schedule.reload
     assert_equal "大江戸新会館", schedule.place
     assert_equal 28, schedule.spirit_count
@@ -96,6 +104,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   test "assigned user cannot edit other meeting schedule" do
     schedule = CeremonySchedule.create!(
       fellowship: @other_meeting,
+      event: @event,
       ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
       place: "札幌会館",
       assistant_count: 1,
@@ -112,6 +121,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   test "assigned user can delete own meeting schedule but not another meeting schedule" do
     own_schedule = CeremonySchedule.create!(
       fellowship: @meeting,
+      event: @event,
       ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
       place: "大江戸会館",
       assistant_count: 1,
@@ -119,6 +129,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     )
     other_schedule = CeremonySchedule.create!(
       fellowship: @other_meeting,
+      event: @event,
       ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
       place: "札幌会館",
       assistant_count: 1,
@@ -130,12 +141,36 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_difference("CeremonySchedule.count", -1) do
       delete ceremony_schedule_path(own_schedule)
     end
-    assert_redirected_to ceremony_schedules_path
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
 
     assert_no_difference("CeremonySchedule.count") do
       delete ceremony_schedule_path(other_schedule)
     end
     assert_redirected_to ceremony_schedules_path
+  end
+
+  test "schedules are shown only for the selected event" do
+    current_schedule = CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
+      place: "第75回会場",
+      assistant_count: 1,
+      spirit_count: 15
+    )
+    previous_schedule = CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @previous_event,
+      ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
+      place: "第74回会場",
+      assistant_count: 1,
+      spirit_count: 15
+    )
+
+    get ceremony_schedules_path(event_id: @event.id)
+
+    assert_includes response.body, current_schedule.place
+    assert_not_includes response.body, previous_schedule.place
   end
 
   test "admin can assign user meeting" do

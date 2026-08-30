@@ -2,6 +2,7 @@ class Event < ApplicationRecord
   has_many :event_details, dependent: :destroy
   has_many :regions, through: :event_details
   has_many :chobatsu_reports, dependent: :restrict_with_exception
+  has_many :ceremony_schedules, dependent: :restrict_with_exception
 
   validates :name, presence: true, uniqueness: true
   validate :open_event_must_remain_available

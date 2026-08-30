@@ -192,7 +192,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     get edit_event_path(@event)
     assert_includes response.body, "削除できません"
-    assert_includes response.body, "超抜報告が紐づいている超抜式は削除できません"
+    assert_includes response.body, "超抜報告または挙行予定が紐づいている超抜式は削除できません"
 
     assert_no_difference("Event.count") do
       delete event_path(@event)

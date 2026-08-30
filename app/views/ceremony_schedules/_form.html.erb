@@ -10,6 +10,7 @@
 <% end %>
 
 <%= form_with model: ceremony_schedule, class: "report-form" do |form| %>
+  <%= hidden_field_tag :event_id, @selected_event.id %>
   <div class="field-grid">
     <div class="field">
       <%= form.label :fellowship_id, "伝道会名" %>
@@ -67,6 +68,6 @@
 
   <div class="actions">
     <%= form.submit "保存する", class: "button-primary" %>
-    <%= link_to "キャンセル", ceremony_schedules_path, class: "button-secondary" %>
+    <%= link_to "キャンセル", ceremony_schedules_path(event_id: @selected_event.id), class: "button-secondary" %>
   </div>
 <% end %>
