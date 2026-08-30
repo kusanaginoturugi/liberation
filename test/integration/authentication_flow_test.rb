@@ -133,6 +133,21 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "既存のmyouou管理者グループもAuthentik管理者として扱います" do
+    with_authentik do
+      claims = {
+        "sub" => "authentik-myouou-admin-1",
+        "email" => "myouou-admin@example.com",
+        "name" => "既存管理者",
+        "groups" => [ "myouou-admins" ]
+      }
+
+      complete_authentik_login(claims)
+
+      assert User.find_by!(email: "myouou-admin@example.com").admin?
+    end
+  end
+
   test "Authentikで権限が設定されていない利用者はログインできません" do
     with_authentik do
       claims = {

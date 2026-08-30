@@ -63,7 +63,7 @@ class SessionsController < ApplicationController
 
   private
 
-  AUTHENTIK_ADMIN_GROUP = "liberation-admin"
+  AUTHENTIK_ADMIN_GROUPS = [ "liberation-admin", "myouou-admins" ].freeze
   AUTHENTIK_FELLOWSHIP_GROUPS = {
     "liberation-oedo" => "大江戸",
     "liberation-odaiba" => "お台場",
@@ -76,7 +76,7 @@ class SessionsController < ApplicationController
     "liberation-yamanashi" => "山梨",
     "liberation-seimeiouin" => "聖明王院",
     "liberation-daibutsuden" => "大仏殿"
-  }.freeze
+  }.merge(Fellowship::AVAILABLE_NAMES.to_h { |name| [ name, name ] }).freeze
 
   def valid_authentik_state?
     expected_state = session.delete(:authentik_state).to_s
@@ -112,7 +112,7 @@ class SessionsController < ApplicationController
     fellowship_names = group_names.filter_map { |group| AUTHENTIK_FELLOWSHIP_GROUPS[group] }.uniq
     raise AuthentikClient::Error, "Authentikで複数の伝道会が設定されています" if fellowship_names.many?
 
-    admin = group_names.include?(AUTHENTIK_ADMIN_GROUP)
+    admin = group_names.intersect?(AUTHENTIK_ADMIN_GROUPS)
     fellowship = Fellowship.find_by(name: fellowship_names.first) if fellowship_names.one?
     return [ admin, fellowship ] if admin || fellowship.present?
 
