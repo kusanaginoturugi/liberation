@@ -343,6 +343,17 @@ body.number-shadow-disabled .serial-grid td {
   color: var(--muted);
 }
 
+.schedule-spirit-total {
+  color: #c62828 !important;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.schedule-spirit-total strong {
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .report-form {
   margin-top: 16px;
 }

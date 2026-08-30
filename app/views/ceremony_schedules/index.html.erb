@@ -32,7 +32,7 @@
   <section class="panel schedule-workspace__schedule">
     <div class="panel-header">
       <h2>予定一覧</h2>
-      <p>霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
+      <p class="schedule-spirit-total">霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
     </div>
 
     <div class="summary-table-wrapper">
