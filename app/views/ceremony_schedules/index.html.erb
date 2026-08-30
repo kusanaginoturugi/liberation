@@ -7,16 +7,6 @@
       <h1>挙行予定表</h1>
       <p class="page-context">対象超抜式: <strong><%= @selected_event.name %></strong></p>
     </div>
-    <div class="page-header-actions">
-      <%= link_to "PDFダウンロード", export_ceremony_schedules_path(
-            event_id: @selected_event.id,
-            allocation_sort: params[:allocation_sort],
-            allocation_direction: params[:allocation_direction]
-          ), class: "button-secondary compact-button", target: "_blank", rel: "noopener" %>
-      <% if user_signed_in? && (current_user.admin? || current_user.fellowship.present?) %>
-        <%= link_to "予定追加", new_ceremony_schedule_path(event_id: @selected_event.id), class: "button-secondary" %>
-      <% end %>
-    </div>
   </header>
 
   <% if flash[:notice].present? %>
@@ -37,9 +27,19 @@
 
   <div class="schedule-workspace">
   <section class="panel schedule-workspace__schedule">
-    <div class="panel-header">
+    <div class="panel-header schedule-panel-header">
       <h2>予定一覧</h2>
       <p class="schedule-spirit-total">霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
+      <div class="schedule-panel-actions">
+        <%= link_to "PDFダウンロード", export_ceremony_schedules_path(
+              event_id: @selected_event.id,
+              allocation_sort: params[:allocation_sort],
+              allocation_direction: params[:allocation_direction]
+            ), class: "button-secondary compact-button" %>
+        <% if user_signed_in? && (current_user.admin? || current_user.fellowship.present?) %>
+          <%= link_to "予定追加", new_ceremony_schedule_path(event_id: @selected_event.id), class: "button-secondary compact-button" %>
+        <% end %>
+      </div>
     </div>
 
     <div class="summary-table-wrapper">

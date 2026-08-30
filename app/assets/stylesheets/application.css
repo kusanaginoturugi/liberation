@@ -354,6 +354,16 @@ body.number-shadow-disabled .serial-grid td {
   font-variant-numeric: tabular-nums;
 }
 
+.schedule-panel-header {
+  flex-wrap: wrap;
+}
+
+.schedule-panel-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .report-form {
   margin-top: 16px;
 }
@@ -1075,6 +1085,24 @@ body.number-shadow-disabled .serial-grid td {
   .panel {
     border-radius: 12px;
     padding: 16px;
+  }
+
+  .schedule-panel-header {
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .schedule-panel-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .schedule-panel-actions .button-secondary {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+    padding-right: 8px;
+    padding-left: 8px;
   }
 
   .allocation-list__header {

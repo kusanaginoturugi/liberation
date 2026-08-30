@@ -19,7 +19,14 @@ class CeremonySchedulesController < ApplicationController
     @allocation_sort_direction = allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
 
-    render :export, layout: false
+    send_data CeremonySchedulePdf.new(
+      event: @selected_event,
+      schedules: @ceremony_schedules,
+      allocation_rows: @allocation_rows
+    ).render,
+              filename: "#{@selected_event.name}_挙行予定表.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
   end
 
   def new
