@@ -128,8 +128,9 @@ class CeremonySchedulesController < ApplicationController
       allocation.spirit_count ||= fellowship_schedules.sum(&:spirit_count)
       { fellowship:, spirit_count: allocation.spirit_count, allocation: }
     end
-    rows = rows.sort_by { |row| row[:fellowship].name } if @allocation_sort_direction == :asc
-    rows = rows.sort_by { |row| row[:fellowship].name }.reverse if @allocation_sort_direction == :desc
+    fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
+    rows = rows.sort_by { |row| fellowship_order.fetch(row[:fellowship].name, Float::INFINITY) } if @allocation_sort_direction == :asc
+    rows = rows.sort_by { |row| fellowship_order.fetch(row[:fellowship].name, Float::INFINITY) }.reverse if @allocation_sort_direction == :desc
 
     next_number = 1
     rows.each do |row|
