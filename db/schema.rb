@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_001000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_111000) do
+  create_table "ceremony_schedule_allocations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.integer "fellowship_id", null: false
+    t.integer "spirit_count", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "fellowship_id"], name: "idx_schedule_allocations_event_fellowship", unique: true
+    t.index ["event_id"], name: "index_ceremony_schedule_allocations_on_event_id"
+    t.index ["fellowship_id"], name: "index_ceremony_schedule_allocations_on_fellowship_id"
+  end
+
   create_table "ceremony_schedules", force: :cascade do |t|
     t.integer "assistant_count", null: false
     t.datetime "ceremony_at", null: false
@@ -24,17 +35,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_001000) do
     t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
     t.index ["event_id"], name: "index_ceremony_schedules_on_event_id"
     t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"
-  end
-
-  create_table "ceremony_schedule_allocations", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "event_id", null: false
-    t.integer "fellowship_id", null: false
-    t.integer "spirit_count", null: false
-    t.datetime "updated_at", null: false
-    t.index ["event_id", "fellowship_id"], name: "idx_schedule_allocations_event_fellowship", unique: true
-    t.index ["event_id"], name: "index_ceremony_schedule_allocations_on_event_id"
-    t.index ["fellowship_id"], name: "index_ceremony_schedule_allocations_on_fellowship_id"
   end
 
   create_table "chobatsu_reports", force: :cascade do |t|
@@ -120,6 +120,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_001000) do
 
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
+    t.string "authentik_subject"
     t.datetime "created_at", null: false
     t.text "email", null: false
     t.integer "fellowship_id"
@@ -128,16 +129,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_001000) do
     t.string "password_digest", null: false
     t.integer "region_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["authentik_subject"], name: "index_users_on_authentik_subject", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["fellowship_id"], name: "index_users_on_fellowship_id"
     t.index ["login_id"], name: "index_users_on_login_id", unique: true
     t.index ["region_id"], name: "index_users_on_region_id"
   end
 
-  add_foreign_key "ceremony_schedules", "events"
-  add_foreign_key "ceremony_schedules", "fellowships"
   add_foreign_key "ceremony_schedule_allocations", "events"
   add_foreign_key "ceremony_schedule_allocations", "fellowships"
+  add_foreign_key "ceremony_schedules", "events"
+  add_foreign_key "ceremony_schedules", "fellowships"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"
   add_foreign_key "chobatsu_reports", "regions"

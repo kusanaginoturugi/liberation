@@ -95,4 +95,83 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     assert_includes response.body, "ログインIDの全角文字や空白は自動で補正しています"
   end
+
+  test "Authentik管理者はメールアドレスで既存ユーザーと結び付きます" do
+    with_authentik do
+      claims = {
+        "sub" => "authentik-admin-1",
+        "email" => @user.email,
+        "name" => "Authentik管理者",
+        "groups" => [ "liberation-admin" ]
+      }
+
+      complete_authentik_login(claims)
+
+      assert_redirected_to root_path
+      @user.reload
+      assert_equal "authentik-admin-1", @user.authentik_subject
+      assert @user.admin?
+      assert_equal "Authentik管理者", @user.name
+    end
+  end
+
+  test "Authentikの伝道会グループで新しい担当者を作成します" do
+    with_authentik do
+      claims = {
+        "sub" => "authentik-oedo-1",
+        "email" => "oedo@example.com",
+        "name" => "大江戸担当者",
+        "groups" => [ "liberation-oedo" ]
+      }
+
+      complete_authentik_login(claims)
+
+      user = User.find_by!(email: "oedo@example.com")
+      assert_equal "authentik-oedo-1", user.authentik_subject
+      assert_equal "大江戸", user.fellowship.name
+      assert_not user.admin?
+    end
+  end
+
+  test "Authentikで権限が設定されていない利用者はログインできません" do
+    with_authentik do
+      claims = {
+        "sub" => "authentik-unassigned-1",
+        "email" => "unassigned@example.com",
+        "name" => "未設定者",
+        "groups" => []
+      }
+
+      complete_authentik_login(claims)
+
+      assert_redirected_to new_session_path
+      follow_redirect!
+      assert_includes response.body, "管理者または担当伝道会が設定されていません"
+      assert_nil User.find_by(email: "unassigned@example.com")
+    end
+  end
+
+  private
+
+  def with_authentik
+    previous_secret = ENV["AUTHENTIK_CLIENT_SECRET"]
+    ENV["AUTHENTIK_CLIENT_SECRET"] = "test-secret"
+    yield
+  ensure
+    ENV["AUTHENTIK_CLIENT_SECRET"] = previous_secret
+  end
+
+  def complete_authentik_login(claims)
+    original_exchange_code = AuthentikClient.method(:exchange_code)
+    original_userinfo = AuthentikClient.method(:userinfo)
+    AuthentikClient.define_singleton_method(:exchange_code) { |_| "test-access-token" }
+    AuthentikClient.define_singleton_method(:userinfo) { |_| claims }
+
+    get authentik_login_path
+    state = Rack::Utils.parse_query(URI.parse(response.location).query).fetch("state")
+    get authentik_callback_path, params: { code: "test-code", state: state }
+  ensure
+    AuthentikClient.define_singleton_method(:exchange_code, original_exchange_code) if original_exchange_code
+    AuthentikClient.define_singleton_method(:userinfo, original_userinfo) if original_userinfo
+  end
 end

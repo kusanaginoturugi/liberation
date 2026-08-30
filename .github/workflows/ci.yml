@@ -103,16 +103,26 @@ jobs:
       - lint
       - test
     runs-on: ubuntu-latest
+    env:
+      AUTHENTIK_CLIENT_SECRET: ${{ secrets.AUTHENTIK_CLIENT_SECRET }}
 
     steps:
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.2.5
         with:
+          envs: AUTHENTIK_CLIENT_SECRET
           host: ${{ secrets.EC2_HOST }}
           port: ${{ secrets.EC2_PORT }}
           username: admin
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            if [ -n "${AUTHENTIK_CLIENT_SECRET:-}" ]; then
+              sudo -n install -d -m 700 /etc/liberation
+              printf 'AUTHENTIK_CLIENT_SECRET=%s\n' "$AUTHENTIK_CLIENT_SECRET" | sudo -n tee /etc/liberation/authentik.env > /dev/null
+              sudo -n install -d -m 755 /etc/systemd/system/liberation.service.d
+              printf '[Service]\nEnvironmentFile=/etc/liberation/authentik.env\n' | sudo -n tee /etc/systemd/system/liberation.service.d/authentik.conf > /dev/null
+              sudo -n systemctl daemon-reload
+            fi
             cd /home/admin/liberation
             git config core.fileMode false
             git fetch origin

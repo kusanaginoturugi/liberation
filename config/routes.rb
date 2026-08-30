@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   resource :session, only: [ :new, :create, :destroy ]
+  get "auth/authentik", to: "sessions#authentik", as: :authentik_login
+  get "auth/callback", to: "sessions#callback", as: :authentik_callback
   resource :settings, only: [ :edit, :update ]
   resources :ceremony_schedules, only: [ :index, :new, :create, :edit, :update, :destroy ]
   resources :ceremony_schedule_allocations, only: [ :create, :update ]
