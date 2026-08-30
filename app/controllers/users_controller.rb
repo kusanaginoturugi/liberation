@@ -91,7 +91,7 @@ class UsersController < ApplicationController
   end
 
   def load_fellowships
-    @fellowships = Fellowship.includes(:region).display_sorted
+    @fellowships = Fellowship.available.includes(:region)
   end
 
   def admin_flag_param

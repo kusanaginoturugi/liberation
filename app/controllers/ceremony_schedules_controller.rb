@@ -84,7 +84,7 @@ class CeremonySchedulesController < ApplicationController
 
   def load_fellowships
     @fellowships = if current_user&.admin?
-      Fellowship.includes(:region).display_sorted
+      Fellowship.available.includes(:region)
     else
       Array(current_user.fellowship)
     end

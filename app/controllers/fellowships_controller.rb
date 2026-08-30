@@ -4,8 +4,8 @@ class FellowshipsController < ApplicationController
   before_action :load_regions, only: [ :new, :create, :edit, :update ]
 
   def index
-    @fellowships = Fellowship.includes(:region).where(enabled: true).display_sorted
-    @all_fellowships = Fellowship.includes(:region).order(:display_order, :name).load
+    @fellowships = Fellowship.available.includes(:region)
+    @all_fellowships = Fellowship.available.includes(:region)
   end
 
   def sync
@@ -19,7 +19,7 @@ class FellowshipsController < ApplicationController
     enabled_ids = Array(params[:enabled]).map(&:to_i).to_set
     Fellowship.transaction do
       Fellowship.find_each do |fellowship|
-        want = enabled_ids.include?(fellowship.id)
+        want = fellowship.name.in?(Fellowship::AVAILABLE_NAMES) && enabled_ids.include?(fellowship.id)
         fellowship.update!(enabled: want) if fellowship.enabled != want
       end
     end

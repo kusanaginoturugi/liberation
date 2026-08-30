@@ -10,4 +10,13 @@ class FellowshipTest < ActiveSupport::TestCase
     assert_equal [ early, late ], Fellowship.active.display_sorted.to_a
     assert_not_includes Fellowship.active.display_sorted, inactive
   end
+
+  test "available scope contains only the approved fellowships in their configured order" do
+    region = Region.create!(name: "共通")
+    Fellowship.create!(name: "大仏殿", color_code: "#111111", region: region)
+    Fellowship.create!(name: "大江戸", color_code: "#222222", region: region)
+    Fellowship.create!(name: "対象外", color_code: "#333333", region: region)
+
+    assert_equal [ "大江戸", "大仏殿" ], Fellowship.available.pluck(:name)
+  end
 end

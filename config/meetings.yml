@@ -44,3 +44,13 @@ meetings:
     color_code: "#C2B0D9"
     display_order: 90
     active: true
+  - name: 聖明王院
+    region_name: 共通
+    color_code: "#B9C6D3"
+    display_order: 100
+    active: true
+  - name: 大仏殿
+    region_name: 共通
+    color_code: "#D7C9A5"
+    display_order: 110
+    active: true
