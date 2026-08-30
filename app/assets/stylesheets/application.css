@@ -703,6 +703,107 @@ body.number-shadow-disabled .serial-grid td {
   font-size: 0.85rem;
 }
 
+.schedule-datetime-picker {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7.5rem;
+  gap: 0.5rem;
+}
+
+.schedule-date-button,
+.schedule-time-input {
+  min-height: 2.5rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+
+.schedule-date-button {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.schedule-time-input {
+  width: 100%;
+  padding: 0.4rem 0.55rem;
+}
+
+.schedule-calendar {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: min(21rem, 100%);
+  padding: 0.75rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.schedule-calendar__header,
+.schedule-calendar__weekdays,
+.schedule-calendar__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: center;
+  text-align: center;
+}
+
+.schedule-calendar__header {
+  grid-template-columns: 2.25rem 1fr 2.25rem;
+  margin-bottom: 0.65rem;
+}
+
+.calendar-nav-button,
+.schedule-calendar__day {
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.calendar-nav-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.5rem;
+}
+
+.schedule-calendar__weekdays {
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.schedule-calendar__day {
+  height: 2.25rem;
+  margin: 0.05rem;
+}
+
+.schedule-calendar .is-saturday {
+  color: #1666c5;
+}
+
+.schedule-calendar .is-sunday {
+  color: #d63a3a;
+}
+
+.schedule-calendar__day:hover,
+.schedule-calendar__day:focus-visible {
+  outline: 0;
+  background: #e7f0fd;
+}
+
+.schedule-calendar__day.is-selected {
+  background: #1666c5;
+  color: #fff;
+}
+
 @media (max-width: 960px) {
   .page-grid {
     grid-template-columns: 1fr;

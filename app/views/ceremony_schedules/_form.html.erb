@@ -24,7 +24,24 @@
 
     <div class="field">
       <%= form.label :ceremony_at, "挙行日時" %>
-      <%= form.datetime_local_field :ceremony_at, required: true %>
+      <div class="schedule-datetime-picker" data-schedule-datetime-picker>
+        <%= form.hidden_field :ceremony_at, data: { schedule_datetime_value: true } %>
+        <button type="button" class="schedule-date-button" data-schedule-date-button aria-expanded="false">
+          日付を選択
+        </button>
+        <%= time_field_tag "ceremony_schedule_time", ceremony_schedule.ceremony_at&.strftime("%H:%M"), required: true, class: "schedule-time-input", data: { schedule_time_input: true }, aria: { label: "挙行時刻" } %>
+        <div class="schedule-calendar" data-schedule-calendar hidden>
+          <div class="schedule-calendar__header">
+            <button type="button" class="calendar-nav-button" data-schedule-calendar-previous aria-label="前の月">‹</button>
+            <strong data-schedule-calendar-title></strong>
+            <button type="button" class="calendar-nav-button" data-schedule-calendar-next aria-label="次の月">›</button>
+          </div>
+          <div class="schedule-calendar__weekdays" aria-hidden="true">
+            <span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span class="is-saturday">土</span><span class="is-sunday">日</span>
+          </div>
+          <div class="schedule-calendar__days" data-schedule-calendar-days></div>
+        </div>
+      </div>
     </div>
 
     <div class="field">
