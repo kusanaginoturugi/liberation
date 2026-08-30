@@ -139,7 +139,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
         "sub" => "authentik-myouou-admin-1",
         "email" => "myouou-admin@example.com",
         "name" => "既存管理者",
-        "groups" => [ "myouou-admins" ]
+        "groups" => [ "myouou-admins", "大江戸", "お台場" ]
       }
 
       complete_authentik_login(claims)

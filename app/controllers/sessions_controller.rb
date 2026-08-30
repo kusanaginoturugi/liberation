@@ -109,12 +109,14 @@ class SessionsController < ApplicationController
 
   def authentik_permissions(groups)
     group_names = Array(groups).map(&:to_s)
+    admin = group_names.intersect?(AUTHENTIK_ADMIN_GROUPS)
     fellowship_names = group_names.filter_map { |group| AUTHENTIK_FELLOWSHIP_GROUPS[group] }.uniq
+    return [ true, nil ] if admin
+
     raise AuthentikClient::Error, "Authentikで複数の伝道会が設定されています" if fellowship_names.many?
 
-    admin = group_names.intersect?(AUTHENTIK_ADMIN_GROUPS)
     fellowship = Fellowship.find_by(name: fellowship_names.first) if fellowship_names.one?
-    return [ admin, fellowship ] if admin || fellowship.present?
+    return [ false, fellowship ] if fellowship.present?
 
     raise AuthentikClient::Error, "Authentikで管理者または担当伝道会が設定されていません"
   end
