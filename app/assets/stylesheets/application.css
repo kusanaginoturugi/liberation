@@ -503,6 +503,10 @@ body.number-shadow-disabled .serial-grid td {
   color: var(--muted);
 }
 
+.mobile-summary-total {
+  display: none;
+}
+
 .summary-actions {
   white-space: nowrap;
   display: flex;
@@ -838,5 +842,186 @@ body.number-shadow-disabled .serial-grid td {
 
   .panel {
     padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-nav {
+    padding-top: 12px;
+  }
+
+  .app-nav__inner {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .nav-user-link {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .app-nav__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .app-nav__actions .button-secondary,
+  .app-nav__actions .nav-dropdown__summary,
+  .app-nav__actions form {
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .app-nav__actions form .button-secondary {
+    width: 100%;
+  }
+
+  .nav-dropdown__menu {
+    left: 0;
+    right: auto;
+  }
+
+  .page-shell {
+    width: min(100% - 24px, 1280px);
+    margin-top: 20px;
+  }
+
+  .page-header {
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .page-header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .page-header-actions .button-secondary,
+  .page-header-actions .nav-dropdown__summary {
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .setting-card {
+    min-width: 0;
+    padding: 10px 4px;
+  }
+
+  .setting-card span {
+    font-size: 0.75rem;
+  }
+
+  .setting-card strong {
+    font-size: 1.35rem;
+  }
+
+  .panel {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .summary-table-wrapper {
+    overflow: visible;
+  }
+
+  .summary-table,
+  .ceremony-schedule-table,
+  .summary-table tbody,
+  .ceremony-schedule-table tbody,
+  .summary-table tr,
+  .ceremony-schedule-table tr,
+  .summary-table td,
+  .ceremony-schedule-table td {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .summary-table thead,
+  .ceremony-schedule-table thead,
+  .summary-table tfoot,
+  .ceremony-schedule-table tfoot {
+    display: none;
+  }
+
+  .summary-table tbody tr,
+  .ceremony-schedule-table tbody tr {
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border: 1px solid rgba(127, 136, 160, 0.2);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .summary-table tbody td,
+  .ceremony-schedule-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(6.8rem, 42%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(127, 136, 160, 0.14);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .summary-table tbody td:last-child,
+  .ceremony-schedule-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .summary-table tbody td::before,
+  .ceremony-schedule-table tbody td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .summary-table .summary-actions,
+  .ceremony-schedule-table .summary-actions {
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .summary-table .summary-actions > *,
+  .ceremony-schedule-table .summary-actions > * {
+    grid-column: 2;
+  }
+
+  .summary-table .summary-empty,
+  .ceremony-schedule-table .summary-empty {
+    display: block;
+    text-align: center;
+  }
+
+  .summary-table .summary-empty::before,
+  .ceremony-schedule-table .summary-empty::before {
+    content: none;
+  }
+
+  .mobile-summary-total {
+    display: block;
+    margin: 16px 0 0;
+    padding-top: 14px;
+    border-top: 2px solid rgba(127, 136, 160, 0.3);
+    text-align: right;
+  }
+
+  .serial-grid-wrapper {
+    max-height: 56vh;
+  }
+
+  .serial-grid td {
+    min-width: 0;
+    padding: 9px 3px;
+    font-size: 0.85rem;
   }
 }

@@ -200,7 +200,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
     assert_response :success
-    meeting_names = response.body.scan(%r{<td>(#{Regexp.escape(first_meeting.name)}|#{Regexp.escape(@meeting.name)})</td>}).flatten
+    meeting_names = response.body.scan(%r{<td[^>]*>(#{Regexp.escape(first_meeting.name)}|#{Regexp.escape(@meeting.name)})</td>}).flatten
     assert_equal [ first_meeting.name, @meeting.name ], meeting_names.first(2)
     assert_includes response.body, "伝道会名"
     assert_includes response.body, "▼"
@@ -233,7 +233,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date }
 
     assert_response :success
-    ascending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    ascending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
     assert_equal [ older_report.ceremony_date.strftime("%Y/%m/%d"), newer_report.ceremony_date.strftime("%Y/%m/%d") ],
                  ascending_dates.first(2)
     assert_includes response.body, "挙行日"
@@ -242,7 +242,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date, direction: :desc }
 
     assert_response :success
-    descending_dates = response.body.scan(%r{<td>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    descending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
     assert_equal [ newer_report.ceremony_date.strftime("%Y/%m/%d"), older_report.ceremony_date.strftime("%Y/%m/%d") ],
                  descending_dates.first(2)
     assert_includes response.body, "▲"

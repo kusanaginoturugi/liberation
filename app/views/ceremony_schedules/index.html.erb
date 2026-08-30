@@ -52,14 +52,14 @@
         <tbody>
           <% @ceremony_schedules.each_with_index do |schedule, index| %>
             <tr class="<%= index.even? ? "schedule-row-even" : "schedule-row-odd" %>">
-              <td><%= schedule.fellowship.name %></td>
-              <td><%= l(schedule.ceremony_at, format: :schedule) %></td>
-              <td><%= schedule.place %></td>
-              <td class="summary-number"><%= number_with_delimiter(schedule.assistant_count) %></td>
-              <td class="summary-number"><%= number_with_delimiter(schedule.spirit_count) %></td>
-              <td><%= schedule.minister_name %></td>
+              <td data-label="伝道会名"><%= schedule.fellowship.name %></td>
+              <td data-label="挙行日時"><%= l(schedule.ceremony_at, format: :schedule) %></td>
+              <td data-label="場所"><%= schedule.place %></td>
+              <td class="summary-number" data-label="引保師数"><%= number_with_delimiter(schedule.assistant_count) %></td>
+              <td class="summary-number" data-label="霊数"><%= number_with_delimiter(schedule.spirit_count) %></td>
+              <td data-label="超抜点伝師"><%= schedule.minister_name.presence || "-" %></td>
               <% if user_signed_in? %>
-                <td class="summary-actions">
+                <td class="summary-actions" data-label="操作">
                   <% if current_user.admin? || schedule.fellowship_id == current_user.fellowship_id %>
                     <%= link_to "編集", edit_ceremony_schedule_path(schedule), class: "text-link" %>
                     <%= button_to "削除", ceremony_schedule_path(schedule), method: :delete,
@@ -90,5 +90,8 @@
         <% end %>
       </table>
     </div>
+    <% unless @ceremony_schedules.empty? %>
+      <p class="mobile-summary-total">霊数合計 <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong></p>
+    <% end %>
   </section>
 </div>

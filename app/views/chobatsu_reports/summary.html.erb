@@ -111,19 +111,19 @@
         <tbody>
           <% @summary_reports.each_with_index do |report, index| %>
             <tr>
-              <td><%= index + 1 %></td>
-              <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
-              <td><%= report.fellowship.name %></td>
-              <td class="summary-number"><%= number_with_delimiter(report.participant_count) %></td>
-              <td class="summary-number"><%= number_with_delimiter(report.usage_count) %></td>
-              <td class="summary-number"><%= report.noah_card_count.present? ? number_with_delimiter(report.noah_card_count) : "-" %></td>
-              <td class="summary-number"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
-              <td class="summary-number"><%= number_with_delimiter(report.mirokuji_share) %></td>
-              <td class="summary-number"><%= number_with_delimiter(report.region_refund) %></td>
-              <td><%= report.notes %></td>
-              <td><%= report.user&.name || "未設定" %></td>
+              <td data-label="No."><%= index + 1 %></td>
+              <td data-label="挙行日"><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
+              <td data-label="伝道会名"><%= report.fellowship.name %></td>
+              <td class="summary-number" data-label="超抜人数"><%= number_with_delimiter(report.participant_count) %></td>
+              <td class="summary-number" data-label="超抜霊数"><%= number_with_delimiter(report.usage_count) %></td>
+              <td class="summary-number" data-label="ノアカード分"><%= report.noah_card_count.present? ? number_with_delimiter(report.noah_card_count) : "-" %></td>
+              <td class="summary-number" data-label="功徳費合計"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
+              <td class="summary-number" data-label="みろく寺分"><%= number_with_delimiter(report.mirokuji_share) %></td>
+              <td class="summary-number" data-label="聖院還付金"><%= number_with_delimiter(report.region_refund) %></td>
+              <td data-label="備考欄"><%= report.notes.presence || "-" %></td>
+              <td data-label="入力者名"><%= report.user&.name || "未設定" %></td>
               <% if user_signed_in? %>
-                <td class="summary-actions">
+                <td class="summary-actions" data-label="操作">
                   <% if current_user.admin? || report.user_id == current_user.id %>
                     <%= link_to "編集", edit_chobatsu_report_path(report), class: "text-link" %>
                   <% end %>
@@ -160,5 +160,8 @@
         <% end %>
       </table>
     </div>
+    <% unless @summary_reports.empty? %>
+      <p class="mobile-summary-total">超抜人数 <strong><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></strong>　超抜霊数 <strong><%= number_with_delimiter(@summary_reports.sum(&:usage_count)) %></strong></p>
+    <% end %>
   </section>
 </div>
