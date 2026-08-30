@@ -276,7 +276,7 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 4rem minmax(7rem, 1.1fr);
+  grid-template-columns: minmax(0, 1fr) 5.5rem minmax(7rem, 1.1fr);
   gap: 12px;
   align-items: center;
 }
@@ -290,6 +290,17 @@ body.number-shadow-disabled .serial-grid td {
   color: var(--text);
   font: inherit;
   text-align: right;
+}
+
+.allocation-count-form input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.allocation-count-form input[type="number"]::-webkit-inner-spin-button,
+.allocation-count-form input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
 }
 
 .allocation-list__header {
