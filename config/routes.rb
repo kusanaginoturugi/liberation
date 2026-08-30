@@ -3,7 +3,6 @@ Rails.application.routes.draw do
   resource :session, only: [ :new, :create, :destroy ]
   resource :settings, only: [ :edit, :update ]
   resources :ceremony_schedules, only: [ :index, :new, :create, :edit, :update, :destroy ]
-  resources :ceremony_schedule_allocations, only: [ :create, :update ]
   resources :users, only: [ :index, :new, :create, :edit, :update ]
   resources :regions, only: [ :index, :edit, :update ]
   resources :events, only: [ :index, :new, :create, :edit, :update, :destroy ] do

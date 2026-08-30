@@ -273,41 +273,35 @@ body.number-shadow-disabled .serial-grid td {
   gap: 12px;
 }
 
+.allocation-list__header,
+.allocation-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4rem minmax(7rem, 1.1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.allocation-list__header {
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.allocation-sort-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.allocation-sort-link span {
+  color: var(--accent-strong);
+}
+
 .allocation-row {
   padding: 12px;
   border: 1px solid rgba(127, 136, 160, 0.2);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.58);
-}
-
-.allocation-row__heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: baseline;
-}
-
-.allocation-row__heading span {
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.allocation-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: end;
-  margin-top: 10px;
-}
-
-.allocation-form .field input {
-  padding: 9px 10px;
-}
-
-.allocation-row__numbers {
-  margin: 10px 0 0;
-  color: var(--text);
-  font-weight: 700;
 }
 
 .panel {
@@ -1050,14 +1044,17 @@ body.number-shadow-disabled .serial-grid td {
     padding: 16px;
   }
 
-  .allocation-form {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  .allocation-list__header {
+    display: none;
   }
 
-  .allocation-form .button-secondary {
+  .allocation-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .allocation-row > span:last-child {
     grid-column: 1 / -1;
-    justify-content: center;
-    width: 100%;
+    color: var(--muted);
   }
 
   .summary-table-wrapper {

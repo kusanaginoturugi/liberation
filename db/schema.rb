@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_000800) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_30_000900) do
   create_table "ceremony_schedules", force: :cascade do |t|
     t.integer "assistant_count", null: false
     t.datetime "ceremony_at", null: false
@@ -24,18 +24,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_000800) do
     t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
     t.index ["event_id"], name: "index_ceremony_schedules_on_event_id"
     t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"
-  end
-
-  create_table "ceremony_schedule_allocations", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.integer "event_id", null: false
-    t.integer "fellowship_id", null: false
-    t.integer "serial_number_from", null: false
-    t.integer "serial_number_to", null: false
-    t.datetime "updated_at", null: false
-    t.index ["event_id", "fellowship_id"], name: "idx_schedule_allocations_event_fellowship", unique: true
-    t.index ["event_id"], name: "index_ceremony_schedule_allocations_on_event_id"
-    t.index ["fellowship_id"], name: "index_ceremony_schedule_allocations_on_fellowship_id"
   end
 
   create_table "chobatsu_reports", force: :cascade do |t|
@@ -137,8 +125,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_000800) do
 
   add_foreign_key "ceremony_schedules", "events"
   add_foreign_key "ceremony_schedules", "fellowships"
-  add_foreign_key "ceremony_schedule_allocations", "events"
-  add_foreign_key "ceremony_schedule_allocations", "fellowships"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"
   add_foreign_key "chobatsu_reports", "regions"

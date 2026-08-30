@@ -9,10 +9,8 @@ class CeremonySchedulesController < ApplicationController
 
   def index
     @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
-    @allocation_rows = @ceremony_schedules.group_by(&:fellowship).map do |fellowship, schedules|
-      allocation = CeremonyScheduleAllocation.find_or_initialize_by(event: @selected_event, fellowship: fellowship)
-      { fellowship:, spirit_count: schedules.sum(&:spirit_count), allocation: }
-    end.sort_by { |row| [ row[:fellowship].display_order || Float::INFINITY, row[:fellowship].id ] }
+    @allocation_sort_direction = allocation_sort_direction
+    @allocation_rows = allocation_rows_for(@ceremony_schedules)
   end
 
   def new
@@ -115,6 +113,27 @@ class CeremonySchedulesController < ApplicationController
       Event.find(params[:event_id])
     else
       selected_event_from_navigation
+    end
+  end
+
+  def allocation_sort_direction
+    return nil unless params[:allocation_sort] == "fellowship"
+
+    params[:allocation_direction] == "desc" ? :desc : :asc
+  end
+
+  def allocation_rows_for(schedules)
+    rows = schedules.group_by(&:fellowship).map do |fellowship, fellowship_schedules|
+      { fellowship:, spirit_count: fellowship_schedules.sum(&:spirit_count) }
+    end
+    rows = rows.sort_by { |row| row[:fellowship].name } if @allocation_sort_direction == :asc
+    rows = rows.sort_by { |row| row[:fellowship].name }.reverse if @allocation_sort_direction == :desc
+
+    next_number = 1
+    rows.each do |row|
+      row[:serial_number_from] = next_number
+      row[:serial_number_to] = next_number + row[:spirit_count] - 1
+      next_number = row[:serial_number_to] + 1
     end
   end
 end

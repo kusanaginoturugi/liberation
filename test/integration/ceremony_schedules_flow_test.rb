@@ -63,6 +63,47 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "編集"
   end
 
+  test "number allocations follow the first scheduled date for each fellowship" do
+    CeremonySchedule.create!(
+      fellowship: @other_meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
+      place: "札幌会館",
+      assistant_count: 1,
+      spirit_count: 15
+    )
+    CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
+      place: "大江戸会館",
+      assistant_count: 1,
+      spirit_count: 20
+    )
+    CeremonySchedule.create!(
+      fellowship: @other_meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 3, 10, 30),
+      place: "札幌会館",
+      assistant_count: 1,
+      spirit_count: 5
+    )
+
+    get ceremony_schedules_path
+
+    assert_response :success
+    assert_includes response.body, "番号割り振り"
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("札幌会場"), :<, allocation_section.index("大江戸")
+    assert_includes allocation_section, "1 〜 20"
+    assert_includes allocation_section, "21 〜 40"
+
+    get ceremony_schedules_path, params: { allocation_sort: :fellowship, allocation_direction: :asc }
+
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("大江戸"), :<, allocation_section.index("札幌会場")
+  end
+
   test "assigned user can create and edit own meeting schedule" do
     post session_path, params: { login_id: @user.login_id, password: "password123" }
 

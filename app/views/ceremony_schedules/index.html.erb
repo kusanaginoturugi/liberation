@@ -105,31 +105,25 @@
       <p class="summary-empty">挙行予定を入力すると、ここに伝道会ごとの合計が表示されます</p>
     <% else %>
       <div class="allocation-list">
+        <div class="allocation-list__header">
+          <%= link_to ceremony_schedules_path(
+                event_id: @selected_event.id,
+                allocation_sort: :fellowship,
+                allocation_direction: @allocation_sort_direction == :asc ? :desc : :asc
+              ),
+              class: "allocation-sort-link" do %>
+            伝道会名
+            <span><%= @allocation_sort_direction == :asc ? "▲" : "▼" %></span>
+          <% end %>
+          <span>霊数</span>
+          <span>番号</span>
+        </div>
         <% @allocation_rows.each do |row| %>
           <% fellowship = row[:fellowship] %>
-          <% allocation = row[:allocation] %>
           <article class="allocation-row">
-            <div class="allocation-row__heading">
-              <strong><%= fellowship.name %></strong>
-              <span><%= number_with_delimiter(row[:spirit_count]) %> 霊</span>
-            </div>
-            <% if current_user&.admin? %>
-              <%= form_with model: allocation, class: "allocation-form" do |form| %>
-                <%= form.hidden_field :event_id %>
-                <%= form.hidden_field :fellowship_id %>
-                <div class="field">
-                  <%= form.label :serial_number_from, "始" %>
-                  <%= form.number_field :serial_number_from, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
-                </div>
-                <div class="field">
-                  <%= form.label :serial_number_to, "終" %>
-                  <%= form.number_field :serial_number_to, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
-                </div>
-                <%= form.submit "保存", class: "button-secondary compact-button" %>
-              <% end %>
-            <% else %>
-              <p class="allocation-row__numbers"><%= allocation.persisted? ? "#{allocation.serial_number_from} 〜 #{allocation.serial_number_to}" : "未割り振り" %></p>
-            <% end %>
+            <strong><%= fellowship.name %></strong>
+            <span><%= number_with_delimiter(row[:spirit_count]) %></span>
+            <span><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></span>
           </article>
         <% end %>
       </div>
