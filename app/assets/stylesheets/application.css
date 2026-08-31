@@ -355,13 +355,13 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .schedule-qualified-total {
-  color: var(--text) !important;
-  font-size: 1.1rem;
+  color: #1565c0 !important;
+  font-size: 1.25rem;
   font-weight: 700;
 }
 
 .schedule-qualified-total strong {
-  font-size: 1.6rem;
+  font-size: 2rem;
   font-variant-numeric: tabular-nums;
 }
 
