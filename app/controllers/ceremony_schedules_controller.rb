@@ -8,7 +8,9 @@ class CeremonySchedulesController < ApplicationController
   before_action :load_fellowships, only: [ :new, :create, :edit, :update ]
 
   def index
-    @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
+    @schedule_sort_direction = schedule_sort_direction
+    @next_schedule_sort_direction = next_schedule_sort_direction
+    @ceremony_schedules = schedules_for_selected_event
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
@@ -16,7 +18,8 @@ class CeremonySchedulesController < ApplicationController
   end
 
   def export
-    @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
+    @schedule_sort_direction = schedule_sort_direction
+    @ceremony_schedules = schedules_for_selected_event
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
@@ -138,12 +141,37 @@ class CeremonySchedulesController < ApplicationController
     params[:allocation_direction] == "desc" ? :desc : :asc
   end
 
+  def schedule_sort_direction
+    return nil unless params[:schedule_sort] == "fellowship"
+
+    params[:schedule_direction] == "desc" ? :desc : :asc
+  end
+
   def next_allocation_sort_direction
     case @allocation_sort_direction
     when nil then :asc
     when :asc then :desc
     else nil
     end
+  end
+
+  def next_schedule_sort_direction
+    case @schedule_sort_direction
+    when nil then :asc
+    when :asc then :desc
+    else nil
+    end
+  end
+
+  def schedules_for_selected_event
+    schedules = CeremonySchedule.for_event(@selected_event).chronological.to_a
+    return schedules unless @schedule_sort_direction
+
+    fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
+    schedules = schedules.sort_by do |schedule|
+      [ fellowship_order.fetch(schedule.fellowship.name, Float::INFINITY), schedule.ceremony_at, schedule.id ]
+    end
+    @schedule_sort_direction == :desc ? schedules.reverse : schedules
   end
 
   def allocation_rows_for(schedules)

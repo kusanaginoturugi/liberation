@@ -103,6 +103,22 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     @meeting.update!(name: "大江戸")
     @other_meeting.update!(name: "山梨")
+
+    get ceremony_schedules_path, params: { schedule_sort: :fellowship, schedule_direction: :asc }
+
+    schedule_section = response.body.split("番号割り振り", 2).first
+    assert_operator schedule_section.index("大江戸"), :<, schedule_section.index("山梨")
+
+    get ceremony_schedules_path, params: { schedule_sort: :fellowship, schedule_direction: :desc }
+
+    schedule_section = response.body.split("番号割り振り", 2).first
+    assert_operator schedule_section.index("山梨"), :<, schedule_section.index("大江戸")
+
+    get ceremony_schedules_path
+
+    schedule_section = response.body.split("番号割り振り", 2).first
+    assert_operator schedule_section.index("山梨"), :<, schedule_section.index("大江戸")
+
     get ceremony_schedules_path, params: { allocation_sort: :fellowship, allocation_direction: :asc }
 
     allocation_section = response.body.split("番号割り振り", 2).last

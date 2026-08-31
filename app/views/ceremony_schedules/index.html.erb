@@ -34,6 +34,8 @@
       <div class="schedule-panel-actions">
         <%= link_to "PDFダウンロード", export_ceremony_schedules_path(
               event_id: @selected_event.id,
+              schedule_sort: params[:schedule_sort],
+              schedule_direction: params[:schedule_direction],
               allocation_sort: params[:allocation_sort],
               allocation_direction: params[:allocation_direction]
             ), class: "button-secondary compact-button" %>
@@ -47,7 +49,19 @@
       <table class="admin-table ceremony-schedule-table <%= "ceremony-schedule-table--with-actions" if user_signed_in? %>">
         <thead>
           <tr>
-            <th>伝道会名</th>
+            <th>
+              <%= link_to ceremony_schedules_path(
+                    event_id: @selected_event.id,
+                    schedule_sort: @next_schedule_sort_direction ? :fellowship : nil,
+                    schedule_direction: @next_schedule_sort_direction,
+                    allocation_sort: params[:allocation_sort],
+                    allocation_direction: params[:allocation_direction]
+                  ),
+                  class: "schedule-sort-link" do %>
+                伝道会名
+                <span><%= @schedule_sort_direction == :asc ? "▲" : "▼" %></span>
+              <% end %>
+            </th>
             <th>挙行日時</th>
             <th>場所</th>
             <th class="summary-number">引保師数</th>
@@ -116,6 +130,8 @@
         <div class="allocation-list__header">
           <%= link_to ceremony_schedules_path(
                 event_id: @selected_event.id,
+                schedule_sort: params[:schedule_sort],
+                schedule_direction: params[:schedule_direction],
                 allocation_sort: @next_allocation_sort_direction ? :fellowship : nil,
                 allocation_direction: @next_allocation_sort_direction
               ),
