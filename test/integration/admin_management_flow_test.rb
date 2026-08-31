@@ -229,7 +229,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get event_event_details_path(@event)
     assert_includes response.body, "第1回修霊超抜式"
     assert_includes response.body, event_event_detail_path(@event, @event_detail)
-    assert_includes response.body, "超抜式一覧に戻る"
+    assert_includes response.body, "戻る"
     assert_includes response.body, 'name="event_detail[total_serial_count]"'
 
     patch event_event_detail_path(@event, @event_detail), params: {

@@ -5,7 +5,7 @@
   <section class="panel form-panel auth-panel">
     <div class="panel-header">
       <h1><%= display_event_name %>の合格霊数設定</h1>
-      <%= link_to "戻る", event_event_details_path(@event), class: "button-secondary compact-button" %>
+      <%= link_to "戻る", root_path, class: "button-secondary compact-button" %>
     </div>
 
     <% if @event_detail.errors.any? %>
