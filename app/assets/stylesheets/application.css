@@ -354,6 +354,17 @@ body.number-shadow-disabled .serial-grid td {
   font-variant-numeric: tabular-nums;
 }
 
+.schedule-qualified-total {
+  color: var(--text) !important;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.schedule-qualified-total strong {
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .schedule-panel-header {
   flex-wrap: wrap;
 }

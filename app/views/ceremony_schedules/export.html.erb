@@ -13,7 +13,7 @@
       .document-header, .section-heading { display: flex; align-items: baseline; justify-content: space-between; }
       .document-header { border-bottom: 1px solid #000; margin-bottom: 4mm; padding-bottom: 2mm; }
       .section-heading { margin: 3mm 0 1.5mm; }
-      .total { font-weight: 700; }
+      .totals { display: flex; gap: 5mm; font-weight: 700; }
       table { width: 100%; border-collapse: collapse; table-layout: fixed; }
       th, td { border: 0.5px solid #000; overflow-wrap: anywhere; padding: 1.4mm 1.6mm; text-align: left; vertical-align: middle; }
       th { font-weight: 700; text-align: center; }
@@ -38,7 +38,7 @@
     </header>
 
     <section>
-      <div class="section-heading"><h2>予定表</h2><p class="total">霊数合計 <%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></p></div>
+      <div class="section-heading"><h2>予定表</h2><div class="totals"><p>霊数合計 <%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></p><p>合格霊数 <%= @qualified_spirit_count ? number_with_delimiter(@qualified_spirit_count) : "未設定" %></p></div></div>
       <table>
         <thead><tr><th class="schedule-fellowship">伝道会名</th><th class="schedule-date">挙行日時</th><th class="schedule-place">場所</th><th class="schedule-assistants">引保師数</th><th class="schedule-spirits">霊数</th><th class="schedule-minister">超抜点伝師</th></tr></thead>
         <tbody>

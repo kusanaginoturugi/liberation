@@ -26,6 +26,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "public can view schedules ordered by ceremony date with spirit total" do
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 1_650)
     newer_schedule = CeremonySchedule.create!(
       fellowship: @meeting,
       event: @event,
@@ -57,6 +58,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_operator response.body.index(older_schedule.place), :<, response.body.index(newer_schedule.place)
     assert_includes response.body, "霊数合計"
     assert_includes response.body, ">35<"
+    assert_includes response.body, "合格霊数"
+    assert_includes response.body, ">1,650<"
     assert_includes response.body, "schedule-row-even"
     assert_includes response.body, "schedule-row-odd"
     assert_not_includes response.body, "予定追加"

@@ -9,6 +9,7 @@ class CeremonySchedulesController < ApplicationController
 
   def index
     @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
+    @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
@@ -16,6 +17,7 @@ class CeremonySchedulesController < ApplicationController
 
   def export
     @ceremony_schedules = CeremonySchedule.for_event(@selected_event).chronological
+    @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @allocation_rows = allocation_rows_for(@ceremony_schedules)
 
@@ -160,5 +162,9 @@ class CeremonySchedulesController < ApplicationController
       row[:serial_number_to] = next_number + row[:spirit_count] - 1
       next_number = row[:serial_number_to] + 1
     end
+  end
+
+  def qualified_spirit_count_for(event)
+    event.event_details.find_by(region_id: primary_region_id)&.total_serial_count
   end
 end

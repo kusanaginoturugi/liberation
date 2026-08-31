@@ -20,7 +20,7 @@ class EventsController < ApplicationController
     @total_serial_count_input = total_serial_count_input
 
     unless valid_total_serial_count_input?
-      @event.errors.add(:base, "修霊合計数は1以上の半角数字で入力してください")
+      @event.errors.add(:base, "合格霊数は1以上の半角数字で入力してください")
       render :new, status: :unprocessable_content
       return
     end
@@ -51,7 +51,7 @@ class EventsController < ApplicationController
 
     unless valid_total_serial_count_input?
       @event.assign_attributes(event_params)
-      @event.errors.add(:base, "修霊合計数は1以上の半角数字で入力してください")
+      @event.errors.add(:base, "合格霊数は1以上の半角数字で入力してください")
       render :edit, status: :unprocessable_content
       return
     end

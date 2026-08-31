@@ -20,6 +20,6 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
     return if allocated_count <= total_serial_count
 
-    errors.add(:spirit_count, "の合計は修霊合計数(#{total_serial_count})以下にしてください")
+    errors.add(:spirit_count, "の合計は合格霊数(#{total_serial_count})以下にしてください")
   end
 end

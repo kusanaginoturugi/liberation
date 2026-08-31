@@ -64,10 +64,10 @@ class ChobatsuReport < ApplicationRecord
     number_ranges.each do |from, to|
       next if from.blank? || to.blank? || to <= total_count
 
-      errors.add(:serial_number_to, "は修霊合計数(#{total_count})以下を入力してください")
+      errors.add(:serial_number_to, "は合格霊数(#{total_count})以下を入力してください")
     end
   rescue ActiveRecord::RecordNotFound
-    errors.add(:base, "超抜式ごとの修霊合計数設定が見つかりません")
+    errors.add(:base, "超抜式ごとの合格霊数設定が見つかりません")
   end
 
   def serial_number_range_does_not_overlap
