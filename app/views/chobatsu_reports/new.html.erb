@@ -64,8 +64,11 @@
           </div>
 
           <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
-            <%= form.label :participant_count, "超抜人数" %>
-            <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "participant", action: "input->report-form#update" } %>
+            <%= form.label :participant_count, "超抜引保師数" %>
+            <div class="input-with-unit">
+              <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "participant", action: "input->report-form#update" } %>
+              <span class="input-unit">人</span>
+            </div>
             <% @chobatsu_report.errors.full_messages_for(:participant_count).each do |message| %>
               <p class="field-error"><%= message %></p>
             <% end %>

@@ -159,7 +159,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "PDF出力"
     assert_includes response.body, "2026/04/09"
     assert_includes response.body, @meeting.name
-    assert_includes response.body, "超抜人数"
+    assert_includes response.body, "超抜引保師数"
     assert_includes response.body, "超抜霊数"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"
@@ -319,7 +319,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "text/csv", response.media_type
-    assert_includes response.body, "挙行日,伝道会名,超抜人数,超抜霊数"
+    assert_includes response.body, "挙行日,伝道会名,超抜引保師数,超抜霊数"
     assert_includes response.body, "2026/04/09"
     assert_includes response.body, @meeting.name
     assert_includes response.body, "2026/04/09,#{@meeting.name},2,4"
@@ -383,7 +383,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "text/html", response.media_type
     assert_includes response.body, "挙行報告"
-    assert_includes response.body, "超抜人数"
+    assert_includes response.body, "超抜引保師数"
     assert_includes response.body, "超抜霊数"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"

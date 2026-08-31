@@ -365,6 +365,34 @@ body.number-shadow-disabled .serial-grid td {
   font-variant-numeric: tabular-nums;
 }
 
+.input-with-unit {
+  position: relative;
+}
+
+.input-with-unit input {
+  padding-right: 3.25rem;
+}
+
+.input-with-unit input[type="number"] {
+  appearance: textfield;
+}
+
+.input-with-unit input[type="number"]::-webkit-inner-spin-button,
+.input-with-unit input[type="number"]::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.input-unit {
+  position: absolute;
+  top: 50%;
+  right: 1.2rem;
+  color: var(--muted);
+  font-weight: 700;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
 .schedule-panel-header {
   flex-wrap: wrap;
 }

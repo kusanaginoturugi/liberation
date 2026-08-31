@@ -93,7 +93,7 @@
                 <span><%= @summary_sort_column == :fellowship && @summary_sort_direction == :desc ? "▲" : "▼" %></span>
               <% end %>
             </th>
-            <th class="summary-number" style="width: 6em">超抜人数</th>
+            <th class="summary-number" style="width: 7em">超抜引保師数</th>
             <th class="summary-number" style="width: 6em">超抜霊数</th>
             <th class="summary-number" style="width: 7em">(内)ノアカード分</th>
             <th class="summary-number" style="width: 7em">功徳費合計</th>
@@ -115,7 +115,7 @@
               <td data-label="No."><%= index + 1 %></td>
               <td data-label="挙行日"><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
               <td data-label="伝道会名"><%= report.fellowship.name %></td>
-              <td class="summary-number" data-label="超抜人数"><%= number_with_delimiter(report.participant_count) %></td>
+              <td class="summary-number" data-label="超抜引保師数"><%= number_with_delimiter(report.participant_count) %></td>
               <td class="summary-number" data-label="超抜霊数"><%= number_with_delimiter(report.usage_count) %></td>
               <td class="summary-number" data-label="ノアカード分"><%= report.noah_card_count.present? ? number_with_delimiter(report.noah_card_count) : "-" %></td>
               <td class="summary-number" data-label="功徳費合計"><%= number_with_delimiter(report.calculated_merit_fee_total) %></td>
@@ -162,7 +162,7 @@
       </table>
     </div>
     <% unless @summary_reports.empty? %>
-      <p class="mobile-summary-total">超抜人数 <strong><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></strong>　超抜霊数 <strong><%= number_with_delimiter(@summary_reports.sum(&:usage_count)) %></strong></p>
+      <p class="mobile-summary-total">超抜引保師数 <strong><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></strong>　超抜霊数 <strong><%= number_with_delimiter(@summary_reports.sum(&:usage_count)) %></strong></p>
     <% end %>
   </section>
 </div>
