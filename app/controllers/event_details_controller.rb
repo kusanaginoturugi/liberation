@@ -13,7 +13,7 @@ class EventDetailsController < ApplicationController
 
   def update
     if @event_detail.update(event_detail_params)
-      redirect_to event_event_details_path(@event), notice: "聖院別設定を更新しました"
+      redirect_to event_event_details_path(@event), notice: "合格霊数を更新しました"
     else
       render :edit, status: :unprocessable_content
     end

@@ -1,9 +1,11 @@
-<% content_for :title, "#{@event.name} の聖院別設定" %>
+<% display_event_name = @event.name.sub(/超抜式\z/, "修霊超抜式") %>
+<% content_for :title, "#{display_event_name}の合格霊数設定" %>
 
 <div class="page-shell">
   <div class="panel">
     <div class="panel-header">
-      <h1><%= @event.name %> の聖院別設定</h1>
+      <h1><%= display_event_name %>の合格霊数設定</h1>
+      <%= link_to "超抜式一覧に戻る", events_path, class: "button-secondary compact-button" %>
     </div>
 
     <% if flash[:notice].present? %>
@@ -13,35 +15,25 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th>聖院</th>
+          <th>超抜式</th>
           <th>合格霊数</th>
+          <th style="width: 9em">操作</th>
         </tr>
       </thead>
       <tbody>
         <% @event_details.each do |event_detail| %>
-          <tr class="clickable-row" data-href="<%= edit_event_event_detail_path(@event, event_detail) %>" tabindex="0" role="link" aria-label="<%= "#{event_detail.region.name} の設定を編集" %>">
-            <td><%= event_detail.region.name %></td>
-            <td><%= event_detail.total_serial_count %></td>
+          <% form_id = dom_id(event_detail, :update) %>
+          <tr>
+            <td><%= display_event_name %></td>
+            <td>
+              <%= form_with model: [@event, event_detail], id: form_id do |form| %>
+                <%= form.number_field :total_serial_count, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+              <% end %>
+            </td>
+            <td><%= submit_tag "更新する", form: form_id, class: "button-primary compact-button" %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
-      row.addEventListener("click", () => {
-        window.location.href = row.dataset.href;
-      });
-
-      row.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          window.location.href = row.dataset.href;
-        }
-      });
-    });
-  });
-</script>
