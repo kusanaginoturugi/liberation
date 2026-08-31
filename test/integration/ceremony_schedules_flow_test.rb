@@ -50,6 +50,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "挙行予定表"
+    assert_includes response.body, "/icon.svg?v=20260831"
     assert_includes response.body, "第75次超抜式"
     assert_includes response.body, "第74次超抜式"
     assert_includes response.body, "修霊番号一覧"
