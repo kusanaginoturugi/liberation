@@ -43,6 +43,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get edit_settings_path
     assert_response :success
     assert_includes response.body, "配色のグラデーション"
+    assert_includes response.body, "戻る"
     assert_includes response.body, "数字のドロップシャドウ"
     assert_includes response.body, "有効"
     assert_includes response.body, "無効"
