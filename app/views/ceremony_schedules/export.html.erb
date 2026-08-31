@@ -28,6 +28,7 @@
       .allocation-fellowship { width: 42%; }
       .allocation-spirits { width: 20%; }
       .allocation-numbers { width: 38%; }
+      .allocation-table td { text-align: center; }
       .empty { text-align: center; }
     </style>
   </head>
@@ -46,7 +47,7 @@
             <tr><td colspan="6" class="empty">挙行予定はまだありません</td></tr>
           <% else %>
             <% @ceremony_schedules.each do |schedule| %>
-              <tr><td><%= schedule.fellowship.name %></td><td><%= l(schedule.ceremony_at, format: :schedule) %></td><td><%= schedule.place %></td><td class="number"><%= number_with_delimiter(schedule.assistant_count) %></td><td class="number"><%= number_with_delimiter(schedule.spirit_count) %></td><td><%= schedule.minister_name.presence || "-" %></td></tr>
+              <tr><td><%= schedule.fellowship.name %></td><td><%= schedule.ceremony_at.strftime("%Y/%m/%d　　%H:%M") %></td><td><%= schedule.place %></td><td class="number"><%= number_with_delimiter(schedule.assistant_count) %></td><td class="number"><%= number_with_delimiter(schedule.spirit_count) %></td><td><%= schedule.minister_name.presence || "-" %></td></tr>
             <% end %>
           <% end %>
         </tbody>
@@ -55,7 +56,7 @@
 
     <section>
       <div class="section-heading"><h2>番号割り振り</h2><p>伝道会ごとの霊数合計</p></div>
-      <table>
+      <table class="allocation-table">
         <thead><tr><th class="allocation-fellowship">伝道会名</th><th class="allocation-spirits">霊数</th><th class="allocation-numbers">番号</th></tr></thead>
         <tbody>
           <% if @allocation_rows.empty? %>
