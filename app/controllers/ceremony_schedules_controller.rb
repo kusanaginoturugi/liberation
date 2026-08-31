@@ -14,7 +14,7 @@ class CeremonySchedulesController < ApplicationController
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
-    @allocation_rows = allocation_rows_for(@ceremony_schedules)
+    @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
   end
 
   def export
@@ -22,7 +22,7 @@ class CeremonySchedulesController < ApplicationController
     @ceremony_schedules = schedules_for_selected_event
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
-    @allocation_rows = allocation_rows_for(@ceremony_schedules)
+    @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
 
     send_data CloudflarePdfClient.render(html: render_to_string(template: "ceremony_schedules/export", layout: false)),
               filename: "#{@selected_event.name}_挙行予定表.pdf",
@@ -164,7 +164,7 @@ class CeremonySchedulesController < ApplicationController
   end
 
   def schedules_for_selected_event
-    schedules = CeremonySchedule.for_event(@selected_event).chronological.to_a
+    schedules = chronological_schedules_for_selected_event
     return schedules unless @schedule_sort_direction
 
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
@@ -172,6 +172,10 @@ class CeremonySchedulesController < ApplicationController
       [ fellowship_order.fetch(schedule.fellowship.name, Float::INFINITY), schedule.ceremony_at, schedule.id ]
     end
     @schedule_sort_direction == :desc ? schedules.reverse : schedules
+  end
+
+  def chronological_schedules_for_selected_event
+    CeremonySchedule.for_event(@selected_event).chronological.to_a
   end
 
   def allocation_rows_for(schedules)

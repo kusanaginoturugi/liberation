@@ -108,6 +108,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     schedule_section = response.body.split("番号割り振り", 2).first
     assert_operator schedule_section.index("大江戸"), :<, schedule_section.index("山梨")
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("山梨"), :<, allocation_section.index("大江戸")
 
     get ceremony_schedules_path, params: { schedule_sort: :fellowship, schedule_direction: :desc }
 
