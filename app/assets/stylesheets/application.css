@@ -99,12 +99,26 @@ body.number-shadow-disabled .serial-grid td {
   z-index: 10;
 }
 
-.nav-dropdown.is-open {
+.nav-dropdown__summary {
+  list-style: none;
+}
+
+.nav-dropdown--admin {
   z-index: 10;
 }
 
-.nav-dropdown__summary {
-  list-style: none;
+.nav-dropdown__toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-dropdown--admin .nav-dropdown__summary {
+  cursor: pointer;
+}
+
+.nav-dropdown--admin .nav-dropdown__toggle:not(:checked) ~ .nav-dropdown__menu {
+  display: none;
 }
 
 .nav-dropdown__summary::-webkit-details-marker {

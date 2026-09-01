@@ -41,9 +41,10 @@
             <%= link_to "挙行報告", new_chobatsu_report_path, class: "button-secondary" %>
             <%= link_to "挙行一覧", summary_chobatsu_reports_path(event_id: selected_event_id), class: "button-secondary" %>
             <% if current_user.admin? %>
-              <div class="nav-dropdown" data-nav-dropdown>
-                <button type="button" class="button-secondary nav-dropdown__summary" data-nav-dropdown-toggle aria-expanded="false">管理</button>
-                <div class="nav-dropdown__menu" data-nav-dropdown-menu hidden>
+              <div class="nav-dropdown nav-dropdown--admin">
+                <input type="checkbox" id="admin-navigation-toggle" class="nav-dropdown__toggle">
+                <label for="admin-navigation-toggle" class="button-secondary nav-dropdown__summary">管理</label>
+                <div class="nav-dropdown__menu">
                   <% unless single_region_mode? %>
                     <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
                   <% end %>
@@ -193,32 +194,13 @@
           }, true);
 
           const closeNavigationMenus = () => {
-          document.querySelectorAll("[data-nav-dropdown]").forEach((dropdown) => {
-            dropdown.querySelector("[data-nav-dropdown-menu]").hidden = true;
-            dropdown.querySelector("[data-nav-dropdown-toggle]").setAttribute("aria-expanded", "false");
-            dropdown.classList.remove("is-open");
-          });
-          document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
-            dropdown.open = false;
-          });
+            document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
+              dropdown.open = false;
+            });
           };
 
           document.addEventListener("click", (event) => {
           if (!(event.target instanceof Element)) return;
-
-          const toggle = event.target.closest("[data-nav-dropdown-toggle]");
-          if (toggle) {
-            const dropdown = toggle.closest("[data-nav-dropdown]");
-            const menu = dropdown.querySelector("[data-nav-dropdown-menu]");
-            const shouldOpen = menu.hidden;
-            closeNavigationMenus();
-            menu.hidden = !shouldOpen;
-            toggle.setAttribute("aria-expanded", String(shouldOpen));
-            dropdown.classList.toggle("is-open", shouldOpen);
-            return;
-          }
-
-          if (event.target.closest("[data-nav-dropdown]")) return;
 
           closeNavigationMenus();
           });
