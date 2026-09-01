@@ -184,6 +184,12 @@
           sanitizeLoginIdField(loginIdField);
         }, true);
 
+        document.addEventListener("click", (event) => {
+          document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
+            if (!dropdown.contains(event.target)) dropdown.open = false;
+          });
+        });
+
         document.querySelectorAll("[data-schedule-datetime-picker]").forEach((picker) => {
           const valueInput = picker.querySelector("[data-schedule-datetime-value]");
           const dateButton = picker.querySelector("[data-schedule-date-button]");
