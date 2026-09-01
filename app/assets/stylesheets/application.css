@@ -329,14 +329,14 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 3.5rem 4.5rem minmax(9.25rem, 1.6fr);
+  grid-template-columns: minmax(0, 1fr) 3.5rem 3.5rem minmax(9.25rem, 1.6fr);
   gap: 8px;
   align-items: center;
 }
 
 .allocation-count-form input {
   box-sizing: border-box;
-  width: 4.5rem;
+  width: 3.5rem;
   padding: 6px 8px;
   border: 1px solid rgba(127, 136, 160, 0.28);
   border-radius: 6px;
@@ -368,6 +368,10 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .allocation-row > span:last-child {
+  white-space: nowrap;
+}
+
+.allocation-row > strong {
   white-space: nowrap;
 }
 
@@ -1291,7 +1295,8 @@ body.number-shadow-disabled .serial-grid td {
   }
 
   .allocation-row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto 3.5rem;
+    gap: 4px;
   }
 
   .allocation-altar-count {
