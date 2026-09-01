@@ -4,7 +4,7 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
   setup do
     @region = Region.create!(name: "共通")
     @other_region = Region.create!(name: "札幌")
-    @event = Event.create!(name: "第1回超抜式")
+    @event = Event.create!(name: "第1回修霊超抜式")
     @event_detail = EventDetail.create!(event: @event, region: @region, total_serial_count: 1667)
     @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region, enabled: true)
     @admin = User.create!(

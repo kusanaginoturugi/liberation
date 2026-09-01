@@ -3,7 +3,7 @@ require "test_helper"
 class EventTest < ActiveSupport::TestCase
   test "does not allow a chobatsu period ending before it starts" do
     event = Event.new(
-      name: "第75次超抜式",
+      name: "第75次修霊超抜式",
       chobatsu_starts_on: Date.new(2026, 12, 1),
       chobatsu_ends_on: Date.new(2026, 10, 18)
     )

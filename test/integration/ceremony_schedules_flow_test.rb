@@ -3,8 +3,8 @@ require "test_helper"
 class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   setup do
     @region = Region.create!(name: "共通")
-    @event = Event.create!(name: "第75次超抜式")
-    @previous_event = Event.create!(name: "第74次超抜式", closed: true)
+    @event = Event.create!(name: "第75次修霊超抜式")
+    @previous_event = Event.create!(name: "第74次修霊超抜式", closed: true)
     @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", display_order: 2, region: @region)
     @other_meeting = Fellowship.create!(name: "札幌会場", color_code: "#111111", display_order: 1, region: @region)
     @user = User.create!(
@@ -56,8 +56,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "挙行予定表"
     assert_includes response.body, "/icon.svg?v=20260831"
-    assert_includes response.body, "第75次超抜式"
-    assert_includes response.body, "第74次超抜式"
+    assert_includes response.body, "第75次修霊超抜式"
+    assert_includes response.body, "第74次修霊超抜式"
     assert_includes response.body, "修霊超度審判式"
     assert_includes response.body, "10月18日"
     assert_includes response.body, "超抜期間"

@@ -3,7 +3,7 @@ require "test_helper"
 class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
   setup do
     @region = Region.create!(name: "共通")
-    @event = Event.create!(name: "第75次超抜式")
+    @event = Event.create!(name: "第75次修霊超抜式")
     EventDetail.create!(event: @event, region: @region, total_serial_count: 100)
     @meeting = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
     CeremonySchedule.create!(
