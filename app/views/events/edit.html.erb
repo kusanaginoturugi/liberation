@@ -30,6 +30,21 @@
         <% end %>
 
         <div class="field">
+          <%= form.label :judgment_ceremony_on, "修霊超度審判式日" %>
+          <%= form.date_field :judgment_ceremony_on %>
+        </div>
+
+        <div class="field">
+          <%= form.label :chobatsu_starts_on, "超抜期間（開始）" %>
+          <%= form.date_field :chobatsu_starts_on %>
+        </div>
+
+        <div class="field">
+          <%= form.label :chobatsu_ends_on, "超抜期間（終了）" %>
+          <%= form.date_field :chobatsu_ends_on %>
+        </div>
+
+        <div class="field">
           <span class="field-label">状態</span>
           <div class="radio-group">
             <label class="radio-option">

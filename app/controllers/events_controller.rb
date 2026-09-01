@@ -90,7 +90,7 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:event).permit(:name, :closed)
+    params.require(:event).permit(:name, :closed, :judgment_ceremony_on, :chobatsu_starts_on, :chobatsu_ends_on)
   end
 
   def total_serial_count_input

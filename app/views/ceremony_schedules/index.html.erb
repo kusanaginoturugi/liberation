@@ -17,12 +17,24 @@
   <% end %>
 
   <section class="panel region-filter-panel">
-    <%= form_with url: ceremony_schedules_path, method: :get, class: "region-filter-form" do |form| %>
-      <div class="field">
-        <%= form.label :event_id, "超抜式" %>
-        <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event.id }, { onchange: "this.form.requestSubmit()" } %>
-      </div>
-    <% end %>
+    <div class="schedule-event-overview">
+      <%= form_with url: ceremony_schedules_path, method: :get, class: "region-filter-form" do |form| %>
+        <div class="field">
+          <%= form.label :event_id, "超抜式" %>
+          <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event.id }, { onchange: "this.form.requestSubmit()" } %>
+        </div>
+      <% end %>
+      <% if @selected_event.judgment_ceremony_on || @selected_event.chobatsu_starts_on || @selected_event.chobatsu_ends_on %>
+        <div class="schedule-event-dates">
+          <% if @selected_event.judgment_ceremony_on %>
+            <p><span>修霊超度審判式</span><strong><%= @selected_event.judgment_ceremony_on.strftime("%-m月%-d日") %></strong></p>
+          <% end %>
+          <% if @selected_event.chobatsu_starts_on && @selected_event.chobatsu_ends_on %>
+            <p><span>超抜期間</span><strong><%= @selected_event.chobatsu_starts_on.strftime("%-m月%-d日") %>〜<%= @selected_event.chobatsu_ends_on.strftime("%-m月%-d日") %></strong></p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
   </section>
 
   <div class="schedule-workspace">

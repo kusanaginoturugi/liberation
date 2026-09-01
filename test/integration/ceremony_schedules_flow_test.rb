@@ -27,6 +27,11 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
   test "public can view schedules ordered by ceremony date with spirit total" do
     EventDetail.create!(event: @event, region: @region, total_serial_count: 1_650)
+    @event.update!(
+      judgment_ceremony_on: Date.new(2026, 10, 18),
+      chobatsu_starts_on: Date.new(2026, 10, 18),
+      chobatsu_ends_on: Date.new(2026, 12, 1)
+    )
     newer_schedule = CeremonySchedule.create!(
       fellowship: @meeting,
       event: @event,
@@ -53,6 +58,10 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "/icon.svg?v=20260831"
     assert_includes response.body, "第75次超抜式"
     assert_includes response.body, "第74次超抜式"
+    assert_includes response.body, "修霊超度審判式"
+    assert_includes response.body, "10月18日"
+    assert_includes response.body, "超抜期間"
+    assert_includes response.body, "10月18日〜12月1日"
     assert_includes response.body, "修霊番号一覧"
     assert_includes response.body, older_schedule.place
     assert_includes response.body, newer_schedule.place

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_093000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_095000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
@@ -80,8 +80,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_093000) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.date "chobatsu_ends_on"
+    t.date "chobatsu_starts_on"
     t.boolean "closed", default: false, null: false
     t.datetime "created_at", null: false
+    t.date "judgment_ceremony_on"
     t.text "name", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_events_on_name", unique: true

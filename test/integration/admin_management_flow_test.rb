@@ -147,17 +147,26 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
 
     get edit_event_path(@event)
     assert_includes response.body, 'name="event[total_serial_count]"'
+    assert_includes response.body, 'name="event[judgment_ceremony_on]"'
+    assert_includes response.body, 'name="event[chobatsu_starts_on]"'
+    assert_includes response.body, 'name="event[chobatsu_ends_on]"'
 
     patch event_path(@event), params: {
       event: {
         name: "第1回春期超抜式",
-        total_serial_count: 1800
+        total_serial_count: 1800,
+        judgment_ceremony_on: "2026-10-18",
+        chobatsu_starts_on: "2026-10-18",
+        chobatsu_ends_on: "2026-12-01"
       }
     }
 
     assert_redirected_to events_path
     assert_equal "第1回春期超抜式", @event.reload.name
     assert_equal 1800, @event.event_details.find_by!(region_id: @region.id).total_serial_count
+    assert_equal Date.new(2026, 10, 18), @event.judgment_ceremony_on
+    assert_equal Date.new(2026, 10, 18), @event.chobatsu_starts_on
+    assert_equal Date.new(2026, 12, 1), @event.chobatsu_ends_on
     assert_not @event.closed?
     assert other_event.reload.closed?
   end
