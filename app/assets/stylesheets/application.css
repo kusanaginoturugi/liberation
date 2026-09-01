@@ -329,13 +329,14 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 3.5rem 5.5rem minmax(7rem, 1.1fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 3.5rem 4.5rem minmax(9.25rem, 1.6fr);
+  gap: 8px;
   align-items: center;
 }
 
 .allocation-count-form input {
-  width: 100%;
+  box-sizing: border-box;
+  width: 4.5rem;
   padding: 6px 8px;
   border: 1px solid rgba(127, 136, 160, 0.28);
   border-radius: 6px;
@@ -364,6 +365,10 @@ body.number-shadow-disabled .serial-grid td {
 
 .allocation-spirit-count {
   text-align: right;
+}
+
+.allocation-row > span:last-child {
+  white-space: nowrap;
 }
 
 .allocation-shortfall {
