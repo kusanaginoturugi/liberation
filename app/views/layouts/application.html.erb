@@ -69,7 +69,7 @@
     <%= yield %>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("turbo:load", () => {
         const normalizeNumericValue = (value) =>
           value
             .replace(/[０-９]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xFEE0))
@@ -122,14 +122,17 @@
           }
         };
 
-        document.addEventListener("compositionstart", (event) => {
+        if (document.documentElement.dataset.applicationListenersBound !== "true") {
+          document.documentElement.dataset.applicationListenersBound = "true";
+
+          document.addEventListener("compositionstart", (event) => {
           const field = numericOnlyField(event.target) || emailNormalizeField(event.target) || loginIdNormalizeField(event.target);
           if (!field) return;
 
           field.dataset.composing = "true";
-        });
+          });
 
-        document.addEventListener("compositionend", (event) => {
+          document.addEventListener("compositionend", (event) => {
           const numericField = numericOnlyField(event.target);
           if (numericField) {
             delete numericField.dataset.composing;
@@ -149,9 +152,9 @@
 
           delete loginIdField.dataset.composing;
           sanitizeLoginIdField(loginIdField);
-        });
+          });
 
-        document.addEventListener("input", (event) => {
+          document.addEventListener("input", (event) => {
           const numericField = numericOnlyField(event.target);
           if (numericField) {
             if (numericField.dataset.composing === "true") return;
@@ -173,9 +176,9 @@
           if (loginIdField.dataset.composing === "true") return;
 
           sanitizeLoginIdField(loginIdField);
-        });
+          });
 
-        document.addEventListener("blur", (event) => {
+          document.addEventListener("blur", (event) => {
           const emailField = emailNormalizeField(event.target);
           if (emailField) {
             sanitizeEmailField(emailField);
@@ -186,9 +189,9 @@
           if (!loginIdField) return;
 
           sanitizeLoginIdField(loginIdField);
-        }, true);
+          }, true);
 
-        const closeNavigationMenus = () => {
+          const closeNavigationMenus = () => {
           document.querySelectorAll("[data-nav-dropdown]").forEach((dropdown) => {
             dropdown.querySelector("[data-nav-dropdown-menu]").hidden = true;
             dropdown.querySelector("[data-nav-dropdown-toggle]").setAttribute("aria-expanded", "false");
@@ -197,9 +200,9 @@
           document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
             dropdown.open = false;
           });
-        };
+          };
 
-        document.addEventListener("click", (event) => {
+          document.addEventListener("click", (event) => {
           if (!(event.target instanceof Element)) return;
 
           const toggle = event.target.closest("[data-nav-dropdown-toggle]");
@@ -217,9 +220,13 @@
           if (event.target.closest("[data-nav-dropdown]")) return;
 
           closeNavigationMenus();
-        });
+          });
+        }
 
         document.querySelectorAll("[data-schedule-datetime-picker]").forEach((picker) => {
+          if (picker.dataset.datetimePickerInitialized === "true") return;
+
+          picker.dataset.datetimePickerInitialized = "true";
           const valueInput = picker.querySelector("[data-schedule-datetime-value]");
           const dateButton = picker.querySelector("[data-schedule-date-button]");
           const timeInput = picker.querySelector("[data-schedule-time-input]");
