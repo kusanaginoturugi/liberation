@@ -24,4 +24,26 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_not allocation.valid?
     assert_includes allocation.errors[:spirit_count].join, "100"
   end
+
+  test "distributes a shortfall by altar count and excludes zero altar fellowships" do
+    odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
+    seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", region: @region)
+    CeremonySchedule.create!(
+      event: @event, fellowship: odaiba, ceremony_at: Time.zone.local(2026, 10, 2, 10),
+      place: "お台場会館", assistant_count: 1, spirit_count: 20
+    )
+    CeremonySchedule.create!(
+      event: @event, fellowship: seimeiouin, ceremony_at: Time.zone.local(2026, 10, 3, 10),
+      place: "聖明王院", assistant_count: 1, spirit_count: 10
+    )
+
+    result = CeremonyScheduleAllocation.distribute_shortfall!(event: @event, qualified_spirit_count: 100)
+
+    assert_equal 50, result[:shortfall]
+    assert result[:distributed]
+    assert_equal 37, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 53, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+    assert_nil CeremonyScheduleAllocation.find_by(event: @event, fellowship: seimeiouin)
+    assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+  end
 end

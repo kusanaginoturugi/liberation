@@ -52,6 +52,7 @@ class MasterSync
     fellowship.active = row["active"].to_i == 1
     fellowship.region_id ||= DEFAULT_REGION_ID
     fellowship.display_order ||= 0
+    fellowship.altar_count = Fellowship::ALTAR_COUNTS.fetch(fellowship.name, 0) if fellowship.new_record?
     fellowship.save!
   end
 end

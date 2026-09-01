@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_30_111000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
   create_table "ceremony_schedule_allocations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "event_id", null: false
@@ -81,6 +81,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_30_111000) do
 
   create_table "fellowships", force: :cascade do |t|
     t.boolean "active", default: true, null: false
+    t.integer "altar_count", default: 0, null: false
     t.string "color_code"
     t.datetime "created_at", null: false
     t.integer "display_order"

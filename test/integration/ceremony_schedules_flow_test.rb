@@ -61,6 +61,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">35<"
     assert_includes response.body, "合格霊数"
     assert_includes response.body, ">1,650<"
+    assert_includes response.body, "3壇"
     assert_includes response.body, "schedule-row-even"
     assert_includes response.body, "schedule-row-odd"
     assert_not_includes response.body, "予定追加"
@@ -292,5 +293,29 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to users_path
     assert_equal @meeting, @other_user.reload.fellowship
+  end
+
+  test "admin can distribute the allocation shortfall by altar count" do
+    odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 100)
+    CeremonySchedule.create!(
+      fellowship: @meeting, event: @event, ceremony_at: Time.zone.local(2026, 5, 1, 10, 30),
+      place: "大江戸会館", assistant_count: 1, spirit_count: 20
+    )
+    CeremonySchedule.create!(
+      fellowship: odaiba, event: @event, ceremony_at: Time.zone.local(2026, 5, 2, 10, 30),
+      place: "お台場会館", assistant_count: 1, spirit_count: 30
+    )
+    admin = User.create!(
+      name: "管理者", email: "admin@example.com", password: "password123", password_confirmation: "password123",
+      region: @region, admin: true
+    )
+
+    post session_path, params: { login_id: admin.login_id, password: "password123" }
+    post distribute_shortfall_ceremony_schedule_allocations_path, params: { event_id: @event.id }
+
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
+    assert_equal 37, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 63, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
 end

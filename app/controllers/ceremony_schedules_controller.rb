@@ -15,6 +15,7 @@ class CeremonySchedulesController < ApplicationController
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
     @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
+    @allocation_shortfall = allocation_shortfall_for(@selected_event, @qualified_spirit_count)
   end
 
   def export
@@ -179,10 +180,18 @@ class CeremonySchedulesController < ApplicationController
   end
 
   def allocation_rows_for(schedules)
-    rows = schedules.group_by(&:fellowship).map do |fellowship, fellowship_schedules|
+    return [] if schedules.empty?
+
+    schedules_by_fellowship = schedules.group_by(&:fellowship)
+    fellowships = schedules_by_fellowship.keys
+    eligible_fellowships = Fellowship.available.where("altar_count > 0").to_a
+    fellowships += eligible_fellowships.reject { |fellowship| fellowships.include?(fellowship) }
+
+    rows = fellowships.map do |fellowship|
+      fellowship_schedules = schedules_by_fellowship.fetch(fellowship, [])
       allocation = CeremonyScheduleAllocation.find_or_initialize_by(event: @selected_event, fellowship: fellowship)
       allocation.spirit_count ||= fellowship_schedules.sum(&:spirit_count)
-      { fellowship:, spirit_count: allocation.spirit_count, allocation: }
+      { fellowship:, altar_count: fellowship.altar_count, spirit_count: allocation.spirit_count, allocation: }
     end
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
     rows = rows.sort_by { |row| fellowship_order.fetch(row[:fellowship].name, Float::INFINITY) } if @allocation_sort_direction == :asc
@@ -198,5 +207,11 @@ class CeremonySchedulesController < ApplicationController
 
   def qualified_spirit_count_for(event)
     event.event_details.find_by(region_id: primary_region_id)&.total_serial_count
+  end
+
+  def allocation_shortfall_for(event, qualified_spirit_count)
+    return 0 unless qualified_spirit_count
+
+    [ qualified_spirit_count - CeremonyScheduleAllocation.allocated_spirit_count_for(event), 0 ].max
   end
 end

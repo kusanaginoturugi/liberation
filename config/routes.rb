@@ -9,7 +9,11 @@ Rails.application.routes.draw do
       get :export
     end
   end
-  resources :ceremony_schedule_allocations, only: [ :create, :update ]
+  resources :ceremony_schedule_allocations, only: [ :create, :update ] do
+    collection do
+      post :distribute_shortfall
+    end
+  end
   resources :users, only: [ :index, :new, :create, :edit, :update ]
   resources :regions, only: [ :index, :edit, :update ]
   resources :events, only: [ :index, :new, :create, :edit, :update, :destroy ] do

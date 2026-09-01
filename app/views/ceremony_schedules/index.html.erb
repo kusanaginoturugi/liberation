@@ -121,6 +121,13 @@
     <div class="panel-header">
       <h2>番号割り振り</h2>
       <p>伝道会ごとの霊数合計</p>
+      <% if @allocation_shortfall.positive? %>
+        <p class="allocation-shortfall">不足 <strong><%= number_with_delimiter(@allocation_shortfall) %></strong>霊</p>
+      <% end %>
+      <% if current_user&.admin? && @allocation_rows.present? && @allocation_shortfall.positive? %>
+        <%= button_to "不足分を壇数で配分", distribute_shortfall_ceremony_schedule_allocations_path,
+              params: { event_id: @selected_event.id }, class: "button-secondary compact-button" %>
+      <% end %>
     </div>
 
     <% if @allocation_rows.empty? %>
@@ -139,6 +146,7 @@
             伝道会名
             <span><%= @allocation_sort_direction == :asc ? "▲" : "▼" %></span>
           <% end %>
+          <span>壇数</span>
           <span>霊数</span>
           <span>番号</span>
         </div>
@@ -146,6 +154,7 @@
           <% fellowship = row[:fellowship] %>
           <article class="allocation-row">
             <strong><%= fellowship.name %></strong>
+            <span class="allocation-altar-count"><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></span>
             <% if current_user&.admin? %>
               <%= form_with model: row[:allocation], class: "allocation-count-form" do |form| %>
                 <%= form.hidden_field :event_id %>
@@ -153,7 +162,7 @@
                 <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onfocus: "this.select()", onchange: "this.form.requestSubmit()" %>
               <% end %>
             <% else %>
-              <span><%= number_with_delimiter(row[:spirit_count]) %></span>
+              <span class="allocation-spirit-count"><%= number_with_delimiter(row[:spirit_count]) %></span>
             <% end %>
             <span><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></span>
           </article>

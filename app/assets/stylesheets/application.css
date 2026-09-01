@@ -276,7 +276,7 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 5.5rem minmax(7rem, 1.1fr);
+  grid-template-columns: minmax(0, 1fr) 3.5rem 5.5rem minmax(7rem, 1.1fr);
   gap: 12px;
   align-items: center;
 }
@@ -301,6 +301,26 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-count-form input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
   -webkit-appearance: none;
+}
+
+.allocation-altar-count {
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.allocation-spirit-count {
+  text-align: right;
+}
+
+.allocation-shortfall {
+  color: #c62828 !important;
+  font-weight: 700;
+}
+
+.allocation-shortfall strong {
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .allocation-list__header {
@@ -1158,7 +1178,16 @@ body.number-shadow-disabled .serial-grid td {
   }
 
   .allocation-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .allocation-altar-count {
+    grid-column: 2;
+  }
+
+  .allocation-count-form,
+  .allocation-spirit-count {
+    grid-column: 3;
   }
 
   .allocation-row > span:last-child {

@@ -25,9 +25,10 @@
       .schedule-assistants { width: 12%; }
       .schedule-spirits { width: 11%; }
       .schedule-minister { width: 17%; }
-      .allocation-fellowship { width: 42%; }
-      .allocation-spirits { width: 20%; }
-      .allocation-numbers { width: 38%; }
+      .allocation-fellowship { width: 35%; }
+      .allocation-altars { width: 15%; }
+      .allocation-spirits { width: 18%; }
+      .allocation-numbers { width: 32%; }
       .allocation-table td { text-align: center; }
       .empty { text-align: center; }
     </style>
@@ -57,13 +58,13 @@
     <section>
       <div class="section-heading"><h2>番号割り振り</h2><p>伝道会ごとの霊数合計</p></div>
       <table class="allocation-table">
-        <thead><tr><th class="allocation-fellowship">伝道会名</th><th class="allocation-spirits">霊数</th><th class="allocation-numbers">番号</th></tr></thead>
+        <thead><tr><th class="allocation-fellowship">伝道会名</th><th class="allocation-altars">壇数</th><th class="allocation-spirits">霊数</th><th class="allocation-numbers">番号</th></tr></thead>
         <tbody>
           <% if @allocation_rows.empty? %>
-            <tr><td colspan="3" class="empty">番号を割り振る予定はまだありません</td></tr>
+            <tr><td colspan="4" class="empty">番号を割り振る予定はまだありません</td></tr>
           <% else %>
             <% @allocation_rows.each do |row| %>
-              <tr><td><%= row[:fellowship].name %></td><td class="number"><%= number_with_delimiter(row[:spirit_count]) %></td><td class="center"><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></td></tr>
+              <tr><td><%= row[:fellowship].name %></td><td><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></td><td class="number"><%= number_with_delimiter(row[:spirit_count]) %></td><td class="center"><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></td></tr>
             <% end %>
           <% end %>
         </tbody>
