@@ -69,7 +69,8 @@
     <%= yield %>
 
     <script>
-      document.addEventListener("turbo:load", () => {
+      (() => {
+        const initializeApplication = () => {
         const normalizeNumericValue = (value) =>
           value
             .replace(/[０-９]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xFEE0))
@@ -308,7 +309,15 @@
             }
           });
         });
-      });
+        };
+
+        document.addEventListener("turbo:load", initializeApplication);
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initializeApplication, { once: true });
+        } else {
+          initializeApplication();
+        }
+      })();
     </script>
   </body>
 </html>
