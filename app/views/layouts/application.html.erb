@@ -192,6 +192,14 @@
           });
         });
 
+        document.querySelectorAll("details.nav-dropdown > summary").forEach((summary) => {
+          summary.addEventListener("click", (event) => {
+            event.preventDefault();
+            const dropdown = summary.parentElement;
+            dropdown.open = !dropdown.open;
+          });
+        });
+
         document.querySelectorAll("[data-schedule-datetime-picker]").forEach((picker) => {
           const valueInput = picker.querySelector("[data-schedule-datetime-value]");
           const dateButton = picker.querySelector("[data-schedule-date-button]");
