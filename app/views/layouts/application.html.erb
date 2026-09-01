@@ -214,6 +214,8 @@
             return;
           }
 
+          if (event.target.closest("[data-nav-dropdown]")) return;
+
           closeNavigationMenus();
         });
 
