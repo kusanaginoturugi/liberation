@@ -200,9 +200,15 @@
           };
 
           document.addEventListener("click", (event) => {
-          if (!(event.target instanceof Element)) return;
+            if (!(event.target instanceof Element)) return;
 
-          closeNavigationMenus();
+            const adminNavigationItem = event.target.closest(".nav-dropdown--admin .nav-dropdown__item");
+            if (adminNavigationItem) {
+              const adminNavigationToggle = adminNavigationItem.closest(".nav-dropdown--admin").querySelector(".nav-dropdown__toggle");
+              adminNavigationToggle.checked = false;
+            }
+
+            closeNavigationMenus();
           });
         }
 
