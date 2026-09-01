@@ -17,12 +17,14 @@ class AdminNavigationTest < ApplicationSystemTestCase
   end
 
   test "admin navigation opens and closes from the management button" do
+    page.current_window.resize_to(2048, 800)
+
     visit new_session_path
     fill_in "ログインID", with: @admin.login_id
     fill_in "パスワード", with: "password123"
     click_button "ログイン"
 
-    management_button = find("label[for='admin-navigation-toggle']")
+    management_button = find("#admin-navigation-toggle", visible: :all)
     management_menu = ".nav-dropdown--admin .nav-dropdown__menu"
 
     assert_no_selector management_menu, visible: true
@@ -39,7 +41,7 @@ class AdminNavigationTest < ApplicationSystemTestCase
     end
 
     assert_text "超抜式一覧"
-    management_button = find("label[for='admin-navigation-toggle']")
+    management_button = find("#admin-navigation-toggle", visible: :all)
     assert_no_selector management_menu, visible: true
 
     management_button.click

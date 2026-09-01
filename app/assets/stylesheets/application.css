@@ -109,8 +109,12 @@ body.number-shadow-disabled .serial-grid td {
 
 .nav-dropdown__toggle {
   position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   opacity: 0;
-  pointer-events: none;
+  cursor: pointer;
 }
 
 .nav-dropdown--admin .nav-dropdown__summary {
