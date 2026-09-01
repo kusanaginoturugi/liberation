@@ -46,4 +46,14 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_nil CeremonyScheduleAllocation.find_by(event: @event, fellowship: seimeiouin)
     assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
   end
+
+  test "restores the allocation values from before distribution" do
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 25)
+
+    CeremonyScheduleAllocation.distribute_shortfall!(event: @event, qualified_spirit_count: 100)
+    CeremonyScheduleAllocation.undo_distribution!(event: @event)
+
+    assert_equal 25, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_nil CeremonyScheduleAllocationSnapshot.find_by(event: @event)
+  end
 end

@@ -38,6 +38,10 @@ class CeremonyScheduleAllocation < ApplicationRecord
       .each { |fellowship| additions[fellowship.id] += 1 }
 
     transaction do
+      snapshot = CeremonyScheduleAllocationSnapshot.find_or_initialize_by(event:)
+      snapshot.allocation_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
+      snapshot.save!
+
       fellowships.each do |fellowship|
         allocation = find_or_initialize_by(event:, fellowship:)
         allocation.spirit_count = allocation.spirit_count || CeremonySchedule.where(event:, fellowship:).sum(:spirit_count)
@@ -46,6 +50,19 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
 
     { shortfall:, distributed: true }
+  end
+
+  def self.undo_distribution!(event:)
+    snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
+    raise DistributionError, "元に戻せる配分がありません" unless snapshot
+
+    transaction do
+      where(event:).delete_all
+      snapshot.allocation_counts.each do |fellowship_id, spirit_count|
+        create!(event:, fellowship_id:, spirit_count:)
+      end
+      snapshot.destroy!
+    end
   end
 
   private

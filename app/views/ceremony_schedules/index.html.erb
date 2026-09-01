@@ -125,7 +125,11 @@
         <p class="allocation-shortfall">不足 <strong><%= number_with_delimiter(@allocation_shortfall) %></strong>霊</p>
       <% end %>
       <% if current_user&.admin? && @allocation_rows.present? && @allocation_shortfall.positive? %>
-        <%= button_to "不足分を壇数で配分", distribute_shortfall_ceremony_schedule_allocations_path,
+        <%= button_to "壇数で配分", distribute_shortfall_ceremony_schedule_allocations_path,
+              params: { event_id: @selected_event.id }, class: "button-secondary compact-button" %>
+      <% end %>
+      <% if current_user&.admin? && @distribution_undo_available %>
+        <%= button_to "配分を戻す", undo_distribution_ceremony_schedule_allocations_path,
               params: { event_id: @selected_event.id }, class: "button-secondary compact-button" %>
       <% end %>
     </div>

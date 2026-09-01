@@ -16,6 +16,7 @@ class CeremonySchedulesController < ApplicationController
     @next_allocation_sort_direction = next_allocation_sort_direction
     @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
     @allocation_shortfall = allocation_shortfall_for(@selected_event, @qualified_spirit_count)
+    @distribution_undo_available = CeremonyScheduleAllocationSnapshot.exists?(event: @selected_event)
   end
 
   def export

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :ceremony_schedule_allocations, only: [ :create, :update ] do
     collection do
       post :distribute_shortfall
+      post :undo_distribution
     end
   end
   resources :users, only: [ :index, :new, :create, :edit, :update ]

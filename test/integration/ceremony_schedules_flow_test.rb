@@ -317,5 +317,11 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to ceremony_schedules_path(event_id: @event.id)
     assert_equal 37, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
     assert_equal 63, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+
+    post undo_distribution_ceremony_schedule_allocations_path, params: { event_id: @event.id }
+
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
+    assert_equal 50, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+    assert_equal 0, CeremonyScheduleAllocation.where(event: @event).count
   end
 end

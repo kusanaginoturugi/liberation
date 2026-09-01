@@ -31,6 +31,14 @@ class CeremonyScheduleAllocationsController < ApplicationController
     redirect_to ceremony_schedules_path(event_id: event.id), alert: e.message
   end
 
+  def undo_distribution
+    event = Event.find(params[:event_id])
+    CeremonyScheduleAllocation.undo_distribution!(event:)
+    redirect_to ceremony_schedules_path(event_id: event.id), notice: "壇数配分前の割り振りに戻しました"
+  rescue CeremonyScheduleAllocation::DistributionError, ActiveRecord::RecordInvalid => e
+    redirect_to ceremony_schedules_path(event_id: event.id), alert: e.message
+  end
+
   private
 
   def allocation_params
