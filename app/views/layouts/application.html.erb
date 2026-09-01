@@ -185,8 +185,10 @@
         }, true);
 
         document.addEventListener("click", (event) => {
+          if (event.target instanceof Element && event.target.closest("summary.nav-dropdown__summary")) return;
+
           document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
-            if (!dropdown.contains(event.target)) dropdown.open = false;
+            dropdown.open = false;
           });
         });
 
