@@ -41,9 +41,8 @@
             <%= link_to "挙行報告", new_chobatsu_report_path, class: "button-secondary" %>
             <%= link_to "挙行一覧", summary_chobatsu_reports_path(event_id: selected_event_id), class: "button-secondary" %>
             <% if current_user.admin? %>
-              <div class="nav-dropdown nav-dropdown--admin">
-                <input type="checkbox" id="admin-navigation-toggle" class="nav-dropdown__toggle">
-                <label for="admin-navigation-toggle" class="button-secondary nav-dropdown__summary">管理</label>
+              <details class="nav-dropdown nav-dropdown--admin">
+                <summary class="button-secondary nav-dropdown__summary">管理</summary>
                 <div class="nav-dropdown__menu">
                   <% unless single_region_mode? %>
                     <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
@@ -57,7 +56,7 @@
                     </div>
                   </details>
                 </div>
-              </div>
+              </details>
             <% end %>
             <%= button_to "ログアウト", session_path, method: :delete, class: "button-secondary" %>
           <% else %>
@@ -199,24 +198,15 @@
             });
           };
 
-          const closeAdminNavigation = () => {
-            document.querySelectorAll(".nav-dropdown--admin .nav-dropdown__toggle").forEach((toggle) => {
-              toggle.checked = false;
-            });
-          };
-
           // Turbo caches the current header before moving to the next page.
           // Close the menu first so an open management menu never follows the user.
-          document.addEventListener("turbo:before-cache", closeAdminNavigation);
-          document.addEventListener("turbo:before-visit", closeAdminNavigation);
+          document.addEventListener("turbo:before-cache", closeNavigationMenus);
+          document.addEventListener("turbo:before-visit", closeNavigationMenus);
 
           document.addEventListener("click", (event) => {
             if (!(event.target instanceof Element)) return;
 
-            const adminNavigationItem = event.target.closest(".nav-dropdown--admin .nav-dropdown__item");
-            if (adminNavigationItem) {
-              closeAdminNavigation();
-            }
+            if (event.target.closest(".nav-dropdown")) return;
 
             closeNavigationMenus();
           });

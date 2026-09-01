@@ -24,7 +24,7 @@ class AdminNavigationTest < ApplicationSystemTestCase
     fill_in "パスワード", with: "password123"
     click_button "ログイン"
 
-    management_button = find("#admin-navigation-toggle", visible: :all)
+    management_button = find(".nav-dropdown--admin .nav-dropdown__summary")
     management_menu = ".nav-dropdown--admin .nav-dropdown__menu"
 
     assert_no_selector management_menu, visible: true
@@ -41,7 +41,7 @@ class AdminNavigationTest < ApplicationSystemTestCase
     end
 
     assert_text "超抜式一覧"
-    management_button = find("#admin-navigation-toggle", visible: :all)
+    management_button = find(".nav-dropdown--admin .nav-dropdown__summary")
     assert_no_selector management_menu, visible: true
 
     management_button.click
