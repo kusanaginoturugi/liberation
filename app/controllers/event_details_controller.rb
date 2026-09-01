@@ -2,6 +2,7 @@ class EventDetailsController < ApplicationController
   before_action :require_admin!
   before_action :set_event
   before_action :ensure_event_details!
+  before_action :require_open_event!, only: [ :edit, :update ]
   before_action :set_event_detail, only: [ :edit, :update ]
 
   def index
@@ -27,6 +28,12 @@ class EventDetailsController < ApplicationController
 
   def set_event_detail
     @event_detail = @event.event_details.find(params[:id])
+  end
+
+  def require_open_event!
+    return unless @event.closed?
+
+    redirect_to event_event_details_path(@event), alert: "終了した超抜式の合格霊数は変更できません"
   end
 
   def ensure_event_details!

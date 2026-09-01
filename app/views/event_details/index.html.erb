@@ -11,13 +11,18 @@
     <% if flash[:notice].present? %>
       <div class="flash flash-notice"><%= flash[:notice] %></div>
     <% end %>
+    <% if flash[:alert].present? %>
+      <div class="flash flash-alert"><%= flash[:alert] %></div>
+    <% end %>
 
     <table class="admin-table">
       <thead>
         <tr>
           <th>超抜式</th>
           <th>合格霊数</th>
-          <th style="width: 9em">操作</th>
+          <% unless @event.closed? %>
+            <th style="width: 9em">操作</th>
+          <% end %>
         </tr>
       </thead>
       <tbody>
@@ -26,11 +31,17 @@
           <tr>
             <td><%= display_event_name %></td>
             <td>
-              <%= form_with model: [@event, event_detail], id: form_id do |form| %>
-                <%= form.number_field :total_serial_count, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+              <% if @event.closed? %>
+                <%= number_with_delimiter(event_detail.total_serial_count) %>
+              <% else %>
+                <%= form_with model: [@event, event_detail], id: form_id do |form| %>
+                  <%= form.number_field :total_serial_count, min: 1, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+                <% end %>
               <% end %>
             </td>
-            <td><%= submit_tag "更新する", form: form_id, class: "button-primary compact-button" %></td>
+            <% unless @event.closed? %>
+              <td><%= submit_tag "更新する", form: form_id, class: "button-primary compact-button" %></td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>

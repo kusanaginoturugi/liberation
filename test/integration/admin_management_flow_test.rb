@@ -251,6 +251,34 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1800, @event_detail.reload.total_serial_count
   end
 
+  test "admin cannot edit the qualified spirit count for a closed event" do
+    closed_event = Event.create!(name: "第74次修霊超抜式", closed: true)
+    closed_event_detail = EventDetail.create!(event: closed_event, region: @region, total_serial_count: 1649)
+    post session_path, params: { login_id: @admin.login_id, password: "password123" }
+
+    get event_event_details_path(closed_event)
+    assert_response :success
+    assert_not_includes response.body, 'name="event_detail[total_serial_count]"'
+    assert_not_includes response.body, "更新する"
+
+    patch event_event_detail_path(closed_event, closed_event_detail), params: {
+      event_detail: { total_serial_count: 1800 }
+    }
+
+    assert_redirected_to event_event_details_path(closed_event)
+    assert_equal 1649, closed_event_detail.reload.total_serial_count
+
+    get edit_event_path(closed_event)
+    assert_redirected_to events_path
+
+    patch event_path(closed_event), params: {
+      event: { name: "変更不可", total_serial_count: 1800 }
+    }
+
+    assert_redirected_to events_path
+    assert_equal "第74次修霊超抜式", closed_event.reload.name
+  end
+
   test "event detail index recreates missing region settings" do
     post session_path, params: { login_id: @admin.login_id, password: "password123" }
 

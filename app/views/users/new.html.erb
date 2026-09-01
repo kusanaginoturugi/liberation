@@ -3,7 +3,10 @@
 
 <div class="page-shell auth-shell">
   <section class="panel form-panel auth-panel">
-    <h1><%= initial_signup ? "初期ユーザー登録" : "ユーザー追加" %></h1>
+    <div class="panel-header">
+      <h1><%= initial_signup ? "初期ユーザー登録" : "ユーザー追加" %></h1>
+      <%= link_to "戻る", root_path, class: "button-secondary compact-button" %>
+    </div>
     <% unless initial_signup %>
       <p class="field-hint">ログインIDは作成時に自動採番されます。</p>
     <% end %>

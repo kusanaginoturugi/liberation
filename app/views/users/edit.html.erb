@@ -3,7 +3,10 @@
 
 <div class="page-shell auth-shell">
   <section class="panel form-panel auth-panel">
-    <h1><%= editing_self ? "プロフィール編集" : "ユーザー編集" %></h1>
+    <div class="panel-header">
+      <h1><%= editing_self ? "プロフィール編集" : "ユーザー編集" %></h1>
+      <%= link_to "戻る", root_path, class: "button-secondary compact-button" %>
+    </div>
     <% unless editing_self %>
       <p class="user-edit-summary"><%= @user.name %> (ID: <%= @user.login_id %>, <%= @user.email %>)</p>
     <% end %>

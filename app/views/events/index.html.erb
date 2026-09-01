@@ -4,7 +4,10 @@
   <div class="panel">
     <div class="panel-header">
       <h1>超抜式一覧</h1>
-      <%= link_to "超抜式追加", new_event_path, class: "button-secondary" %>
+      <div class="panel-header-actions">
+        <%= link_to "超抜式追加", new_event_path, class: "button-secondary" %>
+        <%= link_to "戻る", root_path, class: "button-secondary compact-button" %>
+      </div>
     </div>
 
     <% if flash[:notice].present? %>
@@ -22,7 +25,11 @@
       </thead>
       <tbody>
         <% @events.each do |event| %>
-          <tr class="clickable-row" data-href="<%= edit_event_path(event) %>" tabindex="0" role="link" aria-label="<%= "#{event.name}を編集" %>">
+          <% if event.closed? %>
+            <tr>
+          <% else %>
+            <tr class="clickable-row" data-href="<%= edit_event_path(event) %>" tabindex="0" role="link" aria-label="<%= "#{event.name}を編集" %>">
+          <% end %>
             <td><%= event.name %></td>
             <td>
               <% if event.closed? %>

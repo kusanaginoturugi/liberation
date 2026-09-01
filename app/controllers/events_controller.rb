@@ -1,6 +1,7 @@
 class EventsController < ApplicationController
   before_action :require_admin!
   before_action :set_event, only: [ :edit, :update, :destroy ]
+  before_action :require_open_event!, only: [ :edit, :update, :destroy ]
 
   def index
     @events = Event.recent_first
@@ -87,6 +88,12 @@ class EventsController < ApplicationController
 
   def set_event
     @event = Event.find(params[:id])
+  end
+
+  def require_open_event!
+    return unless @event.closed?
+
+    redirect_to events_path, alert: "終了した超抜式は編集・削除できません"
   end
 
   def event_params

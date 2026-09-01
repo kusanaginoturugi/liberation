@@ -2,7 +2,10 @@
 
 <div class="page-shell auth-shell">
   <section class="panel form-panel auth-panel">
-    <h1>伝道会編集</h1>
+    <div class="panel-header">
+      <h1>伝道会編集</h1>
+      <%= link_to "戻る", root_path, class: "button-secondary compact-button" %>
+    </div>
 
     <% if @fellowship.errors.any? %>
       <div class="flash flash-alert">

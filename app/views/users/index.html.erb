@@ -4,7 +4,10 @@
   <div class="panel">
     <div class="panel-header">
       <h1>ユーザー一覧</h1>
-      <%= link_to "ユーザー追加", new_user_path, class: "button-secondary" %>
+      <div class="panel-header-actions">
+        <%= link_to "ユーザー追加", new_user_path, class: "button-secondary" %>
+        <%= link_to "戻る", root_path, class: "button-secondary compact-button" %>
+      </div>
     </div>
 
     <% if flash[:notice].present? %>
