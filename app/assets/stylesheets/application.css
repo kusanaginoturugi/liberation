@@ -408,6 +408,14 @@ body.number-shadow-disabled .serial-grid td {
   background: rgba(255, 255, 255, 0.58);
 }
 
+.allocation-row.allocation-row-even {
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.allocation-row.allocation-row-odd {
+  background: rgba(141, 90, 47, 0.06);
+}
+
 .panel {
   padding: 24px;
 }

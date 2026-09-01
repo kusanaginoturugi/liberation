@@ -166,9 +166,9 @@
           <span>霊数</span>
           <span>番号</span>
         </div>
-        <% @allocation_rows.each do |row| %>
+        <% @allocation_rows.each_with_index do |row, index| %>
           <% fellowship = row[:fellowship] %>
-          <article class="allocation-row">
+          <article class="allocation-row <%= index.even? ? "allocation-row-even" : "allocation-row-odd" %>">
             <strong><%= fellowship.name %></strong>
             <span class="allocation-altar-count"><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></span>
             <% if current_user&.admin? %>

@@ -111,6 +111,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_operator allocation_section.index("札幌会場"), :<, allocation_section.index("大江戸")
     assert_includes allocation_section, "1 〜 20"
     assert_includes allocation_section, "21 〜 40"
+    assert_includes allocation_section, "allocation-row-even"
+    assert_includes allocation_section, "allocation-row-odd"
 
     @meeting.update!(name: "大江戸")
     @other_meeting.update!(name: "山梨")
