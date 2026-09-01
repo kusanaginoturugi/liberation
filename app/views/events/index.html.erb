@@ -20,7 +20,7 @@
           <th>超抜式名</th>
           <th>状態</th>
           <th>登録日</th>
-          <th>聖院別設定</th>
+          <th>設定</th>
         </tr>
       </thead>
       <tbody>
@@ -39,7 +39,13 @@
               <% end %>
             </td>
             <td><%= event.created_at.strftime("%Y/%m/%d") %></td>
-            <td><%= link_to "設定一覧", event_event_details_path(event), class: "text-link", onclick: "event.stopPropagation();" %></td>
+            <td>
+              <% if event.closed? %>
+                <span class="muted-text">変更不可</span>
+              <% else %>
+                <%= link_to "設定", edit_event_path(event), class: "text-link", onclick: "event.stopPropagation();" %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>

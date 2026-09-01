@@ -144,6 +144,8 @@ class AdminManagementFlowTest < ActionDispatch::IntegrationTest
     get events_path
     assert_includes response.body, @event.name
     assert_includes response.body, edit_event_path(@event)
+    assert_includes response.body, ">設定<"
+    assert_not_includes response.body, event_event_details_path(@event)
 
     get edit_event_path(@event)
     assert_includes response.body, 'name="event[total_serial_count]"'
