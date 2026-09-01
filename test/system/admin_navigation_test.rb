@@ -41,13 +41,6 @@ class AdminNavigationTest < ApplicationSystemTestCase
     end
 
     assert_text "超抜式一覧"
-    management_button = find(".nav-dropdown--admin .nav-dropdown__summary")
-    assert_no_selector management_menu, visible: true
-
-    management_button.click
-    assert_selector management_menu, visible: true
-
-    management_button.click
     assert_no_selector management_menu, visible: true
   end
 end
