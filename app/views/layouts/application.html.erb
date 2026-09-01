@@ -199,13 +199,23 @@
             });
           };
 
+          const closeAdminNavigation = () => {
+            document.querySelectorAll(".nav-dropdown--admin .nav-dropdown__toggle").forEach((toggle) => {
+              toggle.checked = false;
+            });
+          };
+
+          // Turbo caches the current header before moving to the next page.
+          // Close the menu first so an open management menu never follows the user.
+          document.addEventListener("turbo:before-cache", closeAdminNavigation);
+          document.addEventListener("turbo:before-visit", closeAdminNavigation);
+
           document.addEventListener("click", (event) => {
             if (!(event.target instanceof Element)) return;
 
             const adminNavigationItem = event.target.closest(".nav-dropdown--admin .nav-dropdown__item");
             if (adminNavigationItem) {
-              const adminNavigationToggle = adminNavigationItem.closest(".nav-dropdown--admin").querySelector(".nav-dropdown__toggle");
-              adminNavigationToggle.checked = false;
+              closeAdminNavigation();
             }
 
             closeNavigationMenus();
