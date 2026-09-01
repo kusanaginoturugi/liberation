@@ -99,6 +99,10 @@ body.number-shadow-disabled .serial-grid td {
   z-index: 10;
 }
 
+.nav-dropdown.is-open {
+  z-index: 10;
+}
+
 .nav-dropdown__summary {
   list-style: none;
 }
@@ -117,6 +121,37 @@ body.number-shadow-disabled .serial-grid td {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: var(--shadow);
+}
+
+.nav-dropdown__group {
+  margin: 2px 0;
+}
+
+.nav-dropdown__group > summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  color: var(--text);
+  font-weight: 700;
+  list-style: none;
+}
+
+.nav-dropdown__group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-dropdown__group > summary::after {
+  content: "▼";
+  float: right;
+  color: var(--muted);
+  font-size: 0.75em;
+}
+
+.nav-dropdown__group[open] > summary::after {
+  content: "▲";
+}
+
+.nav-dropdown__group-items {
+  padding-left: 12px;
 }
 
 .nav-dropdown__item {

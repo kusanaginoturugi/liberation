@@ -41,18 +41,22 @@
             <%= link_to "挙行報告", new_chobatsu_report_path, class: "button-secondary" %>
             <%= link_to "挙行一覧", summary_chobatsu_reports_path(event_id: selected_event_id), class: "button-secondary" %>
             <% if current_user.admin? %>
-              <details class="nav-dropdown">
-                <summary class="button-secondary nav-dropdown__summary">管理</summary>
-                <div class="nav-dropdown__menu">
+              <div class="nav-dropdown" data-nav-dropdown>
+                <button type="button" class="button-secondary nav-dropdown__summary" data-nav-dropdown-toggle aria-expanded="false">管理</button>
+                <div class="nav-dropdown__menu" data-nav-dropdown-menu hidden>
                   <% unless single_region_mode? %>
                     <%= link_to "聖院一覧", regions_path, class: "nav-dropdown__item" %>
                   <% end %>
-                  <%= link_to "設定", edit_settings_path, class: "nav-dropdown__item" %>
-                  <%= link_to "ユーザー一覧", users_path, class: "nav-dropdown__item" %>
                   <%= link_to "超抜式一覧", events_path, class: "nav-dropdown__item" %>
-                  <%= link_to "伝道会一覧", fellowships_path, class: "nav-dropdown__item" %>
+                  <details class="nav-dropdown__group">
+                    <summary>設定</summary>
+                    <div class="nav-dropdown__group-items">
+                      <%= link_to "設定", edit_settings_path, class: "nav-dropdown__item" %>
+                      <%= link_to "伝道会一覧", fellowships_path, class: "nav-dropdown__item" %>
+                    </div>
+                  </details>
                 </div>
-              </details>
+              </div>
             <% end %>
             <%= button_to "ログアウト", session_path, method: :delete, class: "button-secondary" %>
           <% else %>
@@ -184,20 +188,33 @@
           sanitizeLoginIdField(loginIdField);
         }, true);
 
-        document.addEventListener("click", (event) => {
-          if (event.target instanceof Element && event.target.closest("summary.nav-dropdown__summary")) return;
-
+        const closeNavigationMenus = () => {
+          document.querySelectorAll("[data-nav-dropdown]").forEach((dropdown) => {
+            dropdown.querySelector("[data-nav-dropdown-menu]").hidden = true;
+            dropdown.querySelector("[data-nav-dropdown-toggle]").setAttribute("aria-expanded", "false");
+            dropdown.classList.remove("is-open");
+          });
           document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
             dropdown.open = false;
           });
-        });
+        };
 
-        document.querySelectorAll("details.nav-dropdown > summary").forEach((summary) => {
-          summary.addEventListener("click", (event) => {
-            event.preventDefault();
-            const dropdown = summary.parentElement;
-            dropdown.open = !dropdown.open;
-          });
+        document.addEventListener("click", (event) => {
+          if (!(event.target instanceof Element)) return;
+
+          const toggle = event.target.closest("[data-nav-dropdown-toggle]");
+          if (toggle) {
+            const dropdown = toggle.closest("[data-nav-dropdown]");
+            const menu = dropdown.querySelector("[data-nav-dropdown-menu]");
+            const shouldOpen = menu.hidden;
+            closeNavigationMenus();
+            menu.hidden = !shouldOpen;
+            toggle.setAttribute("aria-expanded", String(shouldOpen));
+            dropdown.classList.toggle("is-open", shouldOpen);
+            return;
+          }
+
+          closeNavigationMenus();
         });
 
         document.querySelectorAll("[data-schedule-datetime-picker]").forEach((picker) => {
