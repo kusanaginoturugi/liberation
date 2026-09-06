@@ -134,10 +134,7 @@
       <h2>番号割り振り</h2>
       <p class="allocation-spirit-total">
         <span>伝道会ごとの<br>霊数合計</span>
-        <strong><%= number_with_delimiter(@allocated_spirit_count) %></strong>
-        <% if @distribution_addition&.positive? %>
-          <small>（＋<%= number_with_delimiter(@distribution_addition) %>霊）</small>
-        <% end %>
+        <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong>
       </p>
       <% if @allocation_shortfall.positive? %>
         <p class="allocation-shortfall">不足 <strong><%= number_with_delimiter(@allocation_shortfall) %></strong>霊</p>
@@ -184,9 +181,17 @@
                 <%= form.hidden_field :event_id %>
                 <%= form.hidden_field :fellowship_id %>
                 <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onfocus: "this.select()", onchange: "this.form.requestSubmit()" %>
+                <% if row[:distribution_addition].positive? %>
+                  <span class="allocation-addition">（＋<%= number_with_delimiter(row[:distribution_addition]) %>）</span>
+                <% end %>
               <% end %>
             <% else %>
-              <span class="allocation-spirit-count"><%= number_with_delimiter(row[:spirit_count]) %></span>
+              <span class="allocation-spirit-count">
+                <%= number_with_delimiter(row[:spirit_count]) %>
+                <% if row[:distribution_addition].positive? %>
+                  <span class="allocation-addition">（＋<%= number_with_delimiter(row[:distribution_addition]) %>）</span>
+                <% end %>
+              </span>
             <% end %>
             <span><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></span>
           </article>

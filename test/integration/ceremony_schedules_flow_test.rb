@@ -331,8 +331,9 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     get ceremony_schedules_path(event_id: @event.id)
 
-    assert_includes response.body, ">100<"
-    assert_includes response.body, "（＋50霊）"
+    assert_includes response.body, ">50<"
+    assert_includes response.body, "（＋17）"
+    assert_includes response.body, "（＋33）"
 
     post undo_distribution_ceremony_schedule_allocations_path, params: { event_id: @event.id }
 

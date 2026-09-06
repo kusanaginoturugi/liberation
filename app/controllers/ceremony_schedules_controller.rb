@@ -14,9 +14,8 @@ class CeremonySchedulesController < ApplicationController
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
+    @distribution_additions = CeremonyScheduleAllocation.distribution_additions_for(@selected_event)
     @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
-    @allocated_spirit_count = CeremonyScheduleAllocation.allocated_spirit_count_for(@selected_event)
-    @distribution_addition = CeremonyScheduleAllocation.distribution_addition_for(@selected_event)
     @allocation_shortfall = allocation_shortfall_for(@selected_event, @qualified_spirit_count)
     @distribution_undo_available = CeremonyScheduleAllocationSnapshot.exists?(event: @selected_event)
   end
@@ -26,6 +25,7 @@ class CeremonySchedulesController < ApplicationController
     @ceremony_schedules = schedules_for_selected_event
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
+    @distribution_additions = CeremonyScheduleAllocation.distribution_additions_for(@selected_event)
     @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
 
     send_data CloudflarePdfClient.render(html: render_to_string(template: "ceremony_schedules/export", layout: false)),
@@ -194,7 +194,13 @@ class CeremonySchedulesController < ApplicationController
       fellowship_schedules = schedules_by_fellowship.fetch(fellowship, [])
       allocation = CeremonyScheduleAllocation.find_or_initialize_by(event: @selected_event, fellowship: fellowship)
       allocation.spirit_count ||= fellowship_schedules.sum(&:spirit_count)
-      { fellowship:, altar_count: fellowship.altar_count, spirit_count: allocation.spirit_count, allocation: }
+      {
+        fellowship:,
+        altar_count: fellowship.altar_count,
+        spirit_count: allocation.spirit_count,
+        allocation:,
+        distribution_addition: @distribution_additions.fetch(fellowship.id, 0)
+      }
     end
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
     rows = rows.sort_by { |row| fellowship_order.fetch(row[:fellowship].name, Float::INFINITY) } if @allocation_sort_direction == :asc

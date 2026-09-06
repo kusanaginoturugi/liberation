@@ -12,11 +12,19 @@ class CeremonyScheduleAllocation < ApplicationRecord
     effective_spirit_count_for(event, where(event:).pluck(:fellowship_id, :spirit_count).to_h)
   end
 
-  def self.distribution_addition_for(event)
+  def self.distribution_additions_for(event)
     snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
-    return nil unless snapshot
+    return {} unless snapshot
 
-    allocated_spirit_count_for(event) - effective_spirit_count_for(event, snapshot.allocation_counts)
+    scheduled_counts = CeremonySchedule.where(event:).group(:fellowship_id).sum(:spirit_count)
+    previous_counts = snapshot.allocation_counts
+    current_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
+
+    (scheduled_counts.keys | previous_counts.keys | current_counts.keys).to_h do |fellowship_id|
+      previous_count = previous_counts.fetch(fellowship_id, scheduled_counts.fetch(fellowship_id, 0))
+      current_count = current_counts.fetch(fellowship_id, scheduled_counts.fetch(fellowship_id, 0))
+      [ fellowship_id, current_count - previous_count ]
+    end
   end
 
   def self.distribute_shortfall!(event:, qualified_spirit_count:)
