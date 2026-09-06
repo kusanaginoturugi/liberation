@@ -404,6 +404,15 @@ body.number-shadow-disabled .serial-grid td {
   font-weight: 700;
 }
 
+.schedule-workspace__allocations > .panel-header {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.schedule-workspace__allocations .allocation-spirit-total {
+  flex: 1 1 max-content;
+}
+
 .allocation-list__header {
   padding: 0 12px;
   color: var(--muted);
