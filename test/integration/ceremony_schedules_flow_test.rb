@@ -331,7 +331,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     get ceremony_schedules_path(event_id: @event.id)
 
-    assert_includes response.body, ">50<"
+    assert_includes response.body, ">100<"
     assert_includes response.body, "（＋17）"
     assert_includes response.body, "（＋33）"
 

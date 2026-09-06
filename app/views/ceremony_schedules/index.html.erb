@@ -134,7 +134,7 @@
       <h2>番号割り振り</h2>
       <p class="allocation-spirit-total">
         <span>伝道会ごとの<br>霊数合計</span>
-        <strong><%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></strong>
+        <strong><%= @qualified_spirit_count ? number_with_delimiter(@qualified_spirit_count) : "未設定" %></strong>
       </p>
       <% if @allocation_shortfall.positive? %>
         <p class="allocation-shortfall">不足 <strong><%= number_with_delimiter(@allocation_shortfall) %></strong>霊</p>
