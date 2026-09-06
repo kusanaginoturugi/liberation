@@ -132,7 +132,13 @@
   <section class="panel schedule-workspace__allocations">
     <div class="panel-header">
       <h2>番号割り振り</h2>
-      <p>伝道会ごとの霊数合計</p>
+      <p class="allocation-spirit-total">
+        <span>伝道会ごとの<br>霊数合計</span>
+        <strong><%= number_with_delimiter(@allocated_spirit_count) %></strong>
+        <% if @distribution_addition&.positive? %>
+          <small>（＋<%= number_with_delimiter(@distribution_addition) %>霊）</small>
+        <% end %>
+      </p>
       <% if @allocation_shortfall.positive? %>
         <p class="allocation-shortfall">不足 <strong><%= number_with_delimiter(@allocation_shortfall) %></strong>霊</p>
       <% end %>

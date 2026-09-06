@@ -9,11 +9,14 @@ class CeremonyScheduleAllocation < ApplicationRecord
   validate :does_not_exceed_event_total
 
   def self.allocated_spirit_count_for(event)
-    scheduled_counts = CeremonySchedule.where(event:).group(:fellowship_id).sum(:spirit_count)
-    allocation_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
-    (scheduled_counts.keys | allocation_counts.keys).sum do |fellowship_id|
-      allocation_counts.fetch(fellowship_id, scheduled_counts.fetch(fellowship_id, 0))
-    end
+    effective_spirit_count_for(event, where(event:).pluck(:fellowship_id, :spirit_count).to_h)
+  end
+
+  def self.distribution_addition_for(event)
+    snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
+    return nil unless snapshot
+
+    allocated_spirit_count_for(event) - effective_spirit_count_for(event, snapshot.allocation_counts)
   end
 
   def self.distribute_shortfall!(event:, qualified_spirit_count:)
@@ -66,6 +69,13 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   private
+
+  def self.effective_spirit_count_for(event, allocation_counts)
+    scheduled_counts = CeremonySchedule.where(event:).group(:fellowship_id).sum(:spirit_count)
+    (scheduled_counts.keys | allocation_counts.keys).sum do |fellowship_id|
+      allocation_counts.fetch(fellowship_id, scheduled_counts.fetch(fellowship_id, 0))
+    end
+  end
 
   def does_not_exceed_event_total
     return if event.blank? || fellowship.blank? || spirit_count.blank?

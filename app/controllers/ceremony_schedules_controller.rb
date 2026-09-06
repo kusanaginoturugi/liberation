@@ -15,6 +15,8 @@ class CeremonySchedulesController < ApplicationController
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
     @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
+    @allocated_spirit_count = CeremonyScheduleAllocation.allocated_spirit_count_for(@selected_event)
+    @distribution_addition = CeremonyScheduleAllocation.distribution_addition_for(@selected_event)
     @allocation_shortfall = allocation_shortfall_for(@selected_event, @qualified_spirit_count)
     @distribution_undo_available = CeremonyScheduleAllocationSnapshot.exists?(event: @selected_event)
   end
