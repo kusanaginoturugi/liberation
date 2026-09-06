@@ -206,6 +206,11 @@
           document.addEventListener("click", (event) => {
             if (!(event.target instanceof Element)) return;
 
+            if (event.target.closest(".nav-dropdown__item")) {
+              closeNavigationMenus();
+              return;
+            }
+
             if (event.target.closest(".nav-dropdown")) return;
 
             closeNavigationMenus();

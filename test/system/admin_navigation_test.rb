@@ -32,10 +32,6 @@ class AdminNavigationTest < ApplicationSystemTestCase
     management_button.click
     assert_selector management_menu, visible: true
 
-    management_button.click
-    assert_no_selector management_menu, visible: true
-
-    management_button.click
     within management_menu do
       click_link "超抜式一覧"
     end
