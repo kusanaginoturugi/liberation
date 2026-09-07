@@ -313,16 +313,12 @@
           const fellowshipField = form.querySelector("[data-special-schedule-fellowship]");
           const fellowshipInput = fellowshipField?.querySelector("select");
           const specialName = form.querySelector("[data-special-schedule-name]");
-          const optionalInputs = form.querySelectorAll("[data-special-schedule-optional]");
 
           const updateSpecialScheduleFields = () => {
             const specialSchedule = toggle.checked;
             if (fellowshipField) fellowshipField.hidden = specialSchedule;
             if (specialName) specialName.hidden = !specialSchedule;
             if (fellowshipInput) fellowshipInput.required = !specialSchedule;
-            optionalInputs.forEach((input) => {
-              input.required = !specialSchedule;
-            });
           };
 
           toggle.addEventListener("change", updateSpecialScheduleFields);

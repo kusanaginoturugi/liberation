@@ -66,12 +66,12 @@
 
     <div class="field">
       <%= form.label :assistant_count, "引保師数" %>
-      <%= form.number_field :assistant_count, min: 0, required: !ceremony_schedule.special_schedule?, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_schedule_optional: true } %>
+      <%= form.number_field :assistant_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
     </div>
 
     <div class="field">
       <%= form.label :spirit_count, "霊数" %>
-      <%= form.number_field :spirit_count, min: 0, required: !ceremony_schedule.special_schedule?, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_schedule_optional: true } %>
+      <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
     </div>
 
     <div class="field">
