@@ -208,6 +208,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can add one special schedule without changing regular allocations" do
+    seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", region: @region)
     CeremonySchedule.create!(
       fellowship: @meeting,
       event: @event,
@@ -242,7 +243,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     special_schedule = CeremonySchedule.order(:id).last
     assert_predicate special_schedule, :special_schedule?
-    assert_nil special_schedule.fellowship
+    assert_equal seimeiouin, special_schedule.fellowship
+    assert_equal "聖明王院", special_schedule.place
     assert_nil special_schedule.assistant_count
     assert_nil special_schedule.spirit_count
 

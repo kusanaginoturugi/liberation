@@ -11,7 +11,10 @@
 
 <%= form_with model: ceremony_schedule, class: "report-form" do |form| %>
   <%= hidden_field_tag :event_id, @selected_event.id %>
-  <div class="field-grid" data-special-schedule-form>
+  <div class="field-grid"
+       data-special-schedule-form
+       data-special-schedule-fellowship-id="<%= @special_fellowship&.id %>"
+       data-special-schedule-fellowship-name="聖明王院">
     <% if current_user.admin? %>
       <div class="field special-schedule-toggle-field">
         <label>
@@ -35,6 +38,11 @@
     <div class="field special-schedule-name" data-special-schedule-name hidden>
       <span class="field-label">予定区分</span>
       <p class="readonly-field">聖泉珠院・海外（特別）</p>
+    </div>
+
+    <div class="field special-schedule-name" data-special-schedule-fellowship-name hidden>
+      <span class="field-label">伝道会名</span>
+      <p class="readonly-field">聖明王院</p>
     </div>
 
     <div class="field">
@@ -61,7 +69,7 @@
 
     <div class="field">
       <%= form.label :place, "場所" %>
-      <%= form.text_field :place, required: true %>
+      <%= form.text_field :place, required: true, data: { special_schedule_place: true } %>
     </div>
 
     <div class="field">

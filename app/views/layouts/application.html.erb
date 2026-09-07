@@ -313,12 +313,19 @@
           const fellowshipField = form.querySelector("[data-special-schedule-fellowship]");
           const fellowshipInput = fellowshipField?.querySelector("select");
           const specialName = form.querySelector("[data-special-schedule-name]");
+          const specialFellowshipName = form.querySelector("[data-special-schedule-fellowship-name]");
+          const placeInput = form.querySelector("[data-special-schedule-place]");
 
           const updateSpecialScheduleFields = () => {
             const specialSchedule = toggle.checked;
             if (fellowshipField) fellowshipField.hidden = specialSchedule;
             if (specialName) specialName.hidden = !specialSchedule;
+            if (specialFellowshipName) specialFellowshipName.hidden = !specialSchedule;
             if (fellowshipInput) fellowshipInput.required = !specialSchedule;
+            if (specialSchedule && fellowshipInput && form.dataset.specialScheduleFellowshipId) {
+              fellowshipInput.value = form.dataset.specialScheduleFellowshipId;
+            }
+            if (specialSchedule && placeInput) placeInput.value = form.dataset.specialScheduleFellowshipName;
           };
 
           toggle.addEventListener("change", updateSpecialScheduleFields);

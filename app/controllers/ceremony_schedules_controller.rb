@@ -45,7 +45,7 @@ class CeremonySchedulesController < ApplicationController
   def create
     @ceremony_schedule = CeremonySchedule.new(ceremony_schedule_params)
     @ceremony_schedule.event = @selected_event
-    clear_fellowship_for_special_schedule
+    apply_special_schedule_defaults
     assign_fellowship_for_non_admin
 
     if authorized_fellowship?(@ceremony_schedule.fellowship) && @ceremony_schedule.save
@@ -61,7 +61,7 @@ class CeremonySchedulesController < ApplicationController
 
   def update
     @ceremony_schedule.assign_attributes(ceremony_schedule_params)
-    clear_fellowship_for_special_schedule
+    apply_special_schedule_defaults
     assign_fellowship_for_non_admin
 
     if authorized_fellowship?(@ceremony_schedule.fellowship) && @ceremony_schedule.save
@@ -103,8 +103,17 @@ class CeremonySchedulesController < ApplicationController
     )
   end
 
-  def clear_fellowship_for_special_schedule
-    @ceremony_schedule.fellowship = nil if @ceremony_schedule.special_schedule?
+  def apply_special_schedule_defaults
+    return unless @ceremony_schedule.special_schedule?
+
+    fellowship = special_fellowship
+    unless fellowship
+      @ceremony_schedule.errors.add(:base, "聖明王院が見つかりません")
+      return
+    end
+
+    @ceremony_schedule.fellowship = fellowship
+    @ceremony_schedule.place = fellowship.name
   end
 
   def assign_fellowship_for_non_admin
@@ -133,6 +142,7 @@ class CeremonySchedulesController < ApplicationController
     else
       Array(current_user.fellowship)
     end
+    @special_fellowship = special_fellowship
   end
 
   def load_events
@@ -196,6 +206,10 @@ class CeremonySchedulesController < ApplicationController
 
   def regular_schedules_for_selected_event
     CeremonySchedule.for_event(@selected_event).regular.chronological.to_a
+  end
+
+  def special_fellowship
+    @special_fellowship ||= Fellowship.find_by(name: "聖明王院")
   end
 
   def allocation_rows_for(schedules)
