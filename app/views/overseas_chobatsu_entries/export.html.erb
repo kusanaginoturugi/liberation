@@ -12,10 +12,9 @@
       th, td { min-height: 42px; padding: 10px 12px; border: 1.5px solid #374151; vertical-align: middle; word-break: break-word; }
       th { background: #f3f4f6; font-weight: 700; text-align: left; }
       thead th { text-align: center; }
-      th:nth-child(1) { width: 20%; }
-      th:nth-child(2) { width: 30%; }
-      th:nth-child(3) { width: 15%; }
-      th:nth-child(4) { width: 35%; }
+      th:nth-child(1) { width: 15%; }
+      th:nth-child(2) { width: 45%; }
+      th:nth-child(3) { width: 40%; }
       .number { text-align: right; font-variant-numeric: tabular-nums; }
     </style>
   </head>
@@ -23,15 +22,13 @@
     <h1>海外超抜</h1>
     <p><%= @selected_event.name %></p>
     <table>
-      <thead><tr><th>伝道会名</th><th>引保師名</th><th>霊数</th><th>備考</th></tr></thead>
+      <thead><tr><th>番号</th><th>引保師名</th><th>備考</th></tr></thead>
       <tbody>
-        <% @fellowships.each do |fellowship| %>
-          <% entry = @entries_by_fellowship_id[fellowship.id] %>
+        <% @export_entries.each do |entry| %>
           <tr>
-            <th><%= fellowship.name %></th>
-            <td><%= entry&.assistant_name.presence || "" %></td>
-            <td class="number"><%= entry&.spirit_count ? number_with_delimiter(entry.spirit_count) : "" %></td>
-            <td><%= entry&.notes.presence || "" %></td>
+            <td class="number"><%= number_with_delimiter(entry.serial_number) %></td>
+            <td><%= entry.assistant_name %></td>
+            <td><%= entry.notes.presence || "" %></td>
           </tr>
         <% end %>
       </tbody>

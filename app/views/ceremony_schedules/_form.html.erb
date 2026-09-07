@@ -77,9 +77,18 @@
       <%= form.number_field :assistant_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
     </div>
 
-    <div class="field">
+    <div class="field" data-regular-spirit-count>
       <%= form.label :spirit_count, "霊数" %>
       <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+    </div>
+
+    <div class="field special-schedule-number-range" data-special-schedule-number-range hidden>
+      <span class="field-label">番号</span>
+      <div class="special-schedule-number-range__inputs">
+        <label>始<%= form.number_field :serial_number_from, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_serial_from: true } %></label>
+        <label>終<%= form.number_field :serial_number_to, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_serial_to: true } %></label>
+      </div>
+      <p class="special-schedule-number-range__total" data-special-serial-total>合計 - 霊</p>
     </div>
 
     <div class="field">

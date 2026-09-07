@@ -25,53 +25,59 @@
           <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event.id }, { onchange: "this.form.requestSubmit()" } %>
         </div>
       <% end %>
-      <p>各伝道会の海外超抜引保師を記入してください。霊数は決定後に入力できます。</p>
+      <% if current_user.admin? %>
+        <%= form_with url: overseas_chobatsu_entries_path, method: :get, class: "region-filter-form" do |form| %>
+          <%= form.hidden_field :event_id, value: @selected_event.id %>
+          <div class="field">
+            <%= form.label :fellowship_id, "入力する伝道会" %>
+            <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { selected: @editing_fellowship&.id }, { onchange: "this.form.requestSubmit()" } %>
+          </div>
+        <% end %>
+      <% end %>
+      <p>番号と海外超抜引保師名を入力してください。</p>
     </div>
 
-    <%= form_with url: bulk_update_overseas_chobatsu_entries_path(event_id: @selected_event.id), method: :patch, class: "overseas-chobatsu-form" do %>
+    <%= form_with url: bulk_update_overseas_chobatsu_entries_path(event_id: @selected_event.id, fellowship_id: @editing_fellowship&.id), method: :patch, class: "overseas-chobatsu-form", data: { overseas_entries: true, overseas_entry_index: @entries.length } do %>
       <div class="overseas-chobatsu-table-wrapper">
         <table class="overseas-chobatsu-table">
           <thead>
             <tr>
-              <th>伝道会名</th>
+              <th>番号</th>
               <th>引保師名</th>
-              <th>霊数</th>
               <th>備考</th>
             </tr>
           </thead>
           <tbody>
-            <% @fellowships.each do |fellowship| %>
-              <% entry = @entries_by_fellowship_id[fellowship.id] || OverseasChobatsuEntry.new %>
-              <% editable = current_user.admin? || current_user.fellowship_id == fellowship.id %>
+            <% @entries.each do |entry| %>
               <tr>
-                <th scope="row"><%= fellowship.name %></th>
-                <td>
-                  <% if editable %>
-                    <%= text_field_tag "entries[#{fellowship.id}][assistant_name]", entry.assistant_name, autocomplete: "off", aria: { label: "#{fellowship.name}の引保師名" } %>
-                  <% else %>
-                    <%= entry.assistant_name.presence || "-" %>
-                  <% end %>
-                </td>
                 <td class="overseas-chobatsu-table__number">
-                  <% if editable %>
-                    <%= number_field_tag "entries[#{fellowship.id}][spirit_count]", entry.spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, aria: { label: "#{fellowship.name}の霊数" } %>
-                  <% else %>
-                    <%= entry.spirit_count ? number_with_delimiter(entry.spirit_count) : "-" %>
-                  <% end %>
+                  <%= number_field_tag "entries[#{entry.id}][serial_number]", entry.serial_number, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, aria: { label: "番号" } %>
                 </td>
                 <td>
-                  <% if editable %>
-                    <%= text_area_tag "entries[#{fellowship.id}][notes]", entry.notes, rows: 2, aria: { label: "#{fellowship.name}の備考" } %>
-                  <% else %>
-                    <%= entry.notes.presence || "-" %>
-                  <% end %>
+                  <%= text_field_tag "entries[#{entry.id}][assistant_name]", entry.assistant_name, autocomplete: "off", aria: { label: "引保師名" } %>
+                </td>
+                <td>
+                  <%= text_area_tag "entries[#{entry.id}][notes]", entry.notes, rows: 2, aria: { label: "備考" } %>
                 </td>
               </tr>
             <% end %>
+            <tr data-overseas-entry-row>
+              <td class="overseas-chobatsu-table__number"><%= number_field_tag "entries[new-#{@entries.length}][serial_number]", nil, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, aria: { label: "番号" } %></td>
+              <td><%= text_field_tag "entries[new-#{@entries.length}][assistant_name]", nil, autocomplete: "off", aria: { label: "引保師名" } %></td>
+              <td><%= text_area_tag "entries[new-#{@entries.length}][notes]", nil, rows: 2, aria: { label: "備考" } %></td>
+            </tr>
           </tbody>
         </table>
       </div>
+      <template data-overseas-entry-template>
+        <tr data-overseas-entry-row>
+          <td class="overseas-chobatsu-table__number"><input type="number" name="entries[new-__INDEX__][serial_number]" min="1" inputmode="numeric" pattern="[0-9]*" data-numeric-only="true" aria-label="番号"></td>
+          <td><input type="text" name="entries[new-__INDEX__][assistant_name]" autocomplete="off" aria-label="引保師名"></td>
+          <td><textarea name="entries[new-__INDEX__][notes]" rows="2" aria-label="備考"></textarea></td>
+        </tr>
+      </template>
       <div class="overseas-chobatsu-actions">
+        <button type="button" class="button-secondary" data-add-overseas-entry>行を追加</button>
         <%= submit_tag "更新する", class: "button-primary overseas-chobatsu-save" %>
       </div>
     <% end %>

@@ -318,21 +318,56 @@
           const specialName = form.querySelector("[data-special-schedule-name]");
           const specialFellowshipName = form.querySelector("[data-special-schedule-fellowship-name]");
           const placeInput = form.querySelector("[data-special-schedule-place]");
+          const regularSpiritCount = form.querySelector("[data-regular-spirit-count]");
+          const numberRange = form.querySelector("[data-special-schedule-number-range]");
+          const serialFrom = form.querySelector("[data-special-serial-from]");
+          const serialTo = form.querySelector("[data-special-serial-to]");
+          const serialTotal = form.querySelector("[data-special-serial-total]");
+
+          const updateSerialTotal = () => {
+            if (!(serialFrom instanceof HTMLInputElement) || !(serialTo instanceof HTMLInputElement) || !serialTotal) return;
+
+            const from = Number(serialFrom.value);
+            const to = Number(serialTo.value);
+            serialTotal.textContent = Number.isInteger(from) && Number.isInteger(to) && from > 0 && to >= from ? `合計 ${to - from + 1} 霊` : "合計 - 霊";
+          };
 
           const updateSpecialScheduleFields = () => {
             const specialSchedule = toggle.checked;
             if (fellowshipField) fellowshipField.hidden = specialSchedule;
             if (specialName) specialName.hidden = !specialSchedule;
             if (specialFellowshipName) specialFellowshipName.hidden = !specialSchedule;
+            if (regularSpiritCount) regularSpiritCount.hidden = specialSchedule;
+            if (numberRange) numberRange.hidden = !specialSchedule;
             if (fellowshipInput) fellowshipInput.required = !specialSchedule;
             if (specialSchedule && fellowshipInput && form.dataset.specialScheduleFellowshipId) {
               fellowshipInput.value = form.dataset.specialScheduleFellowshipId;
             }
             if (specialSchedule && placeInput) placeInput.value = form.dataset.specialScheduleFellowshipName;
+            updateSerialTotal();
           };
 
           toggle.addEventListener("change", updateSpecialScheduleFields);
+          serialFrom?.addEventListener("input", updateSerialTotal);
+          serialTo?.addEventListener("input", updateSerialTotal);
           updateSpecialScheduleFields();
+        });
+
+        document.querySelectorAll("[data-overseas-entries]").forEach((form) => {
+          if (form.dataset.overseasEntriesInitialized === "true") return;
+
+          form.dataset.overseasEntriesInitialized = "true";
+          const addButton = form.querySelector("[data-add-overseas-entry]");
+          const template = form.querySelector("[data-overseas-entry-template]");
+          const tableBody = form.querySelector("tbody");
+          let entryIndex = Number(form.dataset.overseasEntryIndex || 0) + 1;
+
+          addButton?.addEventListener("click", () => {
+            if (!(template instanceof HTMLTemplateElement) || !(tableBody instanceof HTMLTableSectionElement)) return;
+
+            tableBody.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("__INDEX__", String(entryIndex)));
+            entryIndex += 1;
+          });
         });
         };
 

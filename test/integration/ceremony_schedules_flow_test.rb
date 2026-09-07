@@ -225,6 +225,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     post session_path, params: { login_id: admin.login_id, password: "password123" }
     get new_ceremony_schedule_path(event_id: @event.id)
     assert_includes response.body, "聖泉珠院・海外として登録"
+    assert_includes response.body, "番号"
+    assert_includes response.body, "data-special-serial-total"
 
     assert_difference("CeremonySchedule.count", 1) do
       post ceremony_schedules_path, params: {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_07_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_07_233000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
@@ -38,6 +38,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_230000) do
     t.integer "fellowship_id"
     t.string "minister_name"
     t.string "place", null: false
+    t.integer "serial_number_from"
+    t.integer "serial_number_to"
     t.boolean "special_schedule", default: false, null: false
     t.integer "spirit_count"
     t.datetime "updated_at", null: false
@@ -113,9 +115,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_230000) do
     t.integer "event_id", null: false
     t.integer "fellowship_id", null: false
     t.text "notes"
-    t.integer "spirit_count"
+    t.integer "serial_number"
     t.datetime "updated_at", null: false
-    t.index ["event_id", "fellowship_id"], name: "idx_overseas_entries_event_fellowship", unique: true
+    t.index ["event_id", "serial_number"], name: "idx_overseas_entries_event_number", unique: true
     t.index ["event_id"], name: "index_overseas_chobatsu_entries_on_event_id"
     t.index ["fellowship_id"], name: "index_overseas_chobatsu_entries_on_fellowship_id"
   end

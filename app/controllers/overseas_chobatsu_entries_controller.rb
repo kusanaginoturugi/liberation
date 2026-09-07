@@ -9,11 +9,11 @@ class OverseasChobatsuEntriesController < ApplicationController
   def bulk_update
     load_entries
 
-    submitted_entries.each do |fellowship_id, attributes|
-      fellowship = @fellowships.find_by(id: fellowship_id)
-      next unless fellowship
+    submitted_entries.each do |entry_id, attributes|
+      entry = entry_for(entry_id)
+      next unless entry
+      next if entry.new_record? && entry_attributes(attributes).values.all?(&:blank?)
 
-      entry = OverseasChobatsuEntry.find_or_initialize_by(event: @selected_event, fellowship: fellowship)
       entry.assign_attributes(entry_attributes(attributes))
       entry.save!
     end
@@ -52,18 +52,32 @@ class OverseasChobatsuEntriesController < ApplicationController
 
   def load_entries
     @fellowships = Fellowship.available
-    @entries_by_fellowship_id = OverseasChobatsuEntry.where(event: @selected_event).index_by(&:fellowship_id)
+    @editing_fellowship = if current_user.admin?
+      @fellowships.find_by(id: params[:fellowship_id]) || @fellowships.first
+    else
+      current_user.fellowship
+    end
+    @entries = OverseasChobatsuEntry.where(event: @selected_event, fellowship: @editing_fellowship).order(:serial_number, :id).to_a
+    @entries_by_id = @entries.index_by(&:id)
+    @export_entries = OverseasChobatsuEntry.where(event: @selected_event).includes(:fellowship).order(:serial_number, :id)
   end
 
   def submitted_entries
     entries = params.fetch(:entries, {})
-    return entries if current_user.admin?
-
-    fellowship_id = current_user.fellowship_id.to_s
-    entries.slice(fellowship_id)
+    entries.respond_to?(:each) ? entries : {}
   end
 
   def entry_attributes(attributes)
-    attributes.permit(:assistant_name, :spirit_count, :notes)
+    attributes.permit(:serial_number, :assistant_name, :notes)
+  end
+
+  def entry_for(entry_id)
+    return unless @editing_fellowship
+
+    if entry_id.start_with?("new-")
+      OverseasChobatsuEntry.new(event: @selected_event, fellowship: @editing_fellowship)
+    else
+      @entries_by_id[entry_id.to_i]
+    end
   end
 end

@@ -98,6 +98,8 @@ class CeremonySchedulesController < ApplicationController
       :place,
       :assistant_count,
       :spirit_count,
+      :serial_number_from,
+      :serial_number_to,
       :minister_name,
       :special_schedule
     )
