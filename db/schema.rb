@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_132000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_07_220000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
@@ -31,14 +31,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_132000) do
   end
 
   create_table "ceremony_schedules", force: :cascade do |t|
-    t.integer "assistant_count", null: false
+    t.integer "assistant_count"
     t.datetime "ceremony_at", null: false
     t.datetime "created_at", null: false
     t.integer "event_id", null: false
-    t.integer "fellowship_id", null: false
+    t.integer "fellowship_id"
     t.string "minister_name"
     t.string "place", null: false
-    t.integer "spirit_count", null: false
+    t.boolean "special_schedule", default: false, null: false
+    t.integer "spirit_count"
     t.datetime "updated_at", null: false
     t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
     t.index ["event_id"], name: "index_ceremony_schedules_on_event_id"

@@ -302,6 +302,32 @@
             }
           });
         });
+
+        document.querySelectorAll("[data-special-schedule-form]").forEach((form) => {
+          if (form.dataset.specialScheduleInitialized === "true") return;
+
+          form.dataset.specialScheduleInitialized = "true";
+          const toggle = form.querySelector("[data-special-schedule-toggle]");
+          if (!(toggle instanceof HTMLInputElement)) return;
+
+          const fellowshipField = form.querySelector("[data-special-schedule-fellowship]");
+          const fellowshipInput = fellowshipField?.querySelector("select");
+          const specialName = form.querySelector("[data-special-schedule-name]");
+          const optionalInputs = form.querySelectorAll("[data-special-schedule-optional]");
+
+          const updateSpecialScheduleFields = () => {
+            const specialSchedule = toggle.checked;
+            if (fellowshipField) fellowshipField.hidden = specialSchedule;
+            if (specialName) specialName.hidden = !specialSchedule;
+            if (fellowshipInput) fellowshipInput.required = !specialSchedule;
+            optionalInputs.forEach((input) => {
+              input.required = !specialSchedule;
+            });
+          };
+
+          toggle.addEventListener("change", updateSpecialScheduleFields);
+          updateSpecialScheduleFields();
+        });
         };
 
         document.addEventListener("turbo:load", initializeApplication);

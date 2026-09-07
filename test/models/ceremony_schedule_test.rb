@@ -30,4 +30,27 @@ class CeremonyScheduleTest < ActiveSupport::TestCase
     assert_predicate schedule, :valid?
     assert_predicate schedule, :save
   end
+
+  test "allows one special schedule without a fellowship or counts" do
+    schedule = CeremonySchedule.new(
+      event: @event,
+      special_schedule: true,
+      ceremony_at: Time.zone.local(2026, 10, 18, 10, 0),
+      place: "聖泉珠院"
+    )
+
+    assert_predicate schedule, :valid?
+    assert_predicate schedule, :save
+    assert_equal "聖泉珠院・海外", schedule.display_name
+
+    duplicate = CeremonySchedule.new(
+      event: @event,
+      special_schedule: true,
+      ceremony_at: Time.zone.local(2026, 10, 18, 11, 0),
+      place: "海外"
+    )
+
+    assert_not_predicate duplicate, :valid?
+    assert duplicate.errors[:event_id].any?
+  end
 end

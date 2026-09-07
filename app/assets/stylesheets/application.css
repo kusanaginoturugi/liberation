@@ -944,6 +944,46 @@ body.number-shadow-disabled .serial-grid td {
   min-height: 49px;
 }
 
+.special-schedule-toggle-field {
+  justify-content: flex-start;
+}
+
+.special-schedule-toggle-field label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 49px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.special-schedule-toggle-field input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+  accent-color: var(--accent-strong);
+}
+
+.special-schedule-name .readonly-field {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.ceremony-schedule-table tbody tr.schedule-row-special {
+  background: rgba(126, 89, 173, 0.1);
+}
+
+.special-schedule-badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(126, 89, 173, 0.18);
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .field-label {
   display: block;
   margin-bottom: 10px;

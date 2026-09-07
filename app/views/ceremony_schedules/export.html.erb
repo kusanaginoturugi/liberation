@@ -40,7 +40,7 @@
     </header>
 
     <section>
-      <div class="section-heading"><h2>予定表</h2><div class="totals"><p>霊数合計 <%= number_with_delimiter(@ceremony_schedules.sum(&:spirit_count)) %></p><p>合格霊数 <%= @qualified_spirit_count ? number_with_delimiter(@qualified_spirit_count) : "未設定" %></p></div></div>
+      <div class="section-heading"><h2>予定表</h2><div class="totals"><p>霊数合計 <%= number_with_delimiter(@regular_spirit_total) %></p><p>合格霊数 <%= @qualified_spirit_count ? number_with_delimiter(@qualified_spirit_count) : "未設定" %></p></div></div>
       <table>
         <thead><tr><th class="schedule-fellowship">伝道会名</th><th class="schedule-date">挙行日時</th><th class="schedule-place">場所</th><th class="schedule-assistants">引保師数</th><th class="schedule-spirits">霊数</th><th class="schedule-minister">超抜点伝師</th></tr></thead>
         <tbody>
@@ -48,7 +48,7 @@
             <tr><td colspan="6" class="empty">挙行予定はまだありません</td></tr>
           <% else %>
             <% @ceremony_schedules.each do |schedule| %>
-              <tr><td><%= schedule.fellowship.name %></td><td><%= schedule.ceremony_at.strftime("%Y/%m/%d　　%H:%M") %></td><td><%= schedule.place %></td><td class="number"><%= number_with_delimiter(schedule.assistant_count) %></td><td class="number"><%= number_with_delimiter(schedule.spirit_count) %></td><td><%= schedule.minister_name.presence || "-" %></td></tr>
+              <tr><td><%= schedule.special_schedule? ? "【特別】#{schedule.display_name}" : schedule.display_name %></td><td><%= schedule.ceremony_at.strftime("%Y/%m/%d　　%H:%M") %></td><td><%= schedule.place %></td><td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td><td class="number"><%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %></td><td><%= schedule.minister_name.presence || "-" %></td></tr>
             <% end %>
           <% end %>
         </tbody>

@@ -11,11 +11,12 @@ class CeremonySchedulesController < ApplicationController
     @schedule_sort_direction = schedule_sort_direction
     @next_schedule_sort_direction = next_schedule_sort_direction
     @ceremony_schedules = schedules_for_selected_event
+    @regular_spirit_total = regular_schedules_for_selected_event.sum(&:spirit_count)
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
     @distribution_additions = CeremonyScheduleAllocation.distribution_additions_for(@selected_event)
-    @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
+    @allocation_rows = allocation_rows_for(regular_schedules_for_selected_event)
     @allocation_shortfall = allocation_shortfall_for(@selected_event, @qualified_spirit_count)
     @distribution_undo_available = CeremonyScheduleAllocationSnapshot.exists?(event: @selected_event)
   end
@@ -23,10 +24,11 @@ class CeremonySchedulesController < ApplicationController
   def export
     @schedule_sort_direction = schedule_sort_direction
     @ceremony_schedules = schedules_for_selected_event
+    @regular_spirit_total = regular_schedules_for_selected_event.sum(&:spirit_count)
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
     @allocation_sort_direction = allocation_sort_direction
     @distribution_additions = CeremonyScheduleAllocation.distribution_additions_for(@selected_event)
-    @allocation_rows = allocation_rows_for(chronological_schedules_for_selected_event)
+    @allocation_rows = allocation_rows_for(regular_schedules_for_selected_event)
 
     send_data CloudflarePdfClient.render(html: render_to_string(template: "ceremony_schedules/export", layout: false)),
               filename: "#{@selected_event.name}_挙行予定表.pdf",
@@ -43,6 +45,7 @@ class CeremonySchedulesController < ApplicationController
   def create
     @ceremony_schedule = CeremonySchedule.new(ceremony_schedule_params)
     @ceremony_schedule.event = @selected_event
+    clear_fellowship_for_special_schedule
     assign_fellowship_for_non_admin
 
     if authorized_fellowship?(@ceremony_schedule.fellowship) && @ceremony_schedule.save
@@ -58,6 +61,7 @@ class CeremonySchedulesController < ApplicationController
 
   def update
     @ceremony_schedule.assign_attributes(ceremony_schedule_params)
+    clear_fellowship_for_special_schedule
     assign_fellowship_for_non_admin
 
     if authorized_fellowship?(@ceremony_schedule.fellowship) && @ceremony_schedule.save
@@ -81,6 +85,7 @@ class CeremonySchedulesController < ApplicationController
 
   def authorize_ceremony_schedule_edit!
     return if current_user&.admin?
+    return if @ceremony_schedule.special_schedule?
     return if @ceremony_schedule.fellowship_id == current_user&.fellowship_id
 
     redirect_to ceremony_schedules_path, alert: "この伝道会の予定を編集する権限がありません"
@@ -93,17 +98,24 @@ class CeremonySchedulesController < ApplicationController
       :place,
       :assistant_count,
       :spirit_count,
-      :minister_name
+      :minister_name,
+      :special_schedule
     )
   end
 
+  def clear_fellowship_for_special_schedule
+    @ceremony_schedule.fellowship = nil if @ceremony_schedule.special_schedule?
+  end
+
   def assign_fellowship_for_non_admin
+    return if @ceremony_schedule.special_schedule?
     return if current_user&.admin?
 
     @ceremony_schedule.fellowship = current_user.fellowship
   end
 
   def authorized_fellowship?(fellowship)
+    return current_user&.admin? if @ceremony_schedule.special_schedule?
     return true if current_user&.admin?
 
     fellowship.present? && fellowship.id == current_user&.fellowship_id
@@ -173,13 +185,17 @@ class CeremonySchedulesController < ApplicationController
 
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
     schedules = schedules.sort_by do |schedule|
-      [ fellowship_order.fetch(schedule.fellowship.name, Float::INFINITY), schedule.ceremony_at, schedule.id ]
+      [ fellowship_order.fetch(schedule.display_name, Float::INFINITY), schedule.ceremony_at, schedule.id ]
     end
     @schedule_sort_direction == :desc ? schedules.reverse : schedules
   end
 
   def chronological_schedules_for_selected_event
     CeremonySchedule.for_event(@selected_event).chronological.to_a
+  end
+
+  def regular_schedules_for_selected_event
+    CeremonySchedule.for_event(@selected_event).regular.chronological.to_a
   end
 
   def allocation_rows_for(schedules)

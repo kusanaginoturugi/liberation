@@ -207,6 +207,67 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal 28, schedule.spirit_count
   end
 
+  test "admin can add one special schedule without changing regular allocations" do
+    CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 10, 20, 10, 0),
+      place: "大江戸会館",
+      assistant_count: 2,
+      spirit_count: 40
+    )
+    admin = User.create!(
+      name: "管理者", email: "admin-special@example.com", password: "password123", password_confirmation: "password123",
+      region: @region, admin: true
+    )
+
+    post session_path, params: { login_id: admin.login_id, password: "password123" }
+    get new_ceremony_schedule_path(event_id: @event.id)
+    assert_includes response.body, "聖泉珠院・海外として登録"
+
+    assert_difference("CeremonySchedule.count", 1) do
+      post ceremony_schedules_path, params: {
+        event_id: @event.id,
+        ceremony_schedule: {
+          special_schedule: "1",
+          fellowship_id: @meeting.id,
+          ceremony_at: "2026-10-18T10:00",
+          place: "聖泉珠院",
+          assistant_count: "",
+          spirit_count: "",
+          minister_name: ""
+        }
+      }
+    end
+
+    special_schedule = CeremonySchedule.order(:id).last
+    assert_predicate special_schedule, :special_schedule?
+    assert_nil special_schedule.fellowship
+    assert_nil special_schedule.assistant_count
+    assert_nil special_schedule.spirit_count
+
+    get ceremony_schedules_path(event_id: @event.id)
+    assert_includes response.body, "聖泉珠院・海外"
+    assert_includes response.body, "特別"
+    assert_includes response.body, "schedule-row-special"
+    assert_includes response.body, ">40<"
+
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_not_includes allocation_section, "聖泉珠院・海外"
+
+    assert_no_difference("CeremonySchedule.count") do
+      post ceremony_schedules_path, params: {
+        event_id: @event.id,
+        ceremony_schedule: {
+          special_schedule: "1",
+          ceremony_at: "2026-10-18T11:00",
+          place: "海外"
+        }
+      }
+    end
+    assert_response :unprocessable_content
+  end
+
   test "assigned user cannot edit other meeting schedule" do
     schedule = CeremonySchedule.create!(
       fellowship: @other_meeting,

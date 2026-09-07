@@ -1,10 +1,19 @@
 class CeremonySchedule < ApplicationRecord
-  belongs_to :fellowship
+  SPECIAL_SCHEDULE_NAME = "聖泉珠院・海外".freeze
+
+  belongs_to :fellowship, optional: true
   belongs_to :event
 
-  validates :ceremony_at, :place, :assistant_count, :spirit_count, presence: true
-  validates :assistant_count, :spirit_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :ceremony_at, :place, presence: true
+  validates :fellowship, :assistant_count, :spirit_count, presence: true, unless: :special_schedule?
+  validates :assistant_count, :spirit_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :event_id, uniqueness: { conditions: -> { where(special_schedule: true) } }, if: :special_schedule?
 
   scope :chronological, -> { includes(:fellowship).order(:ceremony_at, :id) }
   scope :for_event, ->(event) { where(event: event) }
+  scope :regular, -> { where(special_schedule: false) }
+
+  def display_name
+    special_schedule? ? SPECIAL_SCHEDULE_NAME : fellowship.name
+  end
 end

@@ -16,7 +16,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
     snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
     return {} unless snapshot
 
-    scheduled_counts = CeremonySchedule.where(event:).group(:fellowship_id).sum(:spirit_count)
+    scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)
     previous_counts = snapshot.allocation_counts
     current_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
 
@@ -55,7 +55,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
       fellowships.each do |fellowship|
         allocation = find_or_initialize_by(event:, fellowship:)
-        allocation.spirit_count = allocation.spirit_count || CeremonySchedule.where(event:, fellowship:).sum(:spirit_count)
+        allocation.spirit_count = allocation.spirit_count || CeremonySchedule.where(event:, fellowship:).regular.sum(:spirit_count)
         allocation.update!(spirit_count: allocation.spirit_count + additions.fetch(fellowship.id))
       end
     end
@@ -79,7 +79,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
   private
 
   def self.effective_spirit_count_for(event, allocation_counts)
-    scheduled_counts = CeremonySchedule.where(event:).group(:fellowship_id).sum(:spirit_count)
+    scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)
     (scheduled_counts.keys | allocation_counts.keys).sum do |fellowship_id|
       allocation_counts.fetch(fellowship_id, scheduled_counts.fetch(fellowship_id, 0))
     end
@@ -93,7 +93,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
     allocation_counts = self.class.where(event:).pluck(:fellowship_id, :spirit_count).to_h
     allocation_counts[fellowship_id] = spirit_count
-    scheduled_counts = CeremonySchedule.where(event:).group(:fellowship_id).sum(:spirit_count)
+    scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)
     allocated_count = (scheduled_counts.keys | allocation_counts.keys).sum do |scheduled_fellowship_id|
       allocation_counts.fetch(scheduled_fellowship_id, scheduled_counts.fetch(scheduled_fellowship_id, 0))
     end

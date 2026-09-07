@@ -11,8 +11,17 @@
 
 <%= form_with model: ceremony_schedule, class: "report-form" do |form| %>
   <%= hidden_field_tag :event_id, @selected_event.id %>
-  <div class="field-grid">
-    <div class="field">
+  <div class="field-grid" data-special-schedule-form>
+    <% if current_user.admin? %>
+      <div class="field special-schedule-toggle-field">
+        <label>
+          <%= form.check_box :special_schedule, data: { special_schedule_toggle: true } %>
+          聖泉珠院・海外として登録
+        </label>
+      </div>
+    <% end %>
+
+    <div class="field" data-special-schedule-fellowship>
       <%= form.label :fellowship_id, "伝道会名" %>
       <% if current_user.admin? %>
         <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { prompt: "選択してください" }, { required: true } %>
@@ -21,6 +30,11 @@
       <% else %>
         <p class="readonly-field">未設定</p>
       <% end %>
+    </div>
+
+    <div class="field special-schedule-name" data-special-schedule-name hidden>
+      <span class="field-label">予定区分</span>
+      <p class="readonly-field">聖泉珠院・海外（特別）</p>
     </div>
 
     <div class="field">
@@ -52,12 +66,12 @@
 
     <div class="field">
       <%= form.label :assistant_count, "引保師数" %>
-      <%= form.number_field :assistant_count, min: 0, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+      <%= form.number_field :assistant_count, min: 0, required: !ceremony_schedule.special_schedule?, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_schedule_optional: true } %>
     </div>
 
     <div class="field">
       <%= form.label :spirit_count, "霊数" %>
-      <%= form.number_field :spirit_count, min: 0, required: true, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+      <%= form.number_field :spirit_count, min: 0, required: !ceremony_schedule.special_schedule?, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_schedule_optional: true } %>
     </div>
 
     <div class="field">
