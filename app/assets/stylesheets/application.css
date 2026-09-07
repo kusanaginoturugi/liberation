@@ -778,7 +778,14 @@ body.number-shadow-disabled .serial-grid td {
 
 .overseas-chobatsu-table td:nth-child(1) { width: 16%; }
 .overseas-chobatsu-table td:nth-child(2) { width: 44%; }
-.overseas-chobatsu-table td:nth-child(3) { width: 40%; }
+.overseas-chobatsu-table td:nth-child(3) { width: 28%; }
+.overseas-chobatsu-table td:nth-child(4) { width: 12%; }
+
+.overseas-chobatsu-table__action {
+  width: 8rem;
+  text-align: center !important;
+  white-space: nowrap;
+}
 
 .overseas-chobatsu-table input,
 .overseas-chobatsu-table textarea {

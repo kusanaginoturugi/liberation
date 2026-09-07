@@ -42,6 +42,12 @@ class OverseasChobatsuEntriesFlowTest < ActionDispatch::IntegrationTest
     assert_equal "山田花子", entry.assistant_name
     assert_equal "渡航手続き中", entry.notes
     assert_equal "お台場担当者", OverseasChobatsuEntry.find_by!(event: @event, fellowship: @other_fellowship).assistant_name
+
+    patch bulk_update_overseas_chobatsu_entries_path(event_id: @event.id), params: { deleted_entry_ids: [ entry.id ] }
+
+    assert_redirected_to overseas_chobatsu_entries_path(event_id: @event.id)
+    assert_nil OverseasChobatsuEntry.find_by(id: entry.id)
+    assert_predicate OverseasChobatsuEntry.find_by!(event: @event, fellowship: @other_fellowship), :persisted?
   end
 
   test "overseas PDF returns configuration error when PDF service is unavailable" do

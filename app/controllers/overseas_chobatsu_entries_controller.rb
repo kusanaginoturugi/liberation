@@ -9,13 +9,17 @@ class OverseasChobatsuEntriesController < ApplicationController
   def bulk_update
     load_entries
 
-    submitted_entries.each do |entry_id, attributes|
-      entry = entry_for(entry_id)
-      next unless entry
-      next if entry.new_record? && entry_attributes(attributes).values.all?(&:blank?)
+    OverseasChobatsuEntry.transaction do
+      destroy_submitted_entries
 
-      entry.assign_attributes(entry_attributes(attributes))
-      entry.save!
+      submitted_entries.each do |entry_id, attributes|
+        entry = entry_for(entry_id)
+        next unless entry
+        next if entry.new_record? && entry_attributes(attributes).values.all?(&:blank?)
+
+        entry.assign_attributes(entry_attributes(attributes))
+        entry.save!
+      end
     end
 
     redirect_to overseas_chobatsu_entries_path(event_id: @selected_event.id), notice: "海外超抜の内容を更新しました"
@@ -79,5 +83,10 @@ class OverseasChobatsuEntriesController < ApplicationController
     else
       @entries_by_id[entry_id.to_i]
     end
+  end
+
+  def destroy_submitted_entries
+    entry_ids = Array(params[:deleted_entry_ids]).filter_map { |id| Integer(id, exception: false) }
+    entry_ids.filter_map { |id| @entries_by_id[id] }.each(&:destroy!)
   end
 end

@@ -368,6 +368,23 @@
             tableBody.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("__INDEX__", String(entryIndex)));
             entryIndex += 1;
           });
+
+          form.addEventListener("click", (event) => {
+            if (!(event.target instanceof Element) || !event.target.closest("[data-remove-overseas-entry]")) return;
+
+            const row = event.target.closest("[data-overseas-entry-row]");
+            if (!(row instanceof HTMLTableRowElement)) return;
+
+            const entryId = row.dataset.overseasEntryId;
+            if (entryId) {
+              const deletedEntry = document.createElement("input");
+              deletedEntry.type = "hidden";
+              deletedEntry.name = "deleted_entry_ids[]";
+              deletedEntry.value = entryId;
+              form.append(deletedEntry);
+            }
+            row.remove();
+          });
         });
         };
 
