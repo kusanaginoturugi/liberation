@@ -88,8 +88,12 @@
           <% @ceremony_schedules.each_with_index do |schedule, index| %>
             <tr class="<%= schedule.special_schedule? ? "schedule-row-special" : (index.even? ? "schedule-row-even" : "schedule-row-odd") %>">
               <td data-label="伝道会名">
-                <% if schedule.special_schedule? %><span class="special-schedule-badge">特別</span><% end %>
-                <%= schedule.display_name %>
+                <% if schedule.special_schedule? %>
+                  <span class="special-schedule-badge">特別</span>海外
+                  <span class="special-schedule-location">聖泉珠院</span>
+                <% else %>
+                  <%= schedule.display_name %>
+                <% end %>
               </td>
               <td data-label="挙行日時"><%= l(schedule.ceremony_at, format: :schedule) %></td>
               <td data-label="場所"><%= schedule.place %></td>

@@ -977,6 +977,15 @@ body.number-shadow-disabled .serial-grid td {
   color: #c62828;
 }
 
+.ceremony-schedule-table tbody tr.schedule-row-special td:first-child {
+  white-space: nowrap;
+}
+
+.special-schedule-location {
+  display: block;
+  margin-top: 4px;
+}
+
 .special-schedule-badge {
   display: inline-block;
   margin-right: 6px;

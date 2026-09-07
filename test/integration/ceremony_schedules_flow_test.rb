@@ -249,7 +249,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_nil special_schedule.spirit_count
 
     get ceremony_schedules_path(event_id: @event.id)
-    assert_includes response.body, "聖泉珠院・海外"
+    assert_includes response.body, "特別</span>海外"
+    assert_includes response.body, "special-schedule-location\">聖泉珠院"
     assert_includes response.body, "特別"
     assert_includes response.body, "schedule-row-special"
     assert_includes response.body, ">40<"
