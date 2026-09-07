@@ -9,6 +9,12 @@ Rails.application.routes.draw do
       get :export
     end
   end
+  resources :overseas_chobatsu_entries, only: [ :index ] do
+    collection do
+      patch :bulk_update
+      get :export
+    end
+  end
   resources :ceremony_schedule_allocations, only: [ :create, :update ] do
     collection do
       post :distribute_shortfall

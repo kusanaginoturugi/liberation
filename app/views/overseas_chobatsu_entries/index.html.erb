@@ -1,0 +1,79 @@
+<% content_for :title, "海外超抜" %>
+
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Overseas Chobatsu</p>
+      <h1>海外超抜</h1>
+      <p class="page-context">対象超抜式: <strong><%= @selected_event.name %></strong></p>
+    </div>
+    <%= link_to "PDFダウンロード", export_overseas_chobatsu_entries_path(event_id: @selected_event.id), class: "button-secondary compact-button" %>
+  </header>
+
+  <% if flash[:notice].present? %>
+    <div class="flash flash-notice"><%= flash[:notice] %></div>
+  <% end %>
+  <% if @entry_errors.present? %>
+    <div class="flash flash-alert"><%= @entry_errors.to_sentence %></div>
+  <% end %>
+
+  <section class="panel overseas-chobatsu-panel">
+    <div class="overseas-chobatsu-toolbar">
+      <%= form_with url: overseas_chobatsu_entries_path, method: :get, class: "region-filter-form" do |form| %>
+        <div class="field">
+          <%= form.label :event_id, "超抜式" %>
+          <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event.id }, { onchange: "this.form.requestSubmit()" } %>
+        </div>
+      <% end %>
+      <p>各伝道会の海外超抜引保師を記入してください。霊数は決定後に入力できます。</p>
+    </div>
+
+    <%= form_with url: bulk_update_overseas_chobatsu_entries_path(event_id: @selected_event.id), method: :patch, class: "overseas-chobatsu-form" do %>
+      <div class="overseas-chobatsu-table-wrapper">
+        <table class="overseas-chobatsu-table">
+          <thead>
+            <tr>
+              <th>伝道会名</th>
+              <th>引保師名</th>
+              <th>霊数</th>
+              <th>備考</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @fellowships.each do |fellowship| %>
+              <% entry = @entries_by_fellowship_id[fellowship.id] || OverseasChobatsuEntry.new %>
+              <% editable = current_user.admin? || current_user.fellowship_id == fellowship.id %>
+              <tr>
+                <th scope="row"><%= fellowship.name %></th>
+                <td>
+                  <% if editable %>
+                    <%= text_field_tag "entries[#{fellowship.id}][assistant_name]", entry.assistant_name, autocomplete: "off", aria: { label: "#{fellowship.name}の引保師名" } %>
+                  <% else %>
+                    <%= entry.assistant_name.presence || "-" %>
+                  <% end %>
+                </td>
+                <td class="overseas-chobatsu-table__number">
+                  <% if editable %>
+                    <%= number_field_tag "entries[#{fellowship.id}][spirit_count]", entry.spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, aria: { label: "#{fellowship.name}の霊数" } %>
+                  <% else %>
+                    <%= entry.spirit_count ? number_with_delimiter(entry.spirit_count) : "-" %>
+                  <% end %>
+                </td>
+                <td>
+                  <% if editable %>
+                    <%= text_area_tag "entries[#{fellowship.id}][notes]", entry.notes, rows: 2, aria: { label: "#{fellowship.name}の備考" } %>
+                  <% else %>
+                    <%= entry.notes.presence || "-" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="overseas-chobatsu-actions">
+        <%= submit_tag "更新する", class: "button-primary overseas-chobatsu-save" %>
+      </div>
+    <% end %>
+  </section>
+</div>

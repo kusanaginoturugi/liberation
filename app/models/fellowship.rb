@@ -20,6 +20,7 @@ class Fellowship < ApplicationRecord
   has_many :chobatsu_reports, dependent: :restrict_with_exception
   has_many :ceremony_schedules, dependent: :destroy
   has_many :ceremony_schedule_allocations, dependent: :destroy
+  has_many :overseas_chobatsu_entries, dependent: :destroy
   has_many :users, dependent: :nullify
 
   before_validation :assign_default_altar_count, on: :create

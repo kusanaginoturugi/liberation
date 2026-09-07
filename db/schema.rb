@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_07_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_07_230000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
@@ -107,6 +107,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_220000) do
     t.index ["region_id"], name: "index_fellowships_on_region_id"
   end
 
+  create_table "overseas_chobatsu_entries", force: :cascade do |t|
+    t.string "assistant_name"
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.integer "fellowship_id", null: false
+    t.text "notes"
+    t.integer "spirit_count"
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "fellowship_id"], name: "idx_overseas_entries_event_fellowship", unique: true
+    t.index ["event_id"], name: "index_overseas_chobatsu_entries_on_event_id"
+    t.index ["fellowship_id"], name: "index_overseas_chobatsu_entries_on_fellowship_id"
+  end
+
   create_table "regions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "name", null: false
@@ -161,6 +174,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_220000) do
   add_foreign_key "event_details", "events"
   add_foreign_key "event_details", "regions"
   add_foreign_key "fellowships", "regions"
+  add_foreign_key "overseas_chobatsu_entries", "events"
+  add_foreign_key "overseas_chobatsu_entries", "fellowships"
   add_foreign_key "serial_number_ranges", "chobatsu_reports"
   add_foreign_key "users", "fellowships"
   add_foreign_key "users", "regions"

@@ -1,0 +1,58 @@
+require "test_helper"
+
+class OverseasChobatsuEntriesFlowTest < ActionDispatch::IntegrationTest
+  setup do
+    @region = Region.create!(name: "共通")
+    @event = Event.create!(name: "第75次修霊超抜式")
+    @fellowship = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: @region)
+    @other_fellowship = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
+    @user = User.create!(
+      name: "大江戸担当者", email: "oedo@example.com", password: "password123", password_confirmation: "password123",
+      region: @region, fellowship: @fellowship
+    )
+  end
+
+  test "signed in fellowship user can view and update only their overseas entry" do
+    OverseasChobatsuEntry.create!(
+      event: @event, fellowship: @other_fellowship, assistant_name: "お台場担当者", spirit_count: 12, notes: "確認済み"
+    )
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
+
+    get overseas_chobatsu_entries_path(event_id: @event.id)
+
+    assert_response :success
+    assert_includes response.body, "海外超抜"
+    assert_includes response.body, "伝道会名"
+    assert_includes response.body, "引保師名"
+    assert_includes response.body, "霊数"
+    assert_includes response.body, "備考"
+    assert_includes response.body, "overseas-chobatsu-table"
+    assert_includes response.body, "PDFダウンロード"
+    assert_includes response.body, "お台場担当者"
+    assert_includes response.body, "entries[#{@fellowship.id}][assistant_name]"
+    assert_not_includes response.body, "entries[#{@other_fellowship.id}][assistant_name]"
+
+    patch bulk_update_overseas_chobatsu_entries_path(event_id: @event.id), params: {
+      entries: {
+        @fellowship.id.to_s => { assistant_name: "山田花子", spirit_count: "", notes: "渡航手続き中" },
+        @other_fellowship.id.to_s => { assistant_name: "書き換え不可", spirit_count: "99", notes: "" }
+      }
+    }
+
+    assert_redirected_to overseas_chobatsu_entries_path(event_id: @event.id)
+    entry = OverseasChobatsuEntry.find_by!(event: @event, fellowship: @fellowship)
+    assert_equal "山田花子", entry.assistant_name
+    assert_nil entry.spirit_count
+    assert_equal "渡航手続き中", entry.notes
+    assert_equal "お台場担当者", OverseasChobatsuEntry.find_by!(event: @event, fellowship: @other_fellowship).assistant_name
+  end
+
+  test "overseas PDF returns configuration error when PDF service is unavailable" do
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
+
+    get export_overseas_chobatsu_entries_path(event_id: @event.id)
+
+    assert_response :service_unavailable
+    assert_includes response.body, "Cloudflare PDFの設定がありません"
+  end
+end
