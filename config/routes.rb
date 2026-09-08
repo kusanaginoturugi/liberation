@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     collection do
       patch :bulk_update
       patch :update_assignments
+      post :auto_fill_assignments
       post :reset_assignments
       get :export
     end

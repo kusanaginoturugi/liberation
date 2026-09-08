@@ -1,7 +1,7 @@
 class OverseasChobatsuEntriesController < ApplicationController
   before_action :load_events
   before_action :set_selected_event
-  before_action :require_admin!, only: [ :update_assignments, :reset_assignments ]
+  before_action :require_admin!, only: [ :update_assignments, :auto_fill_assignments, :reset_assignments ]
 
   def index
     load_entries
@@ -37,11 +37,11 @@ class OverseasChobatsuEntriesController < ApplicationController
       submitted_assignments.each do |serial_number, entry_id|
         serial_number = Integer(serial_number, exception: false)
         entry = @all_entries_by_id[Integer(entry_id, exception: false)]
-        next unless serial_number && entry && @serial_numbers.include?(serial_number)
+        next unless serial_number && @serial_numbers.include?(serial_number)
 
-        automatic_entry = @automatic_entries_by_serial[serial_number]
+        automatic_entry = @default_entries_by_serial[serial_number]
         assignment = OverseasChobatsuAssignment.find_or_initialize_by(event: @selected_event, serial_number: serial_number)
-        if entry == automatic_entry
+        if entry.nil? || entry == automatic_entry
           assignment.destroy! if assignment.persisted?
         else
           assignment.update!(overseas_chobatsu_entry: entry)
@@ -59,6 +59,26 @@ class OverseasChobatsuEntriesController < ApplicationController
   def reset_assignments
     OverseasChobatsuAssignment.where(event: @selected_event).destroy_all
     redirect_to overseas_chobatsu_entries_path(event_id: @selected_event.id), notice: "自動配分に戻しました"
+  end
+
+  def auto_fill_assignments
+    load_entries
+    return redirect_to(overseas_chobatsu_entries_path(event_id: @selected_event.id), alert: "引保師名を入力してください") if @all_entries.empty?
+
+    entries_to_assign = @assignment_rows.select { |row| row[:entry].nil? }
+    OverseasChobatsuAssignment.transaction do
+      entries_to_assign.each_with_index do |row, index|
+        OverseasChobatsuAssignment.find_or_initialize_by(event: @selected_event, serial_number: row[:serial_number]).update!(
+          overseas_chobatsu_entry: @all_entries[index % @all_entries.length]
+        )
+      end
+    end
+
+    redirect_to overseas_chobatsu_entries_path(event_id: @selected_event.id), notice: "空欄の番号を自動割り振りしました"
+  rescue ActiveRecord::RecordInvalid => error
+    load_entries
+    @entry_errors = error.record.errors.full_messages
+    render :index, status: :unprocessable_content
   end
 
   def export
@@ -99,14 +119,12 @@ class OverseasChobatsuEntriesController < ApplicationController
     @all_entries_by_id = @all_entries.index_by(&:id)
     @special_schedule = CeremonySchedule.for_event(@selected_event).special.first
     @serial_numbers = serial_numbers_for_special_schedule
-    @automatic_entries_by_serial = automatic_entries_by_serial
+    @default_entries_by_serial = default_entries_by_serial
     @manual_assignments_by_serial = OverseasChobatsuAssignment.where(event: @selected_event).includes(:overseas_chobatsu_entry).index_by(&:serial_number)
     @assignment_rows = @serial_numbers.filter_map do |serial_number|
-      automatic_entry = @automatic_entries_by_serial[serial_number]
+      automatic_entry = @default_entries_by_serial[serial_number]
       manual_assignment = @manual_assignments_by_serial[serial_number]
       entry = manual_assignment&.overseas_chobatsu_entry || automatic_entry
-      next unless entry
-
       { serial_number:, entry:, automatic_entry: }
     end
   end
@@ -146,13 +164,9 @@ class OverseasChobatsuEntriesController < ApplicationController
     (@special_schedule.serial_number_from..@special_schedule.serial_number_to).to_a
   end
 
-  def automatic_entries_by_serial
+  def default_entries_by_serial
     return {} if @serial_numbers.empty? || @all_entries.empty?
 
-    repeat_count, extra_count = @serial_numbers.length.divmod(@all_entries.length)
-    entries = @all_entries.each_with_index.flat_map do |entry, index|
-      Array.new(repeat_count + (index < extra_count ? 1 : 0), entry)
-    end
-    @serial_numbers.zip(entries).to_h
+    @serial_numbers.zip(@all_entries).to_h
   end
 end

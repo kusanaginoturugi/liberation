@@ -51,7 +51,7 @@ class OverseasChobatsuEntriesFlowTest < ActionDispatch::IntegrationTest
     assert_nil OverseasChobatsuEntry.find_by(id: entry.id)
   end
 
-  test "admin can adjust a generated number and reset it to automatic distribution" do
+  test "admin can fill blank numbers automatically, adjust one, and reset the list" do
     first = OverseasChobatsuEntry.create!(event: @event, fellowship: @fellowship, assistant_name: "尾ノ上裕美")
     second = OverseasChobatsuEntry.create!(event: @event, fellowship: @other_fellowship, assistant_name: "尾ノ上卓朗")
     third = OverseasChobatsuEntry.create!(event: @event, fellowship: @third_fellowship, assistant_name: "友田由美")
@@ -63,11 +63,18 @@ class OverseasChobatsuEntriesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "1"
     assert_includes response.body, "6"
     assert_includes response.body, "assignments[2]"
+    assert_includes response.body, "自動割り振り"
     assert_includes response.body, "自動配分に戻す"
     assert_match(/name="assignments\[1\]".*?option selected="selected" value="#{first.id}"/m, response.body)
-    assert_match(/name="assignments\[2\]".*?option selected="selected" value="#{first.id}"/m, response.body)
-    assert_match(/name="assignments\[3\]".*?option selected="selected" value="#{second.id}"/m, response.body)
-    assert_match(/name="assignments\[5\]".*?option selected="selected" value="#{third.id}"/m, response.body)
+    assert_match(/name="assignments\[2\]".*?option selected="selected" value="#{second.id}"/m, response.body)
+    assert_match(/name="assignments\[3\]".*?option selected="selected" value="#{third.id}"/m, response.body)
+
+    post auto_fill_assignments_overseas_chobatsu_entries_path(event_id: @event.id)
+
+    assert_redirected_to overseas_chobatsu_entries_path(event_id: @event.id)
+    assert_equal first, OverseasChobatsuAssignment.find_by!(event: @event, serial_number: 4).overseas_chobatsu_entry
+    assert_equal second, OverseasChobatsuAssignment.find_by!(event: @event, serial_number: 5).overseas_chobatsu_entry
+    assert_equal third, OverseasChobatsuAssignment.find_by!(event: @event, serial_number: 6).overseas_chobatsu_entry
 
     patch update_assignments_overseas_chobatsu_entries_path(event_id: @event.id), params: { assignments: { "2" => third.id } }
 

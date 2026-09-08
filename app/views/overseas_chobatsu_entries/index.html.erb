@@ -88,6 +88,9 @@
           </div>
         <% end %>
         <div class="overseas-chobatsu-reset-action">
+          <% if @assignment_rows.any? { |row| row[:entry].nil? } %>
+            <%= button_to "自動割り振り", auto_fill_assignments_overseas_chobatsu_entries_path(event_id: @selected_event.id), method: :post, class: "button-primary overseas-chobatsu-save" %>
+          <% end %>
           <%= button_to "自動配分に戻す", reset_assignments_overseas_chobatsu_entries_path(event_id: @selected_event.id), method: :post, class: "button-secondary", form: { data: { turbo_confirm: "手動で変更した氏名をすべて自動配分に戻しますか？" } } %>
         </div>
       <% else %>

@@ -7,12 +7,12 @@
           <td class="overseas-chobatsu-table__number"><%= number_with_delimiter(row[:serial_number]) %></td>
           <td>
             <% if current_user.admin? %>
-              <%= select_tag "assignments[#{row[:serial_number]}]", options_from_collection_for_select(@all_entries, :id, :assistant_name, row[:entry]&.id), aria: { label: "#{row[:serial_number]}番の氏名" } %>
+              <%= select_tag "assignments[#{row[:serial_number]}]", options_from_collection_for_select(@all_entries, :id, :assistant_name, row[:entry]&.id), include_blank: "未割り当て", aria: { label: "#{row[:serial_number]}番の氏名" } %>
             <% else %>
-              <%= row[:entry].assistant_name %>
+              <%= row[:entry]&.assistant_name || "-" %>
             <% end %>
           </td>
-          <td><%= row[:entry].notes.presence || "-" %></td>
+          <td><%= row[:entry]&.notes.presence || "-" %></td>
         </tr>
       <% end %>
     </tbody>
