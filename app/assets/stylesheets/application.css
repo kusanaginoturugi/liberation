@@ -1537,17 +1537,24 @@ body.number-shadow-disabled .serial-grid td {
   }
 
   .allocation-row {
-    grid-template-columns: minmax(0, 1fr) auto minmax(6.8rem, auto);
-    gap: 4px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 8px;
+  }
+
+  .allocation-row > strong {
+    grid-column: 1 / -1;
+    min-width: 0;
   }
 
   .allocation-altar-count {
-    grid-column: 2;
+    grid-column: 1;
+    text-align: left;
   }
 
   .allocation-count-form,
   .allocation-spirit-count {
-    grid-column: 3;
+    grid-column: 2;
+    justify-self: end;
   }
 
   .allocation-row > span:last-child {
