@@ -323,13 +323,16 @@
           const serialFrom = form.querySelector("[data-special-serial-from]");
           const serialTo = form.querySelector("[data-special-serial-to]");
           const serialTotal = form.querySelector("[data-special-serial-total]");
+          const spiritCountInput = form.querySelector("[data-special-spirit-count]");
 
           const updateSerialTotal = () => {
             if (!(serialFrom instanceof HTMLInputElement) || !(serialTo instanceof HTMLInputElement) || !serialTotal) return;
 
             const from = Number(serialFrom.value);
             const to = Number(serialTo.value);
-            serialTotal.textContent = Number.isInteger(from) && Number.isInteger(to) && from > 0 && to >= from ? `合計 ${to - from + 1} 霊` : "合計 - 霊";
+            const total = Number.isInteger(from) && Number.isInteger(to) && from > 0 && to >= from ? to - from + 1 : null;
+            serialTotal.textContent = total ? `合計 ${total} 霊` : "合計 - 霊";
+            if (spiritCountInput instanceof HTMLInputElement && toggle.checked) spiritCountInput.value = total || "";
           };
 
           const updateSpecialScheduleFields = () => {
@@ -337,8 +340,9 @@
             if (fellowshipField) fellowshipField.hidden = specialSchedule;
             if (specialName) specialName.hidden = !specialSchedule;
             if (specialFellowshipName) specialFellowshipName.hidden = !specialSchedule;
-            if (regularSpiritCount) regularSpiritCount.hidden = specialSchedule;
+            if (regularSpiritCount) regularSpiritCount.hidden = false;
             if (numberRange) numberRange.hidden = !specialSchedule;
+            if (spiritCountInput instanceof HTMLInputElement) spiritCountInput.readOnly = specialSchedule;
             if (fellowshipInput) fellowshipInput.required = !specialSchedule;
             if (specialSchedule && fellowshipInput && form.dataset.specialScheduleFellowshipId) {
               fellowshipInput.value = form.dataset.specialScheduleFellowshipId;

@@ -227,6 +227,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "聖泉珠院・海外として登録"
     assert_includes response.body, "番号"
     assert_includes response.body, "data-special-serial-total"
+    assert_includes response.body, "data-special-spirit-count"
 
     assert_difference("CeremonySchedule.count", 1) do
       post ceremony_schedules_path, params: {

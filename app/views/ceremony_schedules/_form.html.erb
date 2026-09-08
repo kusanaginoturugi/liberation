@@ -79,7 +79,7 @@
 
     <div class="field" data-regular-spirit-count>
       <%= form.label :spirit_count, "霊数" %>
-      <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+      <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_spirit_count: true } %>
     </div>
 
     <div class="field special-schedule-number-range" data-special-schedule-number-range hidden>
