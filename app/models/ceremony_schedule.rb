@@ -17,6 +17,7 @@ class CeremonySchedule < ApplicationRecord
   scope :chronological, -> { includes(:fellowship).order(:ceremony_at, :id) }
   scope :for_event, ->(event) { where(event: event) }
   scope :regular, -> { where(special_schedule: false) }
+  scope :special, -> { where(special_schedule: true) }
 
   def display_name
     special_schedule? ? SPECIAL_SCHEDULE_NAME : fellowship.name

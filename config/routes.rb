@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   resources :overseas_chobatsu_entries, only: [ :index ] do
     collection do
       patch :bulk_update
+      patch :update_assignments
+      post :reset_assignments
       get :export
     end
   end

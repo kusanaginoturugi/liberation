@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_07_233000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_08_090000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
@@ -109,15 +109,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_233000) do
     t.index ["region_id"], name: "index_fellowships_on_region_id"
   end
 
+  create_table "overseas_chobatsu_assignments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.integer "overseas_chobatsu_entry_id", null: false
+    t.integer "serial_number", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "serial_number"], name: "idx_overseas_assignments_event_number", unique: true
+    t.index ["event_id"], name: "index_overseas_chobatsu_assignments_on_event_id"
+    t.index ["overseas_chobatsu_entry_id"], name: "idx_overseas_assignments_entry"
+  end
+
   create_table "overseas_chobatsu_entries", force: :cascade do |t|
     t.string "assistant_name"
     t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "fellowship_id", null: false
+    t.integer "input_order"
     t.text "notes"
-    t.integer "serial_number"
     t.datetime "updated_at", null: false
-    t.index ["event_id", "serial_number"], name: "idx_overseas_entries_event_number", unique: true
+    t.index ["event_id", "input_order"], name: "idx_overseas_entries_event_order"
     t.index ["event_id"], name: "index_overseas_chobatsu_entries_on_event_id"
     t.index ["fellowship_id"], name: "index_overseas_chobatsu_entries_on_fellowship_id"
   end
@@ -176,6 +187,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_07_233000) do
   add_foreign_key "event_details", "events"
   add_foreign_key "event_details", "regions"
   add_foreign_key "fellowships", "regions"
+  add_foreign_key "overseas_chobatsu_assignments", "events"
+  add_foreign_key "overseas_chobatsu_assignments", "overseas_chobatsu_entries"
   add_foreign_key "overseas_chobatsu_entries", "events"
   add_foreign_key "overseas_chobatsu_entries", "fellowships"
   add_foreign_key "serial_number_ranges", "chobatsu_reports"

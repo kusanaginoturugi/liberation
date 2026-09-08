@@ -20,15 +20,15 @@
   </head>
   <body>
     <h1>海外超抜</h1>
-    <p><%= @selected_event.name %></p>
+    <p><%= @selected_event.name %><%= "　#{@serial_numbers.first}〜#{@serial_numbers.last}番" if @serial_numbers.any? %></p>
     <table>
-      <thead><tr><th>番号</th><th>引保師名</th><th>備考</th></tr></thead>
+      <thead><tr><th>番号</th><th>氏名</th><th>備考</th></tr></thead>
       <tbody>
-        <% @export_entries.each do |entry| %>
+        <% @assignment_rows.each do |row| %>
           <tr>
-            <td class="number"><%= number_with_delimiter(entry.serial_number) %></td>
-            <td><%= entry.assistant_name %></td>
-            <td><%= entry.notes.presence || "" %></td>
+            <td class="number"><%= number_with_delimiter(row[:serial_number]) %></td>
+            <td><%= row[:entry].assistant_name %></td>
+            <td><%= row[:entry].notes.presence || "" %></td>
           </tr>
         <% end %>
       </tbody>

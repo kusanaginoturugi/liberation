@@ -1,0 +1,20 @@
+<div class="overseas-chobatsu-table-wrapper">
+  <table class="overseas-chobatsu-table overseas-assignment-table">
+    <thead><tr><th>番号</th><th>氏名</th><th>備考</th></tr></thead>
+    <tbody>
+      <% @assignment_rows.each do |row| %>
+        <tr>
+          <td class="overseas-chobatsu-table__number"><%= number_with_delimiter(row[:serial_number]) %></td>
+          <td>
+            <% if current_user.admin? %>
+              <%= select_tag "assignments[#{row[:serial_number]}]", options_from_collection_for_select(@all_entries, :id, :assistant_name, row[:entry]&.id), aria: { label: "#{row[:serial_number]}番の氏名" } %>
+            <% else %>
+              <%= row[:entry].assistant_name %>
+            <% end %>
+          </td>
+          <td><%= row[:entry].notes.presence || "-" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -10,14 +10,10 @@
     <%= link_to "PDFダウンロード", export_overseas_chobatsu_entries_path(event_id: @selected_event.id), class: "button-secondary compact-button" %>
   </header>
 
-  <% if flash[:notice].present? %>
-    <div class="flash flash-notice"><%= flash[:notice] %></div>
-  <% end %>
-  <% if @entry_errors.present? %>
-    <div class="flash flash-alert"><%= @entry_errors.to_sentence %></div>
-  <% end %>
+  <% if flash[:notice].present? %><div class="flash flash-notice"><%= flash[:notice] %></div><% end %>
+  <% if @entry_errors.present? %><div class="flash flash-alert"><%= @entry_errors.to_sentence %></div><% end %>
 
-  <section class="panel overseas-chobatsu-panel">
+  <section class="panel overseas-chobatsu-filter-panel">
     <div class="overseas-chobatsu-toolbar">
       <%= form_with url: overseas_chobatsu_entries_path, method: :get, class: "region-filter-form" do |form| %>
         <div class="field">
@@ -34,56 +30,69 @@
           </div>
         <% end %>
       <% end %>
-      <p>番号と海外超抜引保師名を入力してください。</p>
+      <p>氏名を入力すると、予定一覧で設定した番号に自動配分されます。</p>
     </div>
+  </section>
 
-    <%= form_with url: bulk_update_overseas_chobatsu_entries_path(event_id: @selected_event.id, fellowship_id: @editing_fellowship&.id), method: :patch, class: "overseas-chobatsu-form", data: { overseas_entries: true, overseas_entry_index: @entries.length } do %>
-      <div class="overseas-chobatsu-table-wrapper">
-        <table class="overseas-chobatsu-table">
-          <thead>
-            <tr>
-              <th>番号</th>
-              <th>引保師名</th>
-              <th>備考</th>
-              <th class="overseas-chobatsu-table__action">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @entries.each do |entry| %>
-              <tr data-overseas-entry-row data-overseas-entry-id="<%= entry.id %>">
-                <td class="overseas-chobatsu-table__number">
-                  <%= number_field_tag "entries[#{entry.id}][serial_number]", entry.serial_number, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, aria: { label: "番号" } %>
-                </td>
-                <td>
-                  <%= text_field_tag "entries[#{entry.id}][assistant_name]", entry.assistant_name, autocomplete: "off", aria: { label: "引保師名" } %>
-                </td>
-                <td>
-                  <%= text_area_tag "entries[#{entry.id}][notes]", entry.notes, rows: 2, aria: { label: "備考" } %>
-                </td>
+  <div class="overseas-chobatsu-workspace">
+    <section class="panel overseas-chobatsu-input-panel">
+      <div class="panel-header"><h2>引保師名入力</h2></div>
+      <%= form_with url: bulk_update_overseas_chobatsu_entries_path(event_id: @selected_event.id, fellowship_id: @editing_fellowship&.id), method: :patch, class: "overseas-chobatsu-form", data: { overseas_entries: true, overseas_entry_index: @entries.length } do %>
+        <div class="overseas-chobatsu-table-wrapper">
+          <table class="overseas-chobatsu-table overseas-chobatsu-input-table">
+            <thead><tr><th>氏名</th><th>備考</th><th class="overseas-chobatsu-table__action">操作</th></tr></thead>
+            <tbody>
+              <% @entries.each do |entry| %>
+                <tr data-overseas-entry-row data-overseas-entry-id="<%= entry.id %>">
+                  <td><%= text_field_tag "entries[#{entry.id}][assistant_name]", entry.assistant_name, autocomplete: "off", aria: { label: "氏名" } %></td>
+                  <td><%= text_area_tag "entries[#{entry.id}][notes]", entry.notes, rows: 2, aria: { label: "備考" } %></td>
+                  <td class="overseas-chobatsu-table__action"><button type="button" class="button-danger" data-remove-overseas-entry>行を削除</button></td>
+                </tr>
+              <% end %>
+              <tr data-overseas-entry-row>
+                <td><%= text_field_tag "entries[new-#{@entries.length}][assistant_name]", nil, autocomplete: "off", aria: { label: "氏名" } %></td>
+                <td><%= text_area_tag "entries[new-#{@entries.length}][notes]", nil, rows: 2, aria: { label: "備考" } %></td>
                 <td class="overseas-chobatsu-table__action"><button type="button" class="button-danger" data-remove-overseas-entry>行を削除</button></td>
               </tr>
-            <% end %>
-            <tr data-overseas-entry-row>
-              <td class="overseas-chobatsu-table__number"><%= number_field_tag "entries[new-#{@entries.length}][serial_number]", nil, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, aria: { label: "番号" } %></td>
-              <td><%= text_field_tag "entries[new-#{@entries.length}][assistant_name]", nil, autocomplete: "off", aria: { label: "引保師名" } %></td>
-              <td><%= text_area_tag "entries[new-#{@entries.length}][notes]", nil, rows: 2, aria: { label: "備考" } %></td>
-              <td class="overseas-chobatsu-table__action"><button type="button" class="button-danger" data-remove-overseas-entry>行を削除</button></td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
+        <template data-overseas-entry-template>
+          <tr data-overseas-entry-row>
+            <td><input type="text" name="entries[new-__INDEX__][assistant_name]" autocomplete="off" aria-label="氏名"></td>
+            <td><textarea name="entries[new-__INDEX__][notes]" rows="2" aria-label="備考"></textarea></td>
+            <td class="overseas-chobatsu-table__action"><button type="button" class="button-danger" data-remove-overseas-entry>行を削除</button></td>
+          </tr>
+        </template>
+        <div class="overseas-chobatsu-actions">
+          <button type="button" class="button-secondary" data-add-overseas-entry>行を追加</button>
+          <%= submit_tag "更新する", class: "button-primary overseas-chobatsu-save" %>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="panel overseas-chobatsu-assignment-panel">
+      <div class="panel-header">
+        <h2>番号名簿</h2>
+        <% if @special_schedule&.special_spirit_total %><p class="overseas-chobatsu-total">合計 <strong><%= number_with_delimiter(@special_schedule.special_spirit_total) %></strong> 霊</p><% end %>
       </div>
-      <template data-overseas-entry-template>
-        <tr data-overseas-entry-row>
-          <td class="overseas-chobatsu-table__number"><input type="number" name="entries[new-__INDEX__][serial_number]" min="1" inputmode="numeric" pattern="[0-9]*" data-numeric-only="true" aria-label="番号"></td>
-          <td><input type="text" name="entries[new-__INDEX__][assistant_name]" autocomplete="off" aria-label="引保師名"></td>
-          <td><textarea name="entries[new-__INDEX__][notes]" rows="2" aria-label="備考"></textarea></td>
-          <td class="overseas-chobatsu-table__action"><button type="button" class="button-danger" data-remove-overseas-entry>行を削除</button></td>
-        </tr>
-      </template>
-      <div class="overseas-chobatsu-actions">
-        <button type="button" class="button-secondary" data-add-overseas-entry>行を追加</button>
-        <%= submit_tag "更新する", class: "button-primary overseas-chobatsu-save" %>
-      </div>
-    <% end %>
-  </section>
+      <% if @serial_numbers.empty? %>
+        <p class="summary-empty">予定一覧の聖泉珠院・海外で、番号の始と終を入力すると名簿を作成できます。</p>
+      <% elsif @all_entries.empty? %>
+        <p class="summary-empty">引保師名を入力すると、<%= @serial_numbers.first %>〜<%= @serial_numbers.last %>番を自動配分します。</p>
+      <% elsif current_user.admin? %>
+        <%= form_with url: update_assignments_overseas_chobatsu_entries_path(event_id: @selected_event.id), method: :patch, class: "overseas-assignment-form" do %>
+          <%= render "assignment_table" %>
+          <div class="overseas-chobatsu-actions">
+            <%= submit_tag "番号名簿を更新", class: "button-primary overseas-chobatsu-save" %>
+          </div>
+        <% end %>
+        <div class="overseas-chobatsu-reset-action">
+          <%= button_to "自動配分に戻す", reset_assignments_overseas_chobatsu_entries_path(event_id: @selected_event.id), method: :post, class: "button-secondary", form: { data: { turbo_confirm: "手動で変更した氏名をすべて自動配分に戻しますか？" } } %>
+        </div>
+      <% else %>
+        <%= render "assignment_table" %>
+      <% end %>
+    </section>
+  </div>
 </div>

@@ -1,7 +1,15 @@
 class OverseasChobatsuEntry < ApplicationRecord
   belongs_to :event
   belongs_to :fellowship
+  has_many :overseas_chobatsu_assignments, dependent: :destroy
 
-  validates :serial_number, :assistant_name, presence: true
-  validates :serial_number, numericality: { only_integer: true, greater_than_or_equal_to: 1 }, uniqueness: { scope: :event_id }
+  before_validation :assign_input_order, on: :create
+
+  validates :assistant_name, presence: true
+
+  private
+
+  def assign_input_order
+    self.input_order ||= self.class.where(event_id:).maximum(:input_order).to_i + 1
+  end
 end

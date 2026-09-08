@@ -585,6 +585,15 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 @media (max-width: 640px) {
+  .overseas-chobatsu-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .overseas-chobatsu-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .serial-number-range {
     grid-template-columns: 1fr;
   }
@@ -750,13 +759,19 @@ body.number-shadow-disabled .serial-grid td {
   color: var(--muted);
 }
 
+.overseas-chobatsu-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 20px;
+}
+
 .overseas-chobatsu-table-wrapper {
   overflow-x: auto;
 }
 
 .overseas-chobatsu-table {
   width: 100%;
-  min-width: 780px;
+  min-width: 560px;
   border-collapse: collapse;
   border: 2px solid #637083;
   background: rgba(255, 255, 255, 0.75);
@@ -776,10 +791,13 @@ body.number-shadow-disabled .serial-grid td {
   white-space: nowrap;
 }
 
-.overseas-chobatsu-table td:nth-child(1) { width: 16%; }
-.overseas-chobatsu-table td:nth-child(2) { width: 44%; }
-.overseas-chobatsu-table td:nth-child(3) { width: 28%; }
-.overseas-chobatsu-table td:nth-child(4) { width: 12%; }
+.overseas-chobatsu-input-table td:nth-child(1) { width: 38%; }
+.overseas-chobatsu-input-table td:nth-child(2) { width: 46%; }
+.overseas-chobatsu-input-table td:nth-child(3) { width: 16%; }
+
+.overseas-assignment-table td:nth-child(1) { width: 16%; }
+.overseas-assignment-table td:nth-child(2) { width: 44%; }
+.overseas-assignment-table td:nth-child(3) { width: 40%; }
 
 .overseas-chobatsu-table__action {
   width: 8rem;
@@ -788,7 +806,8 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .overseas-chobatsu-table input,
-.overseas-chobatsu-table textarea {
+.overseas-chobatsu-table textarea,
+.overseas-chobatsu-table select {
   width: 100%;
   border: 0;
   background: transparent;
@@ -805,6 +824,10 @@ body.number-shadow-disabled .serial-grid td {
 .overseas-chobatsu-table textarea {
   display: block;
   resize: vertical;
+}
+
+.overseas-chobatsu-table select {
+  min-height: 2.3rem;
 }
 
 .overseas-chobatsu-table__number {
@@ -824,6 +847,20 @@ body.number-shadow-disabled .serial-grid td {
 
 .overseas-chobatsu-save {
   width: auto;
+}
+
+.overseas-chobatsu-reset-action {
+  margin-top: 10px;
+}
+
+.overseas-chobatsu-total {
+  margin: 0;
+  color: var(--muted);
+}
+
+.overseas-chobatsu-total strong {
+  color: var(--accent-strong);
+  font-size: 1.35rem;
 }
 
 .special-schedule-number-range__inputs {
