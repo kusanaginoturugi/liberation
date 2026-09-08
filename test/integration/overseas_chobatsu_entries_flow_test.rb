@@ -65,6 +65,7 @@ class OverseasChobatsuEntriesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "assignments[2]"
     assert_includes response.body, "自動割り振り"
     assert_includes response.body, "自動配分に戻す"
+    assert_not_includes response.body, "未割り当て"
     assert_match(/name="assignments\[1\]".*?option selected="selected" value="#{first.id}"/m, response.body)
     assert_match(/name="assignments\[2\]".*?option selected="selected" value="#{second.id}"/m, response.body)
     assert_match(/name="assignments\[3\]".*?option selected="selected" value="#{third.id}"/m, response.body)
