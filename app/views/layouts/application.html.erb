@@ -241,12 +241,12 @@
           let visibleMonth = selectedDate ? new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
           const syncValue = () => {
-            if (!selectedDate || !timeInput.value) {
+            if (!selectedDate) {
               valueInput.value = "";
               return;
             }
 
-            const [hours, minutes] = timeInput.value.split(":");
+            const [hours, minutes] = (timeInput.value || "00:00").split(":");
             valueInput.value = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}T${hours}:${minutes}`;
             valueInput.dispatchEvent(new Event("change", { bubbles: true }));
           };

@@ -274,6 +274,25 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
+  test "schedule can be saved with a date and no time" do
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
+
+    assert_difference("CeremonySchedule.count", 1) do
+      post ceremony_schedules_path, params: {
+        event_id: @event.id,
+        ceremony_schedule: {
+          fellowship_id: @meeting.id,
+          ceremony_at: "2026-05-03T00:00",
+          place: "大江戸会館",
+          assistant_count: 3,
+          spirit_count: 25
+        }
+      }
+    end
+
+    assert_equal Time.zone.local(2026, 5, 3), CeremonySchedule.order(:id).last.ceremony_at
+  end
+
   test "assigned user cannot edit other meeting schedule" do
     schedule = CeremonySchedule.create!(
       fellowship: @other_meeting,

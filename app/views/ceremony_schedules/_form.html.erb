@@ -52,7 +52,7 @@
         <button type="button" class="schedule-date-button" data-schedule-date-button aria-expanded="false">
           日付を選択
         </button>
-        <%= time_field_tag "ceremony_schedule_time", ceremony_schedule.ceremony_at&.strftime("%H:%M"), required: true, class: "schedule-time-input", data: { schedule_time_input: true }, aria: { label: "挙行時刻" } %>
+        <%= time_field_tag "ceremony_schedule_time", ceremony_schedule.ceremony_at&.strftime("%H:%M"), class: "schedule-time-input", data: { schedule_time_input: true }, aria: { label: "挙行時刻" } %>
         <div class="schedule-calendar" data-schedule-calendar hidden>
           <div class="schedule-calendar__header">
             <button type="button" class="calendar-nav-button" data-schedule-calendar-previous aria-label="前の月">‹</button>
