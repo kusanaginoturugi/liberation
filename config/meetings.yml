@@ -44,6 +44,11 @@ meetings:
     color_code: "#C2B0D9"
     display_order: 90
     active: true
+  - name: 茨城
+    region_name: 共通
+    color_code: "#C2B0D9"
+    display_order: 95
+    active: true
   - name: 聖明王院
     region_name: 共通
     color_code: "#B9C6D3"

@@ -15,8 +15,10 @@ class FellowshipTest < ActiveSupport::TestCase
     region = Region.create!(name: "共通")
     Fellowship.create!(name: "大仏殿", color_code: "#111111", region: region)
     Fellowship.create!(name: "大江戸", color_code: "#222222", region: region)
+    Fellowship.create!(name: "山梨", color_code: "#333333", region: region)
+    Fellowship.create!(name: "茨城", color_code: "#444444", region: region)
     Fellowship.create!(name: "対象外", color_code: "#333333", region: region)
 
-    assert_equal [ "大江戸", "大仏殿" ], Fellowship.available.pluck(:name)
+    assert_equal [ "大江戸", "山梨", "茨城", "大仏殿" ], Fellowship.available.pluck(:name)
   end
 end

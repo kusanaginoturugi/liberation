@@ -1,7 +1,7 @@
 class Fellowship < ApplicationRecord
   AVAILABLE_NAMES = [
     "大江戸", "お台場", "羽田", "かながわ", "富士山", "駿天",
-    "埼玉", "千葉", "山梨", "聖明王院", "大仏殿"
+    "埼玉", "千葉", "山梨", "茨城", "聖明王院", "大仏殿"
   ].freeze
 
   ALTAR_COUNTS = {
