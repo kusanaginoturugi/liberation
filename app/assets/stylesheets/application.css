@@ -73,6 +73,10 @@ body.number-shadow-disabled .serial-grid td {
   text-shadow: none;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .app-nav {
   padding: 16px 0 0;
 }
