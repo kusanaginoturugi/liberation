@@ -207,6 +207,23 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal 28, schedule.spirit_count
   end
 
+  test "edit form keeps the saved ceremony date in a stable browser format" do
+    schedule = CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 10, 25, 11, 0),
+      place: "山梨県甲府市",
+      assistant_count: 8,
+      spirit_count: 40
+    )
+
+    post session_path, params: { login_id: @user.login_id, password: "password123" }
+    get edit_ceremony_schedule_path(schedule)
+
+    assert_response :success
+    assert_includes response.body, 'value="2026-10-25T11:00"'
+  end
+
   test "admin can add one special schedule without changing regular allocations" do
     seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", region: @region)
     CeremonySchedule.create!(

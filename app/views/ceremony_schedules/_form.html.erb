@@ -48,7 +48,9 @@
     <div class="field">
       <%= form.label :ceremony_at, "挙行日時" %>
       <div class="schedule-datetime-picker" data-schedule-datetime-picker>
-        <%= form.hidden_field :ceremony_at, data: { schedule_datetime_value: true } %>
+        <%= form.hidden_field :ceremony_at,
+                              value: ceremony_schedule.ceremony_at&.strftime("%Y-%m-%dT%H:%M"),
+                              data: { schedule_datetime_value: true } %>
         <button type="button" class="schedule-date-button" data-schedule-date-button aria-expanded="false">
           日付を選択
         </button>
