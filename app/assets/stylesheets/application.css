@@ -223,6 +223,11 @@ body.number-shadow-disabled .serial-grid td {
   margin: 32px auto 48px;
 }
 
+.page-shell--wide {
+  width: calc(100% - 48px);
+  max-width: none;
+}
+
 .auth-shell {
   max-width: 640px;
 }
