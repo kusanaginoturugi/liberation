@@ -42,6 +42,18 @@ class CeremonySchedule < ApplicationRecord
     end.join("・")
   end
 
+  def joint_fellowship_counts
+    return [] unless joint_schedule?
+
+    joint_contributions.map do |contribution|
+      {
+        name: contribution.fellowship.name,
+        assistant_count: contribution.assistant_count,
+        spirit_count: contribution.spirit_count
+      }
+    end
+  end
+
   def allocation_contributions
     return [ [ fellowship, spirit_count ] ] unless joint_schedule?
 

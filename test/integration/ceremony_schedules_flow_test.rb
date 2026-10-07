@@ -252,6 +252,10 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal "埼玉・山梨（合同）", schedule.display_name
     assert_equal "埼玉4・山梨4", schedule.joint_assistant_breakdown
     assert_equal "埼玉20・山梨20", schedule.joint_spirit_breakdown
+    assert_equal [
+      { name: "埼玉", assistant_count: 4, spirit_count: 20 },
+      { name: "山梨", assistant_count: 4, spirit_count: 20 }
+    ], schedule.joint_fellowship_counts
     assert_equal [ [ saitama, 20 ], [ yamanashi, 20 ] ], schedule.allocation_contributions
 
     get ceremony_schedules_path(event_id: @event.id)

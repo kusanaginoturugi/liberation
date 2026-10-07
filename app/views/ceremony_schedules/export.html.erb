@@ -19,6 +19,9 @@
       th, td { border: 0.5px solid #000; overflow-wrap: anywhere; padding: 0.65mm 1mm; text-align: left; vertical-align: middle; }
       th { font-weight: 700; text-align: center; }
       .number { text-align: right; white-space: nowrap; }
+      .joint-schedule-name { line-height: 1.2; }
+      .joint-count { padding-top: 0.4mm; padding-bottom: 0.4mm; text-align: left; white-space: normal; }
+      .joint-count-line { display: block; line-height: 1.2; white-space: nowrap; }
       .center { text-align: center; }
       .schedule-fellowship { width: 15%; }
       .schedule-date { width: 20%; }
@@ -49,7 +52,35 @@
             <tr><td colspan="6" class="empty">挙行予定はまだありません</td></tr>
           <% else %>
             <% @ceremony_schedules.each do |schedule| %>
-              <tr><td><% if schedule.special_schedule? %>【特別】<br>海外・聖泉珠院<% else %><%= schedule.display_name %><% end %></td><td><%= schedule.ceremony_at.strftime("%Y/%m/%d　　%H:%M") %></td><td><%= schedule.place %></td><td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %><% if schedule.joint_assistant_breakdown %>（<%= schedule.joint_assistant_breakdown %>）<% end %></td><td class="number"><%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %><% if schedule.joint_spirit_breakdown %>（<%= schedule.joint_spirit_breakdown %>）<% end %></td><td><%= schedule.minister_name.presence || "-" %></td></tr>
+              <tr>
+                <td class="<%= "joint-schedule-name" if schedule.joint_schedule? %>">
+                  <% if schedule.special_schedule? %>
+                    【特別】<br>海外・聖泉珠院
+                  <% elsif schedule.joint_schedule? %>
+                    【合同】<br><%= schedule.joint_fellowship_counts.pluck(:name).join("・") %>
+                  <% else %>
+                    <%= schedule.display_name %>
+                  <% end %>
+                </td>
+                <td><%= schedule.ceremony_at.strftime("%Y/%m/%d　　%H:%M") %></td>
+                <td><%= schedule.place %></td>
+                <% if schedule.joint_schedule? %>
+                  <td class="joint-count">
+                    <% schedule.joint_fellowship_counts.each do |count| %>
+                      <span class="joint-count-line"><%= count[:name] %> <%= count[:assistant_count] ? number_with_delimiter(count[:assistant_count]) : "-" %></span>
+                    <% end %>
+                  </td>
+                  <td class="joint-count">
+                    <% schedule.joint_fellowship_counts.each do |count| %>
+                      <span class="joint-count-line"><%= count[:name] %> <%= number_with_delimiter(count[:spirit_count]) %></span>
+                    <% end %>
+                  </td>
+                <% else %>
+                  <td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td>
+                  <td class="number"><%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %></td>
+                <% end %>
+                <td><%= schedule.minister_name.presence || "-" %></td>
+              </tr>
             <% end %>
           <% end %>
         </tbody>
