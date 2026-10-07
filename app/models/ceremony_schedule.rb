@@ -38,9 +38,21 @@ class CeremonySchedule < ApplicationRecord
   def joint_assistant_breakdown
     return unless joint_schedule?
 
+    joint_assistant_breakdown_lines.join("・")
+  end
+
+  def joint_assistant_breakdown_lines
+    return [] unless joint_schedule?
+
     joint_contributions.map do |contribution|
       "#{contribution.fellowship.name}#{contribution.assistant_count || "-"}"
-    end.join("・")
+    end
+  end
+
+  def joint_spirit_breakdown_lines
+    return [] unless joint_schedule?
+
+    joint_contributions.map { |contribution| "#{contribution.fellowship.name}#{contribution.spirit_count}" }
   end
 
   def joint_fellowship_counts

@@ -252,6 +252,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal "埼玉・山梨（合同）", schedule.display_name
     assert_equal "埼玉4・山梨4", schedule.joint_assistant_breakdown
     assert_equal "埼玉20・山梨20", schedule.joint_spirit_breakdown
+    assert_equal [ "埼玉4", "山梨4" ], schedule.joint_assistant_breakdown_lines
+    assert_equal [ "埼玉20", "山梨20" ], schedule.joint_spirit_breakdown_lines
     assert_equal [
       { name: "埼玉", assistant_count: 4, spirit_count: 20 },
       { name: "山梨", assistant_count: 4, spirit_count: 20 }
@@ -263,8 +265,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "【合同】"
     assert_includes response.body, "埼玉・山梨"
-    assert_includes response.body, "8<span class=\"joint-spirit-breakdown\">（埼玉4・山梨4）</span>"
-    assert_includes response.body, "40<span class=\"joint-spirit-breakdown\">（埼玉20・山梨20）</span>"
+    assert_includes response.body, "8<span class=\"joint-spirit-breakdown\"><span class=\"joint-spirit-breakdown__line\">（埼玉4</span><span class=\"joint-spirit-breakdown__line\">山梨4）</span></span>"
+    assert_includes response.body, "40<span class=\"joint-spirit-breakdown\"><span class=\"joint-spirit-breakdown__line\">（埼玉20</span><span class=\"joint-spirit-breakdown__line\">山梨20）</span></span>"
     allocation_section = response.body.split("番号割り振り", 2).last
     assert_includes allocation_section, "埼玉"
     assert_includes allocation_section, "山梨"

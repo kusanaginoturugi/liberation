@@ -967,13 +967,19 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .joint-spirit-breakdown {
-  display: block;
-  margin-top: 3px;
+  display: inline-block;
+  margin-top: 4px;
   color: var(--muted);
   font-size: 0.78em;
   line-height: 1.35;
-  overflow-wrap: anywhere;
-  white-space: normal;
+  text-align: right;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.joint-spirit-breakdown__line {
+  display: block;
+  white-space: nowrap;
 }
 
 .summary-table {
@@ -1002,22 +1008,22 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(3),
 .ceremony-schedule-table--with-actions td:nth-child(3) {
-  width: 24%;
+  width: 18%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(4),
 .ceremony-schedule-table--with-actions td:nth-child(4) {
-  width: 12%;
+  width: 14%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(5),
 .ceremony-schedule-table--with-actions td:nth-child(5) {
-  width: 10%;
+  width: 13%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(6),
 .ceremony-schedule-table--with-actions td:nth-child(6) {
-  width: 14%;
+  width: 15%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(7),
