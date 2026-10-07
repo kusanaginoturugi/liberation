@@ -1,6 +1,9 @@
 class ChobatsuReportFellowship < ApplicationRecord
   belongs_to :chobatsu_report
   belongs_to :fellowship
+  has_many :additional_serial_number_ranges,
+           class_name: "ChobatsuReportFellowshipSerialNumberRange",
+           dependent: :destroy
 
   before_validation :fill_end_number
 
@@ -8,6 +11,16 @@ class ChobatsuReportFellowship < ApplicationRecord
   validates :serial_number_from, :serial_number_to,
             numericality: { only_integer: true, greater_than: 0 }
   validate :serial_number_range_is_valid
+
+  def number_ranges
+    [ [ serial_number_from, serial_number_to ] ] + additional_serial_number_ranges.reject(&:marked_for_destruction?).map do |range|
+      [ range.serial_number_from, range.serial_number_to ]
+    end
+  end
+
+  def usage_count
+    number_ranges.sum { |from, to| from.present? && to.present? ? to - from + 1 : 0 }
+  end
 
   private
 

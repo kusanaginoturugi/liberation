@@ -107,15 +107,15 @@
               <% if user_signed_in? %>
                 <td class="summary-actions" data-label="操作">
                   <% if current_user.admin? || (!schedule.special_schedule? && schedule.fellowship_id == current_user.fellowship_id) %>
-                    <% if schedule.chobatsu_report %>
-                      <%= link_to "報告を編集", edit_chobatsu_report_path(schedule.chobatsu_report), class: "text-link" %>
-                    <% elsif !schedule.special_schedule? %>
-                      <%= link_to "報告", new_chobatsu_report_path(ceremony_schedule_id: schedule.id), class: "text-link" %>
-                    <% end %>
-                    <%= link_to "編集", edit_ceremony_schedule_path(schedule), class: "text-link" %>
+                    <%= link_to "予定編集", edit_ceremony_schedule_path(schedule), class: "text-link" %>
                     <%= button_to "削除", ceremony_schedule_path(schedule), method: :delete,
                         class: "button-danger",
                         form: { data: { turbo_confirm: "この挙行予定を削除しますか？" } } %>
+                    <% if schedule.chobatsu_report %>
+                      <%= link_to "挙行報告を編集", edit_chobatsu_report_path(schedule.chobatsu_report), class: "text-link" %>
+                    <% elsif !schedule.special_schedule? %>
+                      <%= link_to "挙行報告", new_chobatsu_report_path(ceremony_schedule_id: schedule.id), class: "text-link" %>
+                    <% end %>
                   <% else %>
                     -
                   <% end %>

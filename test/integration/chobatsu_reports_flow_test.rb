@@ -137,22 +137,20 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_difference("ChobatsuReport.count", 1) do
       assert_difference("ChobatsuReportFellowship.count", 2) do
-        assert_difference("SerialNumberRange.count", 1) do
-          post chobatsu_reports_path, params: {
-            chobatsu_report: {
-              ceremony_date: Date.current,
-              joint_report: "1",
-              joint_primary_fellowship_id: odaiba.id,
-              joint_secondary_fellowship_id: @meeting.id,
-              joint_primary_participant_count: 10,
-              joint_secondary_participant_count: 3,
-              joint_primary_serial_number_from: 945,
-              joint_primary_serial_number_to: 999,
-              joint_secondary_serial_number_from: 1196,
-              joint_secondary_serial_number_to: 1265
-            }
+        post chobatsu_reports_path, params: {
+          chobatsu_report: {
+            ceremony_date: Date.current,
+            joint_report: "1",
+            joint_primary_fellowship_id: odaiba.id,
+            joint_secondary_fellowship_id: @meeting.id,
+            joint_primary_participant_count: 10,
+            joint_secondary_participant_count: 3,
+            joint_primary_serial_number_from: 945,
+            joint_primary_serial_number_to: 999,
+            joint_secondary_serial_number_from: 1196,
+            joint_secondary_serial_number_to: 1265
           }
-        end
+        }
       end
     end
 
@@ -197,6 +195,39 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal 15, report.participant_count
     assert_equal [ "お台場 11", "大江戸 4" ], report.participant_count_lines
     assert_equal [ "お台場 945〜1,000", "大江戸 1,196〜1,266" ], report.serial_number_range_lines
+  end
+
+  test "creating a joint report saves added number ranges for each fellowship" do
+    odaiba = Fellowship.create!(name: "お台場", color_code: "#123456", region: @region, enabled: true)
+
+    assert_difference("ChobatsuReportFellowshipSerialNumberRange.count", 2) do
+      post chobatsu_reports_path, params: {
+        chobatsu_report: {
+          ceremony_date: Date.current,
+          joint_report: "1",
+          joint_primary_fellowship_id: odaiba.id,
+          joint_secondary_fellowship_id: @meeting.id,
+          joint_primary_participant_count: 10,
+          joint_secondary_participant_count: 3,
+          joint_primary_serial_number_from: 1,
+          joint_primary_serial_number_to: 50,
+          joint_primary_additional_ranges_attributes: {
+            "0" => { serial_number_from: 82, serial_number_to: 91 }
+          },
+          joint_secondary_serial_number_from: 101,
+          joint_secondary_serial_number_to: 101,
+          joint_secondary_additional_ranges_attributes: {
+            "0" => { serial_number_from: 150, serial_number_to: 202 }
+          }
+        }
+      }
+    end
+
+    report = ChobatsuReport.last
+    assert_equal 114, report.usage_count
+    assert_equal [ "お台場 1〜50、82〜91", "大江戸 101〜101、150〜202" ], report.serial_number_range_lines
+    assert_equal [ "お台場 60", "大江戸 54" ], report.usage_count_lines
+    assert_equal [ [ odaiba, 1, 50 ], [ odaiba, 82, 91 ], [ @meeting, 101, 101 ], [ @meeting, 150, 202 ] ], report.number_range_contributions
   end
 
   test "summary page shows registered report data" do

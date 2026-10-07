@@ -6,7 +6,8 @@ class ChobatsuReport < ApplicationRecord
                 :joint_primary_serial_number_from,
                 :joint_primary_serial_number_to,
                 :joint_secondary_serial_number_from,
-                :joint_secondary_serial_number_to
+                :joint_secondary_serial_number_to,
+                :joint_range_contributions
 
   belongs_to :region
   belongs_to :event
@@ -38,6 +39,8 @@ class ChobatsuReport < ApplicationRecord
   end
 
   def number_ranges
+    return active_joint_range_contributions.flat_map(&:number_ranges) if joint_report?
+
     [ [ serial_number_from, serial_number_to ] ] + serial_number_ranges.reject(&:marked_for_destruction?).map { |range| [ range.serial_number_from, range.serial_number_to ] }
   end
 
@@ -79,7 +82,8 @@ class ChobatsuReport < ApplicationRecord
     return number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" } unless joint_report?
 
     joint_report_contributions.map do |contribution|
-      "#{contribution.fellowship.name} #{formatted_number(contribution.serial_number_from)}〜#{formatted_number(contribution.serial_number_to)}"
+      ranges = contribution.number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" }
+      [ contribution.fellowship.name, ranges.join("、") ].join(" ")
     end
   end
 
@@ -87,16 +91,17 @@ class ChobatsuReport < ApplicationRecord
     return [ formatted_number(usage_count) ] unless joint_report?
 
     joint_report_contributions.map do |contribution|
-      usage_count = contribution.serial_number_to - contribution.serial_number_from + 1
-      "#{contribution.fellowship.name} #{formatted_number(usage_count)}"
+      "#{contribution.fellowship.name} #{formatted_number(contribution.usage_count)}"
     end
   end
 
   def number_range_contributions
     return number_ranges.map { |from, to| [ fellowship, from, to ] } unless joint_report?
 
-    joint_report_contributions.map do |contribution|
-      [ contribution.fellowship, contribution.serial_number_from, contribution.serial_number_to ]
+    joint_report_contributions.flat_map do |contribution|
+      contribution.number_ranges.map do |from, to|
+        [ contribution.fellowship, from, to ]
+      end
     end
   end
 
@@ -113,6 +118,10 @@ class ChobatsuReport < ApplicationRecord
   end
 
   private
+
+  def active_joint_range_contributions
+    joint_range_contributions.presence || joint_report_contributions
+  end
 
   def assign_region_from_meeting
     self.region = fellowship.region if fellowship.present?

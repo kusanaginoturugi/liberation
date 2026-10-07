@@ -134,7 +134,9 @@ class ChobatsuReportsController < ApplicationController
       :joint_primary_serial_number_from,
       :joint_primary_serial_number_to,
       :joint_secondary_serial_number_from,
-      :joint_secondary_serial_number_to
+      :joint_secondary_serial_number_to,
+      joint_primary_additional_ranges_attributes: [ :serial_number_from, :serial_number_to, :_destroy ],
+      joint_secondary_additional_ranges_attributes: [ :serial_number_from, :serial_number_to, :_destroy ]
     )
   end
 
@@ -154,6 +156,8 @@ class ChobatsuReportsController < ApplicationController
     primary_to = positive_integer(details[:joint_primary_serial_number_to]) || primary_from
     secondary_from = positive_integer(details[:joint_secondary_serial_number_from])
     secondary_to = positive_integer(details[:joint_secondary_serial_number_to]) || secondary_from
+    primary_additional_ranges = joint_additional_ranges(details[:joint_primary_additional_ranges_attributes])
+    secondary_additional_ranges = joint_additional_ranges(details[:joint_secondary_additional_ranges_attributes])
 
     add_joint_report_error("合同する1つ目の伝道会を選択してください") unless primary_fellowship
     add_joint_report_error("合同する2つ目の伝道会を選択してください") unless secondary_fellowship
@@ -170,12 +174,11 @@ class ChobatsuReportsController < ApplicationController
     @chobatsu_report.participant_count = primary_participant_count + secondary_participant_count
     @chobatsu_report.serial_number_from = primary_from
     @chobatsu_report.serial_number_to = primary_to
-    @chobatsu_report.serial_number_ranges.each(&:mark_for_destruction)
-    @chobatsu_report.serial_number_ranges.build(serial_number_from: secondary_from, serial_number_to: secondary_to)
     @joint_report_contributions = [
-      { fellowship: primary_fellowship, participant_count: primary_participant_count, serial_number_from: primary_from, serial_number_to: primary_to },
-      { fellowship: secondary_fellowship, participant_count: secondary_participant_count, serial_number_from: secondary_from, serial_number_to: secondary_to }
+      build_joint_contribution(primary_fellowship, primary_participant_count, primary_from, primary_to, primary_additional_ranges),
+      build_joint_contribution(secondary_fellowship, secondary_participant_count, secondary_from, secondary_to, secondary_additional_ranges)
     ]
+    @chobatsu_report.joint_range_contributions = @joint_report_contributions
   end
 
   def assign_joint_report_form_values(details)
@@ -209,12 +212,36 @@ class ChobatsuReportsController < ApplicationController
       @chobatsu_report.save!
       @chobatsu_report.chobatsu_report_fellowships.destroy_all
       @joint_report_contributions.each do |contribution|
-        @chobatsu_report.chobatsu_report_fellowships.create!(contribution)
+        contribution.chobatsu_report = @chobatsu_report
+        contribution.save!
       end
     end
     true
   rescue ActiveRecord::RecordInvalid
     false
+  end
+
+  def joint_additional_ranges(attributes)
+    attributes.to_h.values.filter_map do |range|
+      next if ActiveModel::Type::Boolean.new.cast(range[:_destroy])
+
+      from = positive_integer(range[:serial_number_from])
+      to = positive_integer(range[:serial_number_to]) || from
+      { serial_number_from: from, serial_number_to: to }
+    end
+  end
+
+  def build_joint_contribution(fellowship, participant_count, serial_number_from, serial_number_to, additional_ranges)
+    ChobatsuReportFellowship.new(
+      fellowship: fellowship,
+      participant_count: participant_count,
+      serial_number_from: serial_number_from,
+      serial_number_to: serial_number_to
+    ).tap do |contribution|
+      additional_ranges.each do |range|
+        contribution.additional_serial_number_ranges.build(range)
+      end
+    end
   end
 
   def load_index_collections
