@@ -1724,14 +1724,39 @@ body.number-shadow-disabled .serial-grid td {
 
   .summary-table .summary-actions,
   .ceremony-schedule-table .summary-actions {
+    display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 8px;
+  }
+
+  .summary-table .summary-actions::before,
+  .ceremony-schedule-table .summary-actions::before {
+    width: 100%;
   }
 
   .summary-table .summary-actions > *,
   .ceremony-schedule-table .summary-actions > * {
-    grid-column: 2;
+    grid-column: auto;
+  }
+
+  .summary-table .summary-actions .button-danger,
+  .ceremony-schedule-table .summary-actions .button-danger {
+    font-size: 0.9rem;
+  }
+
+  .summary-table .summary-actions form,
+  .ceremony-schedule-table .summary-actions form {
+    margin: 0;
+  }
+
+  .summary-table .summary-actions .text-link,
+  .ceremony-schedule-table .summary-actions .text-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
   }
 
   .summary-table .summary-empty,
