@@ -34,6 +34,14 @@ class CeremonySchedule < ApplicationRecord
     joint_contributions.map { |contribution| "#{contribution.fellowship.name}#{contribution.spirit_count}" }.join("・")
   end
 
+  def joint_assistant_breakdown
+    return unless joint_schedule?
+
+    joint_contributions.map do |contribution|
+      "#{contribution.fellowship.name}#{contribution.assistant_count || "-"}"
+    end.join("・")
+  end
+
   def allocation_contributions
     return [ [ fellowship, spirit_count ] ] unless joint_schedule?
 
@@ -44,12 +52,20 @@ class CeremonySchedule < ApplicationRecord
     joint_contribution_for(fellowship)&.spirit_count
   end
 
+  def joint_primary_assistant_count
+    joint_contribution_for(fellowship)&.assistant_count
+  end
+
   def joint_secondary_fellowship
     joint_contributions.find { |contribution| contribution.fellowship_id != fellowship_id }&.fellowship
   end
 
   def joint_secondary_spirit_count
     joint_contributions.find { |contribution| contribution.fellowship_id != fellowship_id }&.spirit_count
+  end
+
+  def joint_secondary_assistant_count
+    joint_contributions.find { |contribution| contribution.fellowship_id != fellowship_id }&.assistant_count
   end
 
   def special_spirit_total

@@ -216,6 +216,14 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     )
 
     post session_path, params: { login_id: admin.login_id, password: "password123" }
+    get new_ceremony_schedule_path(event_id: @event.id)
+
+    assert_response :success
+    assert_includes response.body, "合同挙行"
+    assert_includes response.body, "伝道会①"
+    assert_includes response.body, "伝道会②"
+    assert_includes response.body, "joint_primary_assistant_count"
+    assert_includes response.body, "joint_secondary_assistant_count"
 
     assert_difference "CeremonySchedule.count", 1 do
       assert_difference "CeremonyScheduleFellowship.count", 2 do
@@ -225,11 +233,12 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
             fellowship_id: saitama.id,
             joint_schedule: "1",
             joint_fellowship_id: yamanashi.id,
+            primary_assistant_count: "4",
+            secondary_assistant_count: "4",
             primary_spirit_count: "20",
             secondary_spirit_count: "20",
             ceremony_at: "2026-10-25T11:00",
             place: "合同会場",
-            assistant_count: 8,
             minister_name: "合同点伝師"
           }
         }
@@ -238,8 +247,10 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     schedule = CeremonySchedule.order(:id).last
     assert_predicate schedule, :joint_schedule?
+    assert_equal 8, schedule.assistant_count
     assert_equal 40, schedule.spirit_count
     assert_equal "埼玉・山梨（合同）", schedule.display_name
+    assert_equal "埼玉4・山梨4", schedule.joint_assistant_breakdown
     assert_equal "埼玉20・山梨20", schedule.joint_spirit_breakdown
     assert_equal [ [ saitama, 20 ], [ yamanashi, 20 ] ], schedule.allocation_contributions
 
@@ -247,6 +258,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "埼玉・山梨（合同）"
+    assert_includes response.body, "8<span class=\"joint-spirit-breakdown\">（埼玉4・山梨4）</span>"
     assert_includes response.body, "40<span class=\"joint-spirit-breakdown\">（埼玉20・山梨20）</span>"
     allocation_section = response.body.split("番号割り振り", 2).last
     assert_includes allocation_section, "埼玉"

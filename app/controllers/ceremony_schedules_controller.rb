@@ -137,24 +137,35 @@ class CeremonySchedulesController < ApplicationController
 
     primary_fellowship = @ceremony_schedule.fellowship
     secondary_fellowship = Fellowship.available.find_by(id: joint_schedule_params[:joint_fellowship_id])
+    primary_assistant_count = whole_number(joint_schedule_params[:primary_assistant_count])
+    secondary_assistant_count = whole_number(joint_schedule_params[:secondary_assistant_count])
     primary_spirit_count = whole_number(joint_schedule_params[:primary_spirit_count])
     secondary_spirit_count = whole_number(joint_schedule_params[:secondary_spirit_count])
 
     add_joint_schedule_error("合同する2つ目の伝道会を選択してください") unless secondary_fellowship
     add_joint_schedule_error("合同する伝道会は異なる伝道会を選択してください") if primary_fellowship && primary_fellowship == secondary_fellowship
+    add_joint_schedule_error("1つ目の伝道会の引保師数を入力してください") if primary_assistant_count.nil?
+    add_joint_schedule_error("2つ目の伝道会の引保師数を入力してください") if secondary_assistant_count.nil?
     add_joint_schedule_error("1つ目の伝道会の霊数を入力してください") if primary_spirit_count.nil?
     add_joint_schedule_error("2つ目の伝道会の霊数を入力してください") if secondary_spirit_count.nil?
     return if @ceremony_schedule.errors.any?
 
+    @ceremony_schedule.assistant_count = primary_assistant_count + secondary_assistant_count
     @ceremony_schedule.spirit_count = primary_spirit_count + secondary_spirit_count
     @joint_schedule_contributions = [
-      { fellowship: primary_fellowship, spirit_count: primary_spirit_count },
-      { fellowship: secondary_fellowship, spirit_count: secondary_spirit_count }
+      { fellowship: primary_fellowship, assistant_count: primary_assistant_count, spirit_count: primary_spirit_count },
+      { fellowship: secondary_fellowship, assistant_count: secondary_assistant_count, spirit_count: secondary_spirit_count }
     ]
   end
 
   def joint_schedule_params
-    params.fetch(:ceremony_schedule, {}).permit(:joint_fellowship_id, :primary_spirit_count, :secondary_spirit_count)
+    params.fetch(:ceremony_schedule, {}).permit(
+      :joint_fellowship_id,
+      :primary_assistant_count,
+      :secondary_assistant_count,
+      :primary_spirit_count,
+      :secondary_spirit_count
+    )
   end
 
   def whole_number(value)

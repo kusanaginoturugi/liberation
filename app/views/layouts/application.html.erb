@@ -318,6 +318,7 @@
           const specialName = form.querySelector("[data-special-schedule-name]");
           const specialFellowshipName = form.querySelector("[data-special-schedule-fellowship-name]");
           const placeInput = form.querySelector("[data-special-schedule-place]");
+          const regularAssistantCount = form.querySelector("[data-regular-assistant-count]");
           const regularSpiritCount = form.querySelector("[data-regular-spirit-count]");
           const numberRange = form.querySelector("[data-special-schedule-number-range]");
           const serialFrom = form.querySelector("[data-special-serial-from]");
@@ -341,6 +342,7 @@
             if (fellowshipField) fellowshipField.hidden = specialSchedule;
             if (specialName) specialName.hidden = !specialSchedule;
             if (specialFellowshipName) specialFellowshipName.hidden = !specialSchedule;
+            if (regularAssistantCount) regularAssistantCount.hidden = false;
             if (regularSpiritCount) regularSpiritCount.hidden = false;
             if (numberRange) numberRange.hidden = !specialSchedule;
             if (spiritCountInput instanceof HTMLInputElement) spiritCountInput.readOnly = specialSchedule;
@@ -373,11 +375,20 @@
           if (!(toggle instanceof HTMLInputElement)) return;
 
           const specialToggle = form.querySelector("[data-special-schedule-toggle]");
+          const regularFellowshipField = form.querySelector("[data-special-schedule-fellowship]");
+          const regularFellowship = form.querySelector("[data-regular-fellowship]");
+          const regularAssistantCount = form.querySelector("[data-regular-assistant-count]");
           const regularSpiritCount = form.querySelector("[data-regular-spirit-count]");
-          const details = form.querySelector("[data-joint-schedule-details]");
+          const jointFields = form.querySelectorAll("[data-joint-schedule-fields]");
+          const primaryFellowship = form.querySelector("[data-joint-primary-fellowship]");
+          const secondaryFellowship = form.querySelector("[data-joint-secondary-fellowship]");
+          const primaryAssistantCount = form.querySelector("[data-joint-primary-assistant-count]");
+          const secondaryAssistantCount = form.querySelector("[data-joint-secondary-assistant-count]");
           const primarySpiritCount = form.querySelector("[data-joint-primary-spirit-count]");
           const secondarySpiritCount = form.querySelector("[data-joint-secondary-spirit-count]");
           const total = form.querySelector("[data-joint-spirit-count-total]");
+          const primaryFellowshipNames = form.querySelectorAll("[data-joint-primary-fellowship-name]");
+          const secondaryFellowshipNames = form.querySelectorAll("[data-joint-secondary-fellowship-name]");
 
           const updateJointSpiritTotal = () => {
             if (!(primarySpiritCount instanceof HTMLInputElement) || !(secondarySpiritCount instanceof HTMLInputElement) || !total) return;
@@ -388,18 +399,39 @@
             total.textContent = spiritTotal === null ? "合計 - 霊" : `合計 ${spiritTotal} 霊`;
           };
 
+          const updateJointFellowshipNames = () => {
+            const selectedName = (input, fallback) => {
+              if (!(input instanceof HTMLSelectElement)) return fallback;
+
+              return input.selectedOptions[0]?.textContent?.trim() || fallback;
+            };
+            const primaryName = selectedName(primaryFellowship, "伝道会①");
+            const secondaryName = selectedName(secondaryFellowship, "伝道会②");
+            primaryFellowshipNames.forEach((label) => { label.textContent = primaryName; });
+            secondaryFellowshipNames.forEach((label) => { label.textContent = secondaryName; });
+          };
+
           const updateJointScheduleFields = () => {
             const jointSchedule = toggle.checked;
-            if (details) details.hidden = !jointSchedule;
+            if (regularFellowshipField) regularFellowshipField.hidden = jointSchedule;
+            if (regularAssistantCount) regularAssistantCount.hidden = jointSchedule;
             if (regularSpiritCount) regularSpiritCount.hidden = jointSchedule;
+            if (regularFellowship instanceof HTMLSelectElement) regularFellowship.disabled = jointSchedule;
+            jointFields.forEach((field) => { field.hidden = !jointSchedule; });
+            [ primaryFellowship, secondaryFellowship, primaryAssistantCount, secondaryAssistantCount, primarySpiritCount, secondarySpiritCount ].forEach((input) => {
+              if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement) input.disabled = !jointSchedule;
+            });
             if (specialToggle instanceof HTMLInputElement) {
               specialToggle.disabled = jointSchedule;
               if (jointSchedule && specialToggle.checked) specialToggle.checked = false;
             }
             updateJointSpiritTotal();
+            updateJointFellowshipNames();
           };
 
           toggle.addEventListener("change", updateJointScheduleFields);
+          primaryFellowship?.addEventListener("change", updateJointFellowshipNames);
+          secondaryFellowship?.addEventListener("change", updateJointFellowshipNames);
           primarySpiritCount?.addEventListener("input", updateJointSpiritTotal);
           secondarySpiritCount?.addEventListener("input", updateJointSpiritTotal);
           updateJointScheduleFields();

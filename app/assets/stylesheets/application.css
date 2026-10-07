@@ -592,7 +592,7 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 @media (max-width: 640px) {
-  .joint-schedule-details {
+  .joint-schedule-section__inputs {
     grid-template-columns: 1fr;
   }
 
@@ -901,19 +901,21 @@ body.number-shadow-disabled .serial-grid td {
   font-weight: 700;
 }
 
-.joint-schedule-details {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+.joint-schedule-section {
   padding: 14px;
   border: 1px solid var(--panel-border);
   border-radius: 6px;
   background: rgba(141, 90, 47, 0.06);
 }
 
-.joint-schedule-details__total {
-  grid-column: 1 / -1;
-  margin: 0;
+.joint-schedule-section__inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.joint-schedule-section__total {
+  margin: 12px 0 0;
   color: var(--accent-strong);
   font-weight: 700;
 }

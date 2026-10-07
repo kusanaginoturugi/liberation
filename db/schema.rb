@@ -10,20 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_005009) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_091247) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
+    t.integer "event_id", null: false
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
-    t.integer "event_id", null: false
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_ceremony_schedule_allocation_snapshots_on_event_id", unique: true
   end
 
   create_table "ceremony_schedule_allocations", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "fellowship_id", null: false
     t.integer "spirit_count", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["event_id", "fellowship_id"], name: "idx_schedule_allocations_event_fellowship", unique: true
     t.index ["event_id"], name: "index_ceremony_schedule_allocations_on_event_id"
@@ -32,49 +32,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_005009) do
 
   create_table "ceremony_schedule_fellowships", force: :cascade do |t|
     t.integer "ceremony_schedule_id", null: false
-    t.datetime "created_at", null: false
     t.integer "fellowship_id", null: false
     t.integer "spirit_count", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "assistant_count"
     t.index ["ceremony_schedule_id", "fellowship_id"], name: "idx_schedule_fellowships_schedule_fellowship", unique: true
     t.index ["ceremony_schedule_id"], name: "index_ceremony_schedule_fellowships_on_ceremony_schedule_id"
     t.index ["fellowship_id"], name: "index_ceremony_schedule_fellowships_on_fellowship_id"
   end
 
   create_table "ceremony_schedules", force: :cascade do |t|
-    t.integer "assistant_count"
-    t.datetime "ceremony_at", null: false
-    t.datetime "created_at", null: false
-    t.integer "event_id", null: false
     t.integer "fellowship_id"
-    t.boolean "joint_schedule", default: false, null: false
-    t.string "minister_name"
+    t.datetime "ceremony_at", null: false
     t.string "place", null: false
+    t.integer "assistant_count"
+    t.integer "spirit_count"
+    t.string "minister_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "event_id", null: false
+    t.boolean "special_schedule", default: false, null: false
     t.integer "serial_number_from"
     t.integer "serial_number_to"
-    t.boolean "special_schedule", default: false, null: false
-    t.integer "spirit_count"
-    t.datetime "updated_at", null: false
+    t.boolean "joint_schedule", default: false, null: false
     t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
     t.index ["event_id"], name: "index_ceremony_schedules_on_event_id"
     t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"
   end
 
   create_table "chobatsu_reports", force: :cascade do |t|
-    t.string "assistant_name"
     t.date "ceremony_date", null: false
-    t.datetime "created_at", null: false
-    t.integer "event_id", default: 1, null: false
     t.integer "fellowship_id", null: false
-    t.integer "merit_fee_total", null: false
-    t.integer "noah_card_count"
-    t.text "notes"
+    t.string "assistant_name"
     t.integer "participant_count", null: false
-    t.integer "region_id", default: 1, null: false
     t.integer "serial_number_from", null: false
     t.integer "serial_number_to", null: false
+    t.integer "merit_fee_total", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "region_id", default: 1, null: false
+    t.integer "event_id", default: 1, null: false
     t.integer "user_id"
+    t.integer "noah_card_count"
+    t.text "notes"
     t.index ["ceremony_date"], name: "index_chobatsu_reports_on_ceremony_date"
     t.index ["event_id"], name: "index_chobatsu_reports_on_event_id"
     t.index ["fellowship_id"], name: "index_chobatsu_reports_on_fellowship_id"
@@ -84,37 +85,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_005009) do
   end
 
   create_table "event_details", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "region_id", default: 1, null: false
-    t.integer "total_serial_count", default: 1667, null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "total_serial_count", default: 1667, null: false
     t.index ["event_id", "region_id"], name: "index_event_details_on_event_id_and_region_id", unique: true
     t.index ["event_id"], name: "index_event_details_on_event_id"
     t.index ["region_id"], name: "index_event_details_on_region_id"
   end
 
   create_table "events", force: :cascade do |t|
-    t.date "chobatsu_ends_on"
-    t.date "chobatsu_starts_on"
-    t.boolean "closed", default: false, null: false
-    t.datetime "created_at", null: false
-    t.date "judgment_ceremony_on"
     t.text "name", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "closed", default: false, null: false
+    t.date "judgment_ceremony_on"
+    t.date "chobatsu_starts_on"
+    t.date "chobatsu_ends_on"
     t.index ["name"], name: "index_events_on_name", unique: true
   end
 
   create_table "fellowships", force: :cascade do |t|
-    t.boolean "active", default: true, null: false
-    t.integer "altar_count", default: 0, null: false
+    t.string "name", null: false
     t.string "color_code"
     t.datetime "created_at", null: false
-    t.integer "display_order"
-    t.boolean "enabled", default: false, null: false
-    t.string "name", null: false
-    t.integer "region_id", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: true, null: false
+    t.integer "display_order"
+    t.integer "region_id", null: false
+    t.boolean "enabled", default: false, null: false
+    t.integer "altar_count", default: 0, null: false
     t.index ["active"], name: "index_fellowships_on_active"
     t.index ["display_order"], name: "index_fellowships_on_display_order"
     t.index ["name"], name: "index_fellowships_on_name", unique: true
@@ -122,10 +123,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_005009) do
   end
 
   create_table "overseas_chobatsu_assignments", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "overseas_chobatsu_entry_id", null: false
     t.integer "serial_number", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["event_id", "serial_number"], name: "idx_overseas_assignments_event_number", unique: true
     t.index ["event_id"], name: "index_overseas_chobatsu_assignments_on_event_id"
@@ -133,53 +134,53 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_005009) do
   end
 
   create_table "overseas_chobatsu_entries", force: :cascade do |t|
-    t.string "assistant_name"
-    t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "fellowship_id", null: false
-    t.integer "input_order"
+    t.string "assistant_name"
     t.text "notes"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "input_order"
     t.index ["event_id", "input_order"], name: "idx_overseas_entries_event_order"
     t.index ["event_id"], name: "index_overseas_chobatsu_entries_on_event_id"
     t.index ["fellowship_id"], name: "index_overseas_chobatsu_entries_on_fellowship_id"
   end
 
   create_table "regions", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.text "name", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_regions_on_name", unique: true
   end
 
   create_table "serial_number_ranges", force: :cascade do |t|
     t.integer "chobatsu_report_id", null: false
-    t.datetime "created_at", null: false
     t.integer "serial_number_from", null: false
     t.integer "serial_number_to", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["chobatsu_report_id"], name: "index_serial_number_ranges_on_chobatsu_report_id"
   end
 
   create_table "system_settings", force: :cascade do |t|
-    t.datetime "created_at", null: false
     t.string "key", null: false
-    t.datetime "updated_at", null: false
     t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["key"], name: "index_system_settings_on_key", unique: true
   end
 
   create_table "users", force: :cascade do |t|
-    t.boolean "admin", default: false, null: false
-    t.string "authentik_subject"
-    t.datetime "created_at", null: false
     t.text "email", null: false
-    t.integer "fellowship_id"
-    t.string "login_id", null: false
-    t.text "name", null: false
     t.string "password_digest", null: false
+    t.text "name", null: false
     t.integer "region_id", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "admin", default: false, null: false
+    t.string "login_id", null: false
+    t.integer "fellowship_id"
+    t.string "authentik_subject"
     t.index ["authentik_subject"], name: "index_users_on_authentik_subject", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["fellowship_id"], name: "index_users_on_fellowship_id"

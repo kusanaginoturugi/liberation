@@ -26,7 +26,7 @@
       <div class="field special-schedule-toggle-field">
         <label>
           <%= form.check_box :joint_schedule, data: { joint_schedule_toggle: true } %>
-          合同で挙行する
+          合同挙行
         </label>
       </div>
     <% end %>
@@ -34,13 +34,41 @@
     <div class="field" data-special-schedule-fellowship>
       <%= form.label :fellowship_id, "伝道会名" %>
       <% if current_user.admin? %>
-        <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { prompt: "選択してください" }, { required: true } %>
+        <%= form.collection_select :fellowship_id, @fellowships, :id, :name,
+                                   { prompt: "選択してください" },
+                                   { required: true, disabled: ceremony_schedule.joint_schedule?, data: { regular_fellowship: true } } %>
       <% elsif current_user.fellowship.present? %>
         <p class="readonly-field"><%= current_user.fellowship.name %></p>
       <% else %>
         <p class="readonly-field">未設定</p>
       <% end %>
     </div>
+
+    <% if current_user.admin? %>
+      <div class="field joint-schedule-section" data-joint-schedule-fields hidden>
+        <span class="field-label">伝道会名</span>
+        <div class="joint-schedule-section__inputs">
+          <div class="field">
+            <%= label_tag :joint_primary_fellowship_id, "伝道会①" %>
+            <%= select_tag "ceremony_schedule[fellowship_id]",
+                           options_from_collection_for_select(@fellowships, :id, :name, ceremony_schedule.fellowship_id),
+                           include_blank: "選択してください",
+                           id: :joint_primary_fellowship_id,
+                           disabled: !ceremony_schedule.joint_schedule?,
+                           data: { joint_primary_fellowship: true } %>
+          </div>
+          <div class="field">
+            <%= label_tag :joint_fellowship_id, "伝道会②" %>
+            <%= select_tag "ceremony_schedule[joint_fellowship_id]",
+                           options_from_collection_for_select(@fellowships, :id, :name, ceremony_schedule.joint_secondary_fellowship&.id),
+                           include_blank: "選択してください",
+                           id: :joint_fellowship_id,
+                           disabled: !ceremony_schedule.joint_schedule?,
+                           data: { joint_secondary_fellowship: true } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
 
     <div class="field special-schedule-name" data-special-schedule-name hidden>
       <span class="field-label">予定区分</span>
@@ -81,47 +109,74 @@
       <%= form.text_field :place, required: true, data: { special_schedule_place: true } %>
     </div>
 
-    <div class="field">
+    <div class="field" data-regular-assistant-count>
       <%= form.label :assistant_count, "引保師数" %>
-      <%= form.number_field :assistant_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
-    </div>
-
-    <div class="field" data-regular-spirit-count>
-      <%= form.label :spirit_count, "霊数" %>
-      <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_spirit_count: true } %>
+      <%= form.number_field :assistant_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", disabled: ceremony_schedule.joint_schedule?, data: { numeric_only: true, regular_assistant_count: true } %>
     </div>
 
     <% if current_user.admin? %>
-      <div class="joint-schedule-details" data-joint-schedule-details hidden>
-        <div class="field">
-          <%= label_tag :joint_primary_spirit_count, "1つ目の伝道会の霊数" %>
+      <div class="field joint-schedule-section" data-joint-schedule-fields hidden>
+        <span class="field-label">引保師数</span>
+        <div class="joint-schedule-section__inputs">
+          <div class="field">
+            <label for="joint_primary_assistant_count" data-joint-primary-fellowship-name>伝道会①</label>
+            <%= number_field_tag "ceremony_schedule[primary_assistant_count]",
+                                 ceremony_schedule.joint_primary_assistant_count,
+                                 min: 0,
+                                 inputmode: "numeric",
+                                 pattern: "[0-9]*",
+                                 id: :joint_primary_assistant_count,
+                                 disabled: !ceremony_schedule.joint_schedule?,
+                                 data: { numeric_only: true, joint_primary_assistant_count: true } %>
+          </div>
+          <div class="field">
+            <label for="joint_secondary_assistant_count" data-joint-secondary-fellowship-name>伝道会②</label>
+            <%= number_field_tag "ceremony_schedule[secondary_assistant_count]",
+                                 ceremony_schedule.joint_secondary_assistant_count,
+                                 min: 0,
+                                 inputmode: "numeric",
+                                 pattern: "[0-9]*",
+                                 id: :joint_secondary_assistant_count,
+                                 disabled: !ceremony_schedule.joint_schedule?,
+                                 data: { numeric_only: true, joint_secondary_assistant_count: true } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="field" data-regular-spirit-count>
+      <%= form.label :spirit_count, "霊数" %>
+      <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", disabled: ceremony_schedule.joint_schedule?, data: { numeric_only: true, special_spirit_count: true, regular_spirit_count: true } %>
+    </div>
+
+    <% if current_user.admin? %>
+      <div class="field joint-schedule-section" data-joint-schedule-fields hidden>
+        <span class="field-label">霊数</span>
+        <div class="joint-schedule-section__inputs">
+          <div class="field">
+            <label for="joint_primary_spirit_count" data-joint-primary-fellowship-name>伝道会①</label>
           <%= number_field_tag "ceremony_schedule[primary_spirit_count]",
                                ceremony_schedule.joint_primary_spirit_count,
                                min: 0,
                                inputmode: "numeric",
                                pattern: "[0-9]*",
                                id: :joint_primary_spirit_count,
+                               disabled: !ceremony_schedule.joint_schedule?,
                                data: { numeric_only: true, joint_primary_spirit_count: true } %>
-        </div>
-        <div class="field">
-          <%= label_tag :joint_fellowship_id, "2つ目の伝道会" %>
-          <%= select_tag "ceremony_schedule[joint_fellowship_id]",
-                         options_from_collection_for_select(@fellowships, :id, :name, ceremony_schedule.joint_secondary_fellowship&.id),
-                         include_blank: "選択してください",
-                         id: :joint_fellowship_id,
-                         data: { joint_fellowship: true } %>
-        </div>
-        <div class="field">
-          <%= label_tag :joint_secondary_spirit_count, "2つ目の伝道会の霊数" %>
+          </div>
+          <div class="field">
+            <label for="joint_secondary_spirit_count" data-joint-secondary-fellowship-name>伝道会②</label>
           <%= number_field_tag "ceremony_schedule[secondary_spirit_count]",
                                ceremony_schedule.joint_secondary_spirit_count,
                                min: 0,
                                inputmode: "numeric",
                                pattern: "[0-9]*",
                                id: :joint_secondary_spirit_count,
+                               disabled: !ceremony_schedule.joint_schedule?,
                                data: { numeric_only: true, joint_secondary_spirit_count: true } %>
+          </div>
         </div>
-        <p class="joint-schedule-details__total" data-joint-spirit-count-total>合計 - 霊</p>
+        <p class="joint-schedule-section__total" data-joint-spirit-count-total>合計 - 霊</p>
       </div>
     <% end %>
 

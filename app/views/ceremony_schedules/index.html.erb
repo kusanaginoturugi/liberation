@@ -97,7 +97,9 @@
               </td>
               <td data-label="挙行日時"><%= l(schedule.ceremony_at, format: :schedule) %></td>
               <td data-label="場所"><%= schedule.place %></td>
-              <td class="summary-number" data-label="引保師数"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td>
+              <td class="summary-number" data-label="引保師数">
+                <%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %><% if schedule.joint_assistant_breakdown %><span class="joint-spirit-breakdown">（<%= schedule.joint_assistant_breakdown %>）</span><% end %>
+              </td>
               <td class="summary-number" data-label="霊数">
                 <%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %><% if schedule.joint_spirit_breakdown %><span class="joint-spirit-breakdown">（<%= schedule.joint_spirit_breakdown %>）</span><% end %>
               </td>
