@@ -921,11 +921,13 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .joint-spirit-breakdown {
-  display: inline-block;
-  margin-left: 4px;
+  display: block;
+  margin-top: 3px;
   color: var(--muted);
-  font-size: 0.9em;
-  white-space: nowrap;
+  font-size: 0.78em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .summary-table {
