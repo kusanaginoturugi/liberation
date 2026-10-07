@@ -112,7 +112,7 @@
                         class: "button-danger",
                         form: { data: { turbo_confirm: "この挙行予定を削除しますか？" } } %>
                     <% if schedule.chobatsu_report %>
-                      <%= link_to "挙行報告を編集", edit_chobatsu_report_path(schedule.chobatsu_report), class: "text-link" %>
+                      <%= link_to "挙行報告", edit_chobatsu_report_path(schedule.chobatsu_report), class: "text-link" %>
                     <% elsif !schedule.special_schedule? %>
                       <%= link_to "挙行報告", new_chobatsu_report_path(ceremony_schedule_id: schedule.id), class: "text-link" %>
                     <% end %>
