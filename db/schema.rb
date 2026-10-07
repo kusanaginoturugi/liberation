@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_212000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_005009) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.text "allocation_counts", default: "{}", null: false
     t.datetime "created_at", null: false
@@ -30,12 +30,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_212000) do
     t.index ["fellowship_id"], name: "index_ceremony_schedule_allocations_on_fellowship_id"
   end
 
+  create_table "ceremony_schedule_fellowships", force: :cascade do |t|
+    t.integer "ceremony_schedule_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "fellowship_id", null: false
+    t.integer "spirit_count", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ceremony_schedule_id", "fellowship_id"], name: "idx_schedule_fellowships_schedule_fellowship", unique: true
+    t.index ["ceremony_schedule_id"], name: "index_ceremony_schedule_fellowships_on_ceremony_schedule_id"
+    t.index ["fellowship_id"], name: "index_ceremony_schedule_fellowships_on_fellowship_id"
+  end
+
   create_table "ceremony_schedules", force: :cascade do |t|
     t.integer "assistant_count"
     t.datetime "ceremony_at", null: false
     t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "fellowship_id"
+    t.boolean "joint_schedule", default: false, null: false
     t.string "minister_name"
     t.string "place", null: false
     t.integer "serial_number_from"
@@ -178,6 +190,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_212000) do
   add_foreign_key "ceremony_schedule_allocation_snapshots", "events"
   add_foreign_key "ceremony_schedule_allocations", "events"
   add_foreign_key "ceremony_schedule_allocations", "fellowships"
+  add_foreign_key "ceremony_schedule_fellowships", "ceremony_schedules"
+  add_foreign_key "ceremony_schedule_fellowships", "fellowships"
   add_foreign_key "ceremony_schedules", "events"
   add_foreign_key "ceremony_schedules", "fellowships"
   add_foreign_key "chobatsu_reports", "events"

@@ -207,6 +207,53 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal 28, schedule.spirit_count
   end
 
+  test "admin can create a joint schedule with spirit counts for each fellowship" do
+    saitama = Fellowship.create!(name: "埼玉", color_code: "#123456", region: @region)
+    yamanashi = Fellowship.create!(name: "山梨", color_code: "#654321", region: @region)
+    admin = User.create!(
+      name: "管理者", email: "admin-joint@example.com", password: "password123", password_confirmation: "password123",
+      region: @region, admin: true
+    )
+
+    post session_path, params: { login_id: admin.login_id, password: "password123" }
+
+    assert_difference "CeremonySchedule.count", 1 do
+      assert_difference "CeremonyScheduleFellowship.count", 2 do
+        post ceremony_schedules_path, params: {
+          event_id: @event.id,
+          ceremony_schedule: {
+            fellowship_id: saitama.id,
+            joint_schedule: "1",
+            joint_fellowship_id: yamanashi.id,
+            primary_spirit_count: "20",
+            secondary_spirit_count: "20",
+            ceremony_at: "2026-10-25T11:00",
+            place: "合同会場",
+            assistant_count: 8,
+            minister_name: "合同点伝師"
+          }
+        }
+      end
+    end
+
+    schedule = CeremonySchedule.order(:id).last
+    assert_predicate schedule, :joint_schedule?
+    assert_equal 40, schedule.spirit_count
+    assert_equal "埼玉・山梨（合同）", schedule.display_name
+    assert_equal "埼玉20・山梨20", schedule.joint_spirit_breakdown
+    assert_equal [ [ saitama, 20 ], [ yamanashi, 20 ] ], schedule.allocation_contributions
+
+    get ceremony_schedules_path(event_id: @event.id)
+
+    assert_response :success
+    assert_includes response.body, "埼玉・山梨（合同）"
+    assert_includes response.body, "40<span class=\"joint-spirit-breakdown\">（埼玉20・山梨20）</span>"
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_includes allocation_section, "埼玉"
+    assert_includes allocation_section, "山梨"
+    assert_equal 2, allocation_section.scan('value="20"').count
+  end
+
   test "edit form keeps the saved ceremony date in a stable browser format" do
     schedule = CeremonySchedule.create!(
       fellowship: @meeting,

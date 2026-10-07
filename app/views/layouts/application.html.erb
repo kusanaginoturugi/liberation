@@ -324,6 +324,7 @@
           const serialTo = form.querySelector("[data-special-serial-to]");
           const serialTotal = form.querySelector("[data-special-serial-total]");
           const spiritCountInput = form.querySelector("[data-special-spirit-count]");
+          const jointToggle = form.querySelector("[data-joint-schedule-toggle]");
 
           const updateSerialTotal = () => {
             if (!(serialFrom instanceof HTMLInputElement) || !(serialTo instanceof HTMLInputElement) || !serialTotal) return;
@@ -348,6 +349,13 @@
               fellowshipInput.value = form.dataset.specialScheduleFellowshipId;
             }
             if (specialSchedule && placeInput) placeInput.value = form.dataset.specialScheduleFellowshipName;
+            if (jointToggle instanceof HTMLInputElement) {
+              jointToggle.disabled = specialSchedule;
+              if (specialSchedule && jointToggle.checked) {
+                jointToggle.checked = false;
+                jointToggle.dispatchEvent(new Event("change", { bubbles: true }));
+              }
+            }
             updateSerialTotal();
           };
 
@@ -355,6 +363,46 @@
           serialFrom?.addEventListener("input", updateSerialTotal);
           serialTo?.addEventListener("input", updateSerialTotal);
           updateSpecialScheduleFields();
+        });
+
+        document.querySelectorAll("[data-joint-schedule-form]").forEach((form) => {
+          if (form.dataset.jointScheduleInitialized === "true") return;
+
+          form.dataset.jointScheduleInitialized = "true";
+          const toggle = form.querySelector("[data-joint-schedule-toggle]");
+          if (!(toggle instanceof HTMLInputElement)) return;
+
+          const specialToggle = form.querySelector("[data-special-schedule-toggle]");
+          const regularSpiritCount = form.querySelector("[data-regular-spirit-count]");
+          const details = form.querySelector("[data-joint-schedule-details]");
+          const primarySpiritCount = form.querySelector("[data-joint-primary-spirit-count]");
+          const secondarySpiritCount = form.querySelector("[data-joint-secondary-spirit-count]");
+          const total = form.querySelector("[data-joint-spirit-count-total]");
+
+          const updateJointSpiritTotal = () => {
+            if (!(primarySpiritCount instanceof HTMLInputElement) || !(secondarySpiritCount instanceof HTMLInputElement) || !total) return;
+
+            const primary = Number(primarySpiritCount.value);
+            const secondary = Number(secondarySpiritCount.value);
+            const spiritTotal = Number.isInteger(primary) && Number.isInteger(secondary) && primary >= 0 && secondary >= 0 ? primary + secondary : null;
+            total.textContent = spiritTotal === null ? "合計 - 霊" : `合計 ${spiritTotal} 霊`;
+          };
+
+          const updateJointScheduleFields = () => {
+            const jointSchedule = toggle.checked;
+            if (details) details.hidden = !jointSchedule;
+            if (regularSpiritCount) regularSpiritCount.hidden = jointSchedule;
+            if (specialToggle instanceof HTMLInputElement) {
+              specialToggle.disabled = jointSchedule;
+              if (jointSchedule && specialToggle.checked) specialToggle.checked = false;
+            }
+            updateJointSpiritTotal();
+          };
+
+          toggle.addEventListener("change", updateJointScheduleFields);
+          primarySpiritCount?.addEventListener("input", updateJointSpiritTotal);
+          secondarySpiritCount?.addEventListener("input", updateJointSpiritTotal);
+          updateJointScheduleFields();
         });
 
         document.querySelectorAll("[data-overseas-entries]").forEach((form) => {

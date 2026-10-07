@@ -13,6 +13,7 @@
   <%= hidden_field_tag :event_id, @selected_event.id %>
   <div class="field-grid"
        data-special-schedule-form
+       data-joint-schedule-form
        data-special-schedule-fellowship-id="<%= @special_fellowship&.id %>"
        data-special-schedule-fellowship-name="聖明王院">
     <% if current_user.admin? %>
@@ -20,6 +21,12 @@
         <label>
           <%= form.check_box :special_schedule, data: { special_schedule_toggle: true } %>
           聖泉珠院・海外として登録
+        </label>
+      </div>
+      <div class="field special-schedule-toggle-field">
+        <label>
+          <%= form.check_box :joint_schedule, data: { joint_schedule_toggle: true } %>
+          合同で挙行する
         </label>
       </div>
     <% end %>
@@ -83,6 +90,40 @@
       <%= form.label :spirit_count, "霊数" %>
       <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_spirit_count: true } %>
     </div>
+
+    <% if current_user.admin? %>
+      <div class="joint-schedule-details" data-joint-schedule-details hidden>
+        <div class="field">
+          <%= label_tag :joint_primary_spirit_count, "1つ目の伝道会の霊数" %>
+          <%= number_field_tag "ceremony_schedule[primary_spirit_count]",
+                               ceremony_schedule.joint_primary_spirit_count,
+                               min: 0,
+                               inputmode: "numeric",
+                               pattern: "[0-9]*",
+                               id: :joint_primary_spirit_count,
+                               data: { numeric_only: true, joint_primary_spirit_count: true } %>
+        </div>
+        <div class="field">
+          <%= label_tag :joint_fellowship_id, "2つ目の伝道会" %>
+          <%= select_tag "ceremony_schedule[joint_fellowship_id]",
+                         options_from_collection_for_select(@fellowships, :id, :name, ceremony_schedule.joint_secondary_fellowship&.id),
+                         include_blank: "選択してください",
+                         id: :joint_fellowship_id,
+                         data: { joint_fellowship: true } %>
+        </div>
+        <div class="field">
+          <%= label_tag :joint_secondary_spirit_count, "2つ目の伝道会の霊数" %>
+          <%= number_field_tag "ceremony_schedule[secondary_spirit_count]",
+                               ceremony_schedule.joint_secondary_spirit_count,
+                               min: 0,
+                               inputmode: "numeric",
+                               pattern: "[0-9]*",
+                               id: :joint_secondary_spirit_count,
+                               data: { numeric_only: true, joint_secondary_spirit_count: true } %>
+        </div>
+        <p class="joint-schedule-details__total" data-joint-spirit-count-total>合計 - 霊</p>
+      </div>
+    <% end %>
 
     <div class="field special-schedule-number-range" data-special-schedule-number-range hidden>
       <span class="field-label">番号</span>
