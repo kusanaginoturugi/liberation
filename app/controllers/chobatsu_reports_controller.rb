@@ -48,9 +48,10 @@ class ChobatsuReportsController < ApplicationController
   def create
     @chobatsu_report = ChobatsuReport.new(chobatsu_report_params)
     @chobatsu_report.user = current_user
+    apply_joint_report_details
     ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.fellowship&.region)
 
-    if @chobatsu_report.save
+    if @joint_report_valid && save_chobatsu_report
       redirect_to root_path, notice: "挙行報告を登録しました"
     else
       render :new, status: :unprocessable_content
@@ -62,9 +63,10 @@ class ChobatsuReportsController < ApplicationController
 
   def update
     @chobatsu_report.assign_attributes(chobatsu_report_params)
+    apply_joint_report_details
     ensure_event_detail_for(@chobatsu_report.event, @chobatsu_report.fellowship&.region)
 
-    if @chobatsu_report.save
+    if @joint_report_valid && save_chobatsu_report
       redirect_to summary_chobatsu_reports_path(event_id: @chobatsu_report.event_id), notice: "挙行報告を更新しました"
     else
       render :edit, status: :unprocessable_content
@@ -105,10 +107,103 @@ class ChobatsuReportsController < ApplicationController
       :serial_number_to,
       :noah_card_count,
       :notes,
+      :joint_report,
       serial_number_ranges_attributes: [ :id, :serial_number_from, :serial_number_to, :_destroy ]
     ).tap do |attrs|
       attrs[:event_id] = @selected_event.id if action_name == "create" && @selected_event&.id.present?
     end
+  end
+
+  def joint_report_params
+    params.fetch(:chobatsu_report, {}).permit(
+      :joint_primary_fellowship_id,
+      :joint_secondary_fellowship_id,
+      :joint_primary_participant_count,
+      :joint_secondary_participant_count,
+      :joint_primary_serial_number_from,
+      :joint_primary_serial_number_to,
+      :joint_secondary_serial_number_from,
+      :joint_secondary_serial_number_to
+    )
+  end
+
+  def apply_joint_report_details
+    @joint_report_contributions = []
+    @joint_report_valid = true
+    return unless @chobatsu_report.joint_report?
+
+    details = joint_report_params
+    assign_joint_report_form_values(details)
+
+    primary_fellowship = @fellowships.find { |fellowship| fellowship.id == details[:joint_primary_fellowship_id].to_i }
+    secondary_fellowship = @fellowships.find { |fellowship| fellowship.id == details[:joint_secondary_fellowship_id].to_i }
+    primary_participant_count = nonnegative_integer(details[:joint_primary_participant_count])
+    secondary_participant_count = nonnegative_integer(details[:joint_secondary_participant_count])
+    primary_from = positive_integer(details[:joint_primary_serial_number_from])
+    primary_to = positive_integer(details[:joint_primary_serial_number_to]) || primary_from
+    secondary_from = positive_integer(details[:joint_secondary_serial_number_from])
+    secondary_to = positive_integer(details[:joint_secondary_serial_number_to]) || secondary_from
+
+    add_joint_report_error("合同する1つ目の伝道会を選択してください") unless primary_fellowship
+    add_joint_report_error("合同する2つ目の伝道会を選択してください") unless secondary_fellowship
+    add_joint_report_error("合同する伝道会は異なる伝道会を選択してください") if primary_fellowship && primary_fellowship == secondary_fellowship
+    add_joint_report_error("1つ目の伝道会の超抜引保師数を入力してください") if primary_participant_count.nil?
+    add_joint_report_error("2つ目の伝道会の超抜引保師数を入力してください") if secondary_participant_count.nil?
+    add_joint_report_error("1つ目の伝道会の使用修霊番号(始)を入力してください") if primary_from.nil?
+    add_joint_report_error("2つ目の伝道会の使用修霊番号(始)を入力してください") if secondary_from.nil?
+    add_joint_report_error("1つ目の伝道会の使用修霊番号(終)は始以上にしてください") if primary_from && primary_to < primary_from
+    add_joint_report_error("2つ目の伝道会の使用修霊番号(終)は始以上にしてください") if secondary_from && secondary_to < secondary_from
+    return if @chobatsu_report.errors.any?
+
+    @chobatsu_report.fellowship = primary_fellowship
+    @chobatsu_report.participant_count = primary_participant_count + secondary_participant_count
+    @chobatsu_report.serial_number_from = primary_from
+    @chobatsu_report.serial_number_to = primary_to
+    @chobatsu_report.serial_number_ranges.each(&:mark_for_destruction)
+    @chobatsu_report.serial_number_ranges.build(serial_number_from: secondary_from, serial_number_to: secondary_to)
+    @joint_report_contributions = [
+      { fellowship: primary_fellowship, participant_count: primary_participant_count, serial_number_from: primary_from, serial_number_to: primary_to },
+      { fellowship: secondary_fellowship, participant_count: secondary_participant_count, serial_number_from: secondary_from, serial_number_to: secondary_to }
+    ]
+  end
+
+  def assign_joint_report_form_values(details)
+    @chobatsu_report.joint_primary_fellowship_id = details[:joint_primary_fellowship_id]
+    @chobatsu_report.joint_secondary_fellowship_id = details[:joint_secondary_fellowship_id]
+    @chobatsu_report.joint_primary_participant_count = details[:joint_primary_participant_count]
+    @chobatsu_report.joint_secondary_participant_count = details[:joint_secondary_participant_count]
+    @chobatsu_report.joint_primary_serial_number_from = details[:joint_primary_serial_number_from]
+    @chobatsu_report.joint_primary_serial_number_to = details[:joint_primary_serial_number_to]
+    @chobatsu_report.joint_secondary_serial_number_from = details[:joint_secondary_serial_number_from]
+    @chobatsu_report.joint_secondary_serial_number_to = details[:joint_secondary_serial_number_to]
+  end
+
+  def add_joint_report_error(message)
+    @joint_report_valid = false
+    @chobatsu_report.errors.add(:base, message)
+  end
+
+  def nonnegative_integer(value)
+    number = Integer(value, exception: false)
+    number if number && number >= 0
+  end
+
+  def positive_integer(value)
+    number = Integer(value, exception: false)
+    number if number && number.positive?
+  end
+
+  def save_chobatsu_report
+    ChobatsuReport.transaction do
+      @chobatsu_report.save!
+      @chobatsu_report.chobatsu_report_fellowships.destroy_all
+      @joint_report_contributions.each do |contribution|
+        @chobatsu_report.chobatsu_report_fellowships.create!(contribution)
+      end
+    end
+    true
+  rescue ActiveRecord::RecordInvalid
+    false
   end
 
   def load_index_collections
@@ -187,7 +282,7 @@ class ChobatsuReportsController < ApplicationController
 
   def reports_for_region_and_event(region_id, event_id)
     ChobatsuReport.where(region_id: region_id, event_id: event_id)
-                  .includes(:fellowship)
+                  .includes(:fellowship, chobatsu_report_fellowships: :fellowship)
                   .order(:serial_number_from)
   end
 
@@ -257,9 +352,9 @@ class ChobatsuReportsController < ApplicationController
     reports.each do |report|
       lines << csv_line([
         report.ceremony_date.strftime("%Y/%m/%d"),
-        report.fellowship.name,
-        report.participant_count,
-        report.usage_count,
+        report.report_display_name,
+        report.participant_count_lines.join("\n"),
+        report.usage_count_lines.join("\n"),
         report.noah_card_count,
         report.calculated_merit_fee_total,
         report.mirokuji_share,

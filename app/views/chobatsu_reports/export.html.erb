@@ -73,9 +73,9 @@
           <tr>
             <td><%= index + 1 %></td>
             <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
-            <td><%= report.fellowship.name %></td>
-            <td><%= report.participant_count %></td>
-            <td><%= report.usage_count %></td>
+            <td><% report.report_display_name_lines.each do |line| %><div><%= line %></div><% end %></td>
+            <td><% report.participant_count_lines.each do |line| %><div><%= line %></div><% end %></td>
+            <td><% report.usage_count_lines.each do |line| %><div><%= line %></div><% end %></td>
             <td><%= report.noah_card_count.present? ? report.noah_card_count : "-" %></td>
             <td><%= report.calculated_merit_fee_total %></td>
             <td><%= report.mirokuji_share %></td>

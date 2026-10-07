@@ -9,8 +9,9 @@ module ChobatsuReportsHelper
 
   def color_map_for_reports(reports)
     reports.each_with_object({}) do |report, map|
-      color = report.fellowship.color_code
-      report.number_ranges.each { |from, to| (from..to).each { |number| map[number] = color } }
+      report.number_range_contributions.each do |fellowship, from, to|
+        (from..to).each { |number| map[number] = fellowship.color_code }
+      end
     end
   end
 

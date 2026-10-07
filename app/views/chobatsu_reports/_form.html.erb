@@ -1,0 +1,183 @@
+<% primary_contribution = report.joint_primary_contribution %>
+<% secondary_contribution = report.joint_secondary_contribution %>
+<% primary_fellowship_id = report.joint_primary_fellowship_id.presence || primary_contribution&.fellowship_id || report.fellowship_id %>
+<% secondary_fellowship_id = report.joint_secondary_fellowship_id.presence || secondary_contribution&.fellowship_id %>
+<% primary_participant_count = report.joint_primary_participant_count.presence || primary_contribution&.participant_count %>
+<% secondary_participant_count = report.joint_secondary_participant_count.presence || secondary_contribution&.participant_count %>
+<% primary_from = report.joint_primary_serial_number_from.presence || primary_contribution&.serial_number_from || report.serial_number_from %>
+<% primary_to = report.joint_primary_serial_number_to.presence || primary_contribution&.serial_number_to || report.serial_number_to %>
+<% secondary_from = report.joint_secondary_serial_number_from.presence || secondary_contribution&.serial_number_from %>
+<% secondary_to = report.joint_secondary_serial_number_to.presence || secondary_contribution&.serial_number_to %>
+
+<%= form_with(model: report, class: "report-form", data: { joint_report_form: true }) do |form| %>
+  <div class="field-grid">
+    <div class="field <%= "field-with-error" if report.errors[:ceremony_date].any? %>">
+      <%= form.label :ceremony_date, "挙行日" %>
+      <%= form.date_field :ceremony_date %>
+    </div>
+
+    <div class="field joint-report-toggle">
+      <%= form.label :joint_report do %>
+        <%= form.check_box :joint_report, data: { joint_report_toggle: true } %>
+        合同挙行として登録
+      <% end %>
+    </div>
+
+    <div data-regular-report-fields <%= "hidden" if report.joint_report? %>>
+      <div class="field <%= "field-with-error" if report.errors[:fellowship].any? || report.errors[:fellowship_id].any? %>">
+        <%= form.label :fellowship_id, "伝道会名" %>
+        <%= form.collection_select :fellowship_id, fellowships, :id, :name, { prompt: "選択してください" }, { disabled: report.joint_report? } %>
+      </div>
+
+      <div class="field <%= "field-with-error" if report.errors[:participant_count].any? %>">
+        <%= form.label :participant_count, "超抜引保師数" %>
+        <div class="input-with-unit">
+          <%= form.number_field :participant_count, min: 0, value: report.participant_count.presence, inputmode: "numeric", pattern: "[0-9]*", disabled: report.joint_report?, data: { numeric_only: true } %>
+          <span class="input-unit">人</span>
+        </div>
+        <% report.errors.full_messages_for(:participant_count).each do |message| %><p class="field-error"><%= message %></p><% end %>
+      </div>
+
+      <%= render "number_ranges", form: form, report: report, total_serial_count: total_serial_count %>
+    </div>
+
+    <section class="joint-report-section" data-joint-report-fields <%= "hidden" unless report.joint_report? %>>
+      <div class="joint-report-section__inputs">
+        <div class="field">
+          <label for="joint_primary_fellowship_id">伝道会①</label>
+          <%= select_tag "chobatsu_report[joint_primary_fellowship_id]", options_from_collection_for_select(fellowships, :id, :name, primary_fellowship_id), include_blank: "選択してください", id: "joint_primary_fellowship_id", disabled: !report.joint_report?, data: { joint_report_input: true, joint_primary_fellowship: true } %>
+        </div>
+        <div class="field">
+          <label for="joint_secondary_fellowship_id">伝道会②</label>
+          <%= select_tag "chobatsu_report[joint_secondary_fellowship_id]", options_from_collection_for_select(fellowships, :id, :name, secondary_fellowship_id), include_blank: "選択してください", id: "joint_secondary_fellowship_id", disabled: !report.joint_report?, data: { joint_report_input: true, joint_secondary_fellowship: true } %>
+        </div>
+        <div class="field">
+          <label data-joint-primary-label>伝道会①の超抜引保師数</label>
+          <div class="input-with-unit"><%= number_field_tag "chobatsu_report[joint_primary_participant_count]", primary_participant_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, joint_report_input: true } %><span class="input-unit">人</span></div>
+        </div>
+        <div class="field">
+          <label data-joint-secondary-label>伝道会②の超抜引保師数</label>
+          <div class="input-with-unit"><%= number_field_tag "chobatsu_report[joint_secondary_participant_count]", secondary_participant_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, joint_report_input: true } %><span class="input-unit">人</span></div>
+        </div>
+      </div>
+
+      <div class="joint-report-section__inputs">
+        <div class="serial-number-range" data-number-range>
+          <div class="field"><label data-joint-primary-label>伝道会①の使用修霊番号(始)</label><%= number_field_tag "chobatsu_report[joint_primary_serial_number_from]", primary_from, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_from: true, joint_report_input: true } %></div>
+          <div class="field"><label data-joint-primary-label>伝道会①の使用修霊番号(終)</label><%= number_field_tag "chobatsu_report[joint_primary_serial_number_to]", primary_to, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_to: true, joint_report_input: true } %></div>
+        </div>
+        <div class="serial-number-range" data-number-range>
+          <div class="field"><label data-joint-secondary-label>伝道会②の使用修霊番号(始)</label><%= number_field_tag "chobatsu_report[joint_secondary_serial_number_from]", secondary_from, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_from: true, joint_report_input: true } %></div>
+          <div class="field"><label data-joint-secondary-label>伝道会②の使用修霊番号(終)</label><%= number_field_tag "chobatsu_report[joint_secondary_serial_number_to]", secondary_to, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_to: true, joint_report_input: true } %></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="field <%= "field-with-error" if report.errors[:noah_card_count].any? %>">
+      <%= form.label :noah_card_count, "ノアカード分" %>
+      <%= form.number_field :noah_card_count, min: 0, value: report.noah_card_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
+      <% report.errors.full_messages_for(:noah_card_count).each do |message| %><p class="field-error"><%= message %></p><% end %>
+    </div>
+
+    <div class="field <%= "field-with-error" if report.errors[:notes].any? %>">
+      <%= form.label :notes, "備考欄" %>
+      <%= form.text_area :notes %>
+    </div>
+
+    <div class="field usage-field"><span class="field-label">使用数</span><div class="usage-count" data-calc-target="usageOutput"><%= report.usage_count %></div></div>
+    <div class="field usage-field"><span class="field-label">功徳費合計</span><div class="usage-count" data-calc-target="meritOutput"><%= report.calculated_merit_fee_total %></div></div>
+    <div class="field usage-field"><span class="field-label">みろく寺分</span><div class="usage-count" data-calc-target="mirokujiOutput"><%= report.mirokuji_share %></div></div>
+    <div class="field usage-field"><span class="field-label">聖院還付金</span><div class="usage-count" data-calc-target="regionRefundOutput"><%= report.region_refund %></div></div>
+  </div>
+
+  <div class="actions"><%= form.submit submit_label, class: "button-primary" %></div>
+<% end %>
+
+<script>
+  (() => {
+    const initializeReportForm = () => {
+      document.querySelectorAll("[data-joint-report-form]").forEach((form) => {
+        if (form.dataset.initialized === "true") return;
+        form.dataset.initialized = "true";
+
+        const toggle = form.querySelector("[data-joint-report-toggle]");
+        const regularFields = form.querySelector("[data-regular-report-fields]");
+        const jointFields = form.querySelector("[data-joint-report-fields]");
+        const primaryFellowship = form.querySelector("[data-joint-primary-fellowship]");
+        const secondaryFellowship = form.querySelector("[data-joint-secondary-fellowship]");
+        const usageOutput = form.querySelector("[data-calc-target='usageOutput']");
+        const meritOutput = form.querySelector("[data-calc-target='meritOutput']");
+        const mirokujiOutput = form.querySelector("[data-calc-target='mirokujiOutput']");
+        const regionRefundOutput = form.querySelector("[data-calc-target='regionRefundOutput']");
+
+        const updateJointLabels = () => {
+          const nameFor = (select, fallback) => select?.value ? select.selectedOptions[0]?.textContent?.trim() : fallback;
+          const primaryName = nameFor(primaryFellowship, "伝道会①");
+          const secondaryName = nameFor(secondaryFellowship, "伝道会②");
+          form.querySelectorAll("[data-joint-primary-label]").forEach((label) => {
+            label.textContent = label.textContent.includes("使用修霊番号") ? `${primaryName}の使用修霊番号${label.textContent.includes("(終)") ? "(終)" : "(始)"}` : `${primaryName}の超抜引保師数`;
+          });
+          form.querySelectorAll("[data-joint-secondary-label]").forEach((label) => {
+            label.textContent = label.textContent.includes("使用修霊番号") ? `${secondaryName}の使用修霊番号${label.textContent.includes("(終)") ? "(終)" : "(始)"}` : `${secondaryName}の超抜引保師数`;
+          });
+        };
+
+        const updateTotals = () => {
+          const usageCount = Array.from(form.querySelectorAll("[data-number-range]"))
+            .filter((range) => !range.querySelector("[data-number-range-from]").disabled)
+            .reduce((total, range) => {
+              const from = Number.parseInt(range.querySelector("[data-number-range-from]").value, 10);
+              const to = Number.parseInt(range.querySelector("[data-number-range-to]").value || from, 10);
+              return Number.isNaN(from) || Number.isNaN(to) || to < from ? total : total + to - from + 1;
+            }, 0);
+          const meritTotal = usageCount * 5000;
+          usageOutput.textContent = String(usageCount);
+          meritOutput.textContent = String(meritTotal);
+          mirokujiOutput.textContent = String(Math.floor(meritTotal * 0.65));
+          regionRefundOutput.textContent = String(Math.floor(meritTotal * 0.15));
+        };
+
+        const updateMode = () => {
+          const joint = toggle.checked;
+          regularFields.hidden = joint;
+          jointFields.hidden = !joint;
+          regularFields.querySelectorAll("input, select, textarea, button").forEach((input) => { input.disabled = joint; });
+          jointFields.querySelectorAll("input, select").forEach((input) => { input.disabled = !joint; });
+          updateJointLabels();
+          updateTotals();
+        };
+
+        toggle.addEventListener("change", updateMode);
+        primaryFellowship?.addEventListener("change", updateJointLabels);
+        secondaryFellowship?.addEventListener("change", updateJointLabels);
+        form.addEventListener("input", (event) => {
+          if (event.target.matches("[data-number-range-from], [data-number-range-to]")) updateTotals();
+        });
+        form.querySelectorAll("[data-number-range-list]").forEach((list) => {
+          const additions = list.querySelector("[data-additional-number-ranges]");
+          const template = list.querySelector("[data-number-range-template]");
+          list.querySelector("[data-add-number-range]").addEventListener("click", () => {
+            additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
+          });
+          list.addEventListener("click", (event) => {
+            if (!event.target.matches("[data-remove-number-range]")) return;
+
+            const range = event.target.closest("[data-number-range]");
+            const destroyField = range.querySelector("[data-destroy-number-range]");
+            if (range.dataset.persistedNumberRange === "true") {
+              destroyField.value = "1";
+              range.hidden = true;
+            } else {
+              range.remove();
+            }
+            updateTotals();
+          });
+        });
+        updateMode();
+      });
+    };
+
+    document.addEventListener("turbo:load", initializeReportForm);
+    document.addEventListener("DOMContentLoaded", initializeReportForm);
+  })();
+</script>

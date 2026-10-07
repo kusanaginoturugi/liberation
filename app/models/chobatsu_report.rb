@@ -1,9 +1,19 @@
 class ChobatsuReport < ApplicationRecord
+  attr_accessor :joint_primary_fellowship_id,
+                :joint_secondary_fellowship_id,
+                :joint_primary_participant_count,
+                :joint_secondary_participant_count,
+                :joint_primary_serial_number_from,
+                :joint_primary_serial_number_to,
+                :joint_secondary_serial_number_from,
+                :joint_secondary_serial_number_to
+
   belongs_to :region
   belongs_to :event
   belongs_to :user, optional: true
   belongs_to :fellowship
   has_many :serial_number_ranges, dependent: :destroy
+  has_many :chobatsu_report_fellowships, dependent: :destroy
   accepts_nested_attributes_for :serial_number_ranges, allow_destroy: true, reject_if: :all_blank
 
   before_validation :assign_region_from_meeting
@@ -28,6 +38,65 @@ class ChobatsuReport < ApplicationRecord
 
   def number_ranges
     [ [ serial_number_from, serial_number_to ] ] + serial_number_ranges.reject(&:marked_for_destruction?).map { |range| [ range.serial_number_from, range.serial_number_to ] }
+  end
+
+  def report_display_name
+    report_display_name_lines.join("\n")
+  end
+
+  def report_display_name_lines
+    return [ fellowship.name ] unless joint_report?
+
+    [ "【合同】", joint_report_contributions.map { |contribution| contribution.fellowship.name }.join("・") ]
+  end
+
+  def joint_report_contributions
+    return [] unless joint_report?
+
+    chobatsu_report_fellowships.includes(:fellowship).sort_by do |contribution|
+      contribution.fellowship_id == fellowship_id ? 0 : 1
+    end
+  end
+
+  def joint_primary_contribution
+    joint_report_contributions.find { |contribution| contribution.fellowship_id == fellowship_id }
+  end
+
+  def joint_secondary_contribution
+    joint_report_contributions.find { |contribution| contribution.fellowship_id != fellowship_id }
+  end
+
+  def participant_count_lines
+    return [ formatted_number(participant_count) ] unless joint_report?
+
+    joint_report_contributions.map do |contribution|
+      "#{contribution.fellowship.name} #{formatted_number(contribution.participant_count)}"
+    end
+  end
+
+  def serial_number_range_lines
+    return number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" } unless joint_report?
+
+    joint_report_contributions.map do |contribution|
+      "#{contribution.fellowship.name} #{formatted_number(contribution.serial_number_from)}〜#{formatted_number(contribution.serial_number_to)}"
+    end
+  end
+
+  def usage_count_lines
+    return [ formatted_number(usage_count) ] unless joint_report?
+
+    joint_report_contributions.map do |contribution|
+      usage_count = contribution.serial_number_to - contribution.serial_number_from + 1
+      "#{contribution.fellowship.name} #{formatted_number(usage_count)}"
+    end
+  end
+
+  def number_range_contributions
+    return number_ranges.map { |from, to| [ fellowship, from, to ] } unless joint_report?
+
+    joint_report_contributions.map do |contribution|
+      [ contribution.fellowship, contribution.serial_number_from, contribution.serial_number_to ]
+    end
   end
 
   def calculated_merit_fee_total
@@ -105,5 +174,9 @@ class ChobatsuReport < ApplicationRecord
 
   def fill_end_number
     self.serial_number_to = serial_number_from if serial_number_to.blank? && serial_number_from.present?
+  end
+
+  def formatted_number(number)
+    number.to_i.to_s.reverse.scan(/.{1,3}/).join(",").reverse
   end
 end

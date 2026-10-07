@@ -17,179 +17,22 @@
         </div>
       </details>
       <%= link_to "PDF出力", export_chobatsu_reports_path(event_id: @selected_event&.id, region_id: current_user.region_id), class: "button-secondary compact-button", target: "_blank", rel: "noopener" %>
-      <div class="setting-card">
-        <span>合格霊数</span>
-        <strong><%= @total_serial_count %></strong>
-      </div>
-      <div class="setting-card">
-        <span>超抜済</span>
-        <strong><%= used_serial_count(@chobatsu_reports) %></strong>
-      </div>
-      <div class="setting-card">
-        <span>残霊数</span>
-        <strong><%= remaining_serial_count(@total_serial_count, @chobatsu_reports) %></strong>
-      </div>
+      <div class="setting-card"><span>合格霊数</span><strong><%= @total_serial_count %></strong></div>
+      <div class="setting-card"><span>超抜済</span><strong><%= used_serial_count(@chobatsu_reports) %></strong></div>
+      <div class="setting-card"><span>残霊数</span><strong><%= remaining_serial_count(@total_serial_count, @chobatsu_reports) %></strong></div>
     </div>
   </header>
 
-  <% if flash[:notice].present? %>
-    <div class="flash flash-notice"><%= flash[:notice] %></div>
-  <% end %>
-
+  <% if flash[:notice].present? %><div class="flash flash-notice"><%= flash[:notice] %></div><% end %>
   <% if @chobatsu_report.errors.any? %>
-    <div class="flash flash-alert">
-      <strong>登録できませんでした</strong>
-      <ul>
-        <% @chobatsu_report.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
+    <div class="flash flash-alert"><strong>登録できませんでした</strong><ul><% @chobatsu_report.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div>
   <% end %>
 
   <div class="page-grid">
     <section class="panel form-panel">
       <h2>登録フォーム</h2>
-
-      <%= form_with model: @chobatsu_report, class: "report-form" do |form| %>
-        <div class="field-grid">
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:ceremony_date].any? %>">
-            <%= form.label :ceremony_date, "挙行日" %>
-            <%= form.date_field :ceremony_date %>
-          </div>
-
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:fellowship].any? || @chobatsu_report.errors[:fellowship_id].any? %>">
-            <%= form.label :fellowship_id, "伝道会名" %>
-            <%= form.collection_select :fellowship_id, @fellowships, :id, :name, { prompt: "選択してください" } %>
-          </div>
-
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:participant_count].any? %>">
-            <%= form.label :participant_count, "超抜引保師数" %>
-            <div class="input-with-unit">
-              <%= form.number_field :participant_count, min: 0, value: @chobatsu_report.participant_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, calc_target: "participant", action: "input->report-form#update" } %>
-              <span class="input-unit">人</span>
-            </div>
-            <% @chobatsu_report.errors.full_messages_for(:participant_count).each do |message| %>
-              <p class="field-error"><%= message %></p>
-            <% end %>
-          </div>
-
-          <%= render "number_ranges", form: form, report: @chobatsu_report, total_serial_count: @total_serial_count %>
-
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:noah_card_count].any? %>">
-            <%= form.label :noah_card_count, "ノアカード分" %>
-            <%= form.number_field :noah_card_count, min: 0, value: @chobatsu_report.noah_card_count.presence, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true } %>
-            <% @chobatsu_report.errors.full_messages_for(:noah_card_count).each do |message| %>
-              <p class="field-error"><%= message %></p>
-            <% end %>
-          </div>
-
-          <div class="field <%= "field-with-error" if @chobatsu_report.errors[:notes].any? %>">
-            <%= form.label :notes, "備考欄" %>
-            <%= form.text_area :notes %>
-          </div>
-
-          <div class="field usage-field">
-            <span class="field-label">使用数</span>
-            <div class="usage-count" data-calc-target="usageOutput"><%= @chobatsu_report.usage_count %></div>
-          </div>
-
-          <div class="field usage-field">
-            <span class="field-label">功徳費合計</span>
-            <div class="usage-count" data-calc-target="meritOutput"><%= @chobatsu_report.calculated_merit_fee_total %></div>
-          </div>
-
-          <div class="field usage-field">
-            <span class="field-label">みろく寺分</span>
-            <div class="usage-count" data-calc-target="mirokujiOutput"><%= @chobatsu_report.mirokuji_share %></div>
-          </div>
-
-          <div class="field usage-field">
-            <span class="field-label">聖院還付金</span>
-            <div class="usage-count" data-calc-target="regionRefundOutput"><%= @chobatsu_report.region_refund %></div>
-          </div>
-
-        </div>
-
-        <div class="actions">
-          <%= form.submit "登録する", class: "button-primary" %>
-        </div>
-      <% end %>
+      <%= render "form", report: @chobatsu_report, fellowships: @fellowships, total_serial_count: @total_serial_count, submit_label: "登録する" %>
     </section>
-
-    <%= render "report_grid",
-        chobatsu_reports: @chobatsu_reports,
-        legend_fellowships: @legend_fellowships,
-        total_serial_count: @total_serial_count %>
+    <%= render "report_grid", chobatsu_reports: @chobatsu_reports, legend_fellowships: @legend_fellowships, total_serial_count: @total_serial_count %>
   </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const participantField = document.querySelector("[data-calc-target='participant']");
-    const usageOutput = document.querySelector("[data-calc-target='usageOutput']");
-    const meritOutput = document.querySelector("[data-calc-target='meritOutput']");
-    const mirokujiOutput = document.querySelector("[data-calc-target='mirokujiOutput']");
-    const regionRefundOutput = document.querySelector("[data-calc-target='regionRefundOutput']");
-
-    const updateTotals = () => {
-      const usageCount = Array.from(document.querySelectorAll("[data-number-range]")).reduce((total, range) => {
-        const from = Number.parseInt(range.querySelector("[data-number-range-from]").value, 10);
-        const toField = range.querySelector("[data-number-range-to]");
-        const to = Number.parseInt(toField.value || from, 10);
-        return Number.isNaN(from) || Number.isNaN(to) || to < from ? total : total + to - from + 1;
-      }, 0);
-      let meritTotal = 0;
-
-      if (usageOutput) {
-        usageOutput.textContent = String(usageCount);
-      }
-
-      if (meritOutput) {
-        meritTotal = usageCount * 5000;
-        meritOutput.textContent = String(meritTotal);
-      }
-
-      if (mirokujiOutput) {
-        mirokujiOutput.textContent = String(Math.floor(meritTotal * 0.65));
-      }
-
-      if (regionRefundOutput) {
-        regionRefundOutput.textContent = String(Math.floor(meritTotal * 0.15));
-      }
-    };
-
-    participantField?.addEventListener("input", updateTotals);
-    document.addEventListener("input", (event) => {
-      if (event.target.matches("[data-number-range-from], [data-number-range-to]")) updateTotals();
-    });
-
-    document.querySelectorAll("[data-number-range-list]").forEach((list) => {
-      const additions = list.querySelector("[data-additional-number-ranges]");
-      const template = list.querySelector("[data-number-range-template]");
-      list.querySelector("[data-add-number-range]").addEventListener("click", () => {
-        additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
-      });
-      list.addEventListener("click", (event) => {
-        if (!event.target.matches("[data-remove-number-range]")) return;
-
-        const range = event.target.closest("[data-number-range]");
-        const destroyField = range.querySelector("[data-destroy-number-range]");
-        if (range.dataset.persistedNumberRange === "true") {
-          destroyField.value = "1";
-          range.hidden = true;
-        } else {
-          range.remove();
-        }
-        updateTotals();
-      });
-    });
-
-    const firstInvalidField = document.querySelector(".field-with-error input, .field-with-error select, .field-with-error textarea");
-    if (firstInvalidField) {
-      firstInvalidField.focus();
-    }
-
-    updateTotals();
-  });
-</script>

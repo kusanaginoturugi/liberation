@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_091247) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_100000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.integer "event_id", null: false
     t.text "allocation_counts", default: "{}", null: false
@@ -61,6 +61,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_091247) do
     t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"
   end
 
+  create_table "chobatsu_report_fellowships", force: :cascade do |t|
+    t.integer "chobatsu_report_id", null: false
+    t.integer "fellowship_id", null: false
+    t.integer "participant_count", null: false
+    t.integer "serial_number_from", null: false
+    t.integer "serial_number_to", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chobatsu_report_id"], name: "index_chobatsu_report_fellowships_on_chobatsu_report_id"
+    t.index ["fellowship_id"], name: "index_chobatsu_report_fellowships_on_fellowship_id"
+  end
+
   create_table "chobatsu_reports", force: :cascade do |t|
     t.date "ceremony_date", null: false
     t.integer "fellowship_id", null: false
@@ -76,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_091247) do
     t.integer "user_id"
     t.integer "noah_card_count"
     t.text "notes"
+    t.boolean "joint_report", default: false, null: false
     t.index ["ceremony_date"], name: "index_chobatsu_reports_on_ceremony_date"
     t.index ["event_id"], name: "index_chobatsu_reports_on_event_id"
     t.index ["fellowship_id"], name: "index_chobatsu_reports_on_fellowship_id"
@@ -195,6 +208,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_091247) do
   add_foreign_key "ceremony_schedule_fellowships", "fellowships"
   add_foreign_key "ceremony_schedules", "events"
   add_foreign_key "ceremony_schedules", "fellowships"
+  add_foreign_key "chobatsu_report_fellowships", "chobatsu_reports"
+  add_foreign_key "chobatsu_report_fellowships", "fellowships"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"
   add_foreign_key "chobatsu_reports", "regions"

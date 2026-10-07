@@ -132,6 +132,73 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ [ 20, 21 ] ], report.serial_number_ranges.pluck(:serial_number_from, :serial_number_to)
   end
 
+  test "creating a joint report keeps fellowship counts and number ranges separate" do
+    odaiba = Fellowship.create!(name: "お台場", color_code: "#123456", region: @region, enabled: true)
+
+    assert_difference("ChobatsuReport.count", 1) do
+      assert_difference("ChobatsuReportFellowship.count", 2) do
+        assert_difference("SerialNumberRange.count", 1) do
+          post chobatsu_reports_path, params: {
+            chobatsu_report: {
+              ceremony_date: Date.current,
+              joint_report: "1",
+              joint_primary_fellowship_id: odaiba.id,
+              joint_secondary_fellowship_id: @meeting.id,
+              joint_primary_participant_count: 10,
+              joint_secondary_participant_count: 3,
+              joint_primary_serial_number_from: 945,
+              joint_primary_serial_number_to: 999,
+              joint_secondary_serial_number_from: 1196,
+              joint_secondary_serial_number_to: 1265
+            }
+          }
+        end
+      end
+    end
+
+    report = ChobatsuReport.last
+    assert_predicate report, :joint_report?
+    assert_equal odaiba, report.fellowship
+    assert_equal 13, report.participant_count
+    assert_equal 125, report.usage_count
+    assert_equal [ "【合同】", "お台場・大江戸" ], report.report_display_name_lines
+    assert_equal [ "お台場 10", "大江戸 3" ], report.participant_count_lines
+    assert_equal [ "お台場 55", "大江戸 70" ], report.usage_count_lines
+    assert_equal [ "お台場 945〜999", "大江戸 1,196〜1,265" ], report.serial_number_range_lines
+    assert_equal [ [ odaiba, 945, 999 ], [ @meeting, 1196, 1265 ] ], report.number_range_contributions
+
+    get summary_chobatsu_reports_path, params: { event_id: @next_event.id }
+
+    assert_response :success
+    assert_includes response.body, "【合同】"
+    assert_includes response.body, "お台場・大江戸"
+    assert_includes response.body, "お台場 10"
+    assert_includes response.body, "大江戸 3"
+    assert_includes response.body, "お台場 55"
+    assert_includes response.body, "大江戸 70"
+
+    patch chobatsu_report_path(report), params: {
+      chobatsu_report: {
+        ceremony_date: Date.current,
+        joint_report: "1",
+        joint_primary_fellowship_id: odaiba.id,
+        joint_secondary_fellowship_id: @meeting.id,
+        joint_primary_participant_count: 11,
+        joint_secondary_participant_count: 4,
+        joint_primary_serial_number_from: 945,
+        joint_primary_serial_number_to: 1000,
+        joint_secondary_serial_number_from: 1196,
+        joint_secondary_serial_number_to: 1266
+      }
+    }
+
+    assert_redirected_to summary_chobatsu_reports_path(event_id: @next_event.id)
+    report.reload
+    assert_equal 15, report.participant_count
+    assert_equal [ "お台場 11", "大江戸 4" ], report.participant_count_lines
+    assert_equal [ "お台場 945〜1,000", "大江戸 1,196〜1,266" ], report.serial_number_range_lines
+  end
+
   test "summary page shows registered report data" do
     report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 9),
@@ -200,8 +267,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
     assert_response :success
-    meeting_names = response.body.scan(%r{<td[^>]*>(#{Regexp.escape(first_meeting.name)}|#{Regexp.escape(@meeting.name)})</td>}).flatten
-    assert_equal [ first_meeting.name, @meeting.name ], meeting_names.first(2)
+    assert_operator response.body.index(first_meeting.name), :<, response.body.index(@meeting.name)
     assert_includes response.body, "伝道会名"
     assert_includes response.body, "▼"
   end

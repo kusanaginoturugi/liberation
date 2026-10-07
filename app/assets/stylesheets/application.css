@@ -591,6 +591,42 @@ body.number-shadow-disabled .serial-grid td {
   min-width: 0;
 }
 
+.joint-report-toggle label {
+  align-items: center;
+  color: var(--text);
+  display: inline-flex;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.joint-report-toggle input {
+  width: auto;
+}
+
+.joint-report-section {
+  display: grid;
+  gap: 18px;
+}
+
+.joint-report-section__inputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.joint-report-section__inputs .serial-number-range {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.joint-report-line {
+  display: block;
+  line-height: 1.45;
+}
+
+.joint-report-line--number {
+  text-align: right;
+}
+
 @media (max-width: 640px) {
   .joint-schedule-section__inputs {
     grid-template-columns: 1fr;
@@ -606,6 +642,11 @@ body.number-shadow-disabled .serial-grid td {
   }
 
   .serial-number-range {
+    grid-template-columns: 1fr;
+  }
+
+  .joint-report-section__inputs,
+  .joint-report-section__inputs .serial-number-range {
     grid-template-columns: 1fr;
   }
 }
