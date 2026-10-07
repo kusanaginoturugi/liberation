@@ -368,6 +368,26 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1, EventDetail.where(event: @next_event, region: primary_region).count
   end
 
+  test "report form prepopulates details from a ceremony schedule" do
+    schedule = CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @next_event,
+      ceremony_at: Time.zone.local(2026, 10, 25, 11, 0),
+      place: "大江戸会館",
+      assistant_count: 4,
+      spirit_count: 40
+    )
+
+    get new_chobatsu_report_path, params: { ceremony_schedule_id: schedule.id }
+
+    assert_response :success
+    assert_includes response.body, 'name="chobatsu_report[ceremony_schedule_id]"'
+    assert_includes response.body, "value=\"#{schedule.id}\""
+    assert_includes response.body, 'value="2026-10-25"'
+    assert_includes response.body, "<option selected=\"selected\" value=\"#{@meeting.id}\">#{@meeting.name}</option>"
+    assert_includes response.body, 'value="4"'
+  end
+
   test "report page exports csv" do
     ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 9),

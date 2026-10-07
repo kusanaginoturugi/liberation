@@ -10,6 +10,7 @@
 <% secondary_to = report.joint_secondary_serial_number_to.presence || secondary_contribution&.serial_number_to %>
 
 <%= form_with(model: report, class: "report-form", data: { joint_report_form: true }) do |form| %>
+  <%= form.hidden_field :ceremony_schedule_id %>
   <div class="field-grid">
     <div class="field <%= "field-with-error" if report.errors[:ceremony_date].any? %>">
       <%= form.label :ceremony_date, "挙行日" %>

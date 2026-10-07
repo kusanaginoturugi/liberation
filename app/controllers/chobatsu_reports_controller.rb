@@ -15,6 +15,16 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def new
+    if (schedule = report_schedule_from_params)
+      if (report = schedule.chobatsu_report)
+        redirect_to edit_chobatsu_report_path(report)
+        return
+      end
+
+      @chobatsu_report = report_from_schedule(schedule)
+      return
+    end
+
     @chobatsu_report = ChobatsuReport.new(
       ceremony_date: Date.current,
       event: @selected_event,
@@ -108,6 +118,7 @@ class ChobatsuReportsController < ApplicationController
       :noah_card_count,
       :notes,
       :joint_report,
+      :ceremony_schedule_id,
       serial_number_ranges_attributes: [ :id, :serial_number_from, :serial_number_to, :_destroy ]
     ).tap do |attrs|
       attrs[:event_id] = @selected_event.id if action_name == "create" && @selected_event&.id.present?
@@ -225,8 +236,9 @@ class ChobatsuReportsController < ApplicationController
 
   def load_form_collections
     @events = Event.open.recent_first
-    @selected_event = selected_event_for_form
-    region = current_operational_region
+    schedule = report_schedule_from_params
+    @selected_event = schedule&.event || selected_event_for_form
+    region = schedule&.fellowship&.region || current_operational_region
     ensure_event_detail_for(@selected_event, region)
     region_meetings = region.fellowships
     @fellowships = region_meetings.active.enabled.display_sorted
@@ -236,6 +248,33 @@ class ChobatsuReportsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     @events = []
     @total_serial_count = 0
+  end
+
+  def report_schedule_from_params
+    return unless params[:ceremony_schedule_id].present?
+
+    CeremonySchedule.includes(:fellowship, ceremony_schedule_fellowships: :fellowship).find_by(id: params[:ceremony_schedule_id])
+  end
+
+  def report_from_schedule(schedule)
+    report = ChobatsuReport.new(
+      ceremony_date: schedule.ceremony_at.to_date,
+      ceremony_schedule: schedule,
+      event: schedule.event,
+      fellowship: schedule.fellowship,
+      participant_count: schedule.assistant_count,
+      serial_number_from: nil,
+      serial_number_to: nil,
+      joint_report: schedule.joint_schedule?
+    )
+    return report unless schedule.joint_schedule?
+
+    secondary = schedule.joint_secondary_fellowship
+    report.joint_primary_fellowship_id = schedule.fellowship_id
+    report.joint_secondary_fellowship_id = secondary&.id
+    report.joint_primary_participant_count = schedule.joint_primary_assistant_count
+    report.joint_secondary_participant_count = schedule.joint_secondary_assistant_count
+    report
   end
 
   def load_edit_collections

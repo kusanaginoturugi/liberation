@@ -12,6 +12,7 @@ class ChobatsuReport < ApplicationRecord
   belongs_to :event
   belongs_to :user, optional: true
   belongs_to :fellowship
+  belongs_to :ceremony_schedule, optional: true
   has_many :serial_number_ranges, dependent: :destroy
   has_many :chobatsu_report_fellowships, dependent: :destroy
   accepts_nested_attributes_for :serial_number_ranges, allow_destroy: true, reject_if: :all_blank

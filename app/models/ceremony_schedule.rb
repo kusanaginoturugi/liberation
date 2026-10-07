@@ -4,6 +4,7 @@ class CeremonySchedule < ApplicationRecord
   belongs_to :fellowship, optional: true
   belongs_to :event
   has_many :ceremony_schedule_fellowships, dependent: :destroy
+  has_one :chobatsu_report, dependent: :restrict_with_exception
 
   validates :ceremony_at, :place, presence: true
   validates :fellowship, :assistant_count, :spirit_count, presence: true, unless: :special_schedule?
@@ -16,7 +17,7 @@ class CeremonySchedule < ApplicationRecord
 
   before_validation :assign_special_spirit_count
 
-  scope :chronological, -> { includes(:fellowship, ceremony_schedule_fellowships: :fellowship).order(:ceremony_at, :id) }
+  scope :chronological, -> { includes(:chobatsu_report, :fellowship, ceremony_schedule_fellowships: :fellowship).order(:ceremony_at, :id) }
   scope :for_event, ->(event) { where(event: event) }
   scope :regular, -> { where(special_schedule: false) }
   scope :special, -> { where(special_schedule: true) }

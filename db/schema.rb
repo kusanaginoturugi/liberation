@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_210000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.integer "event_id", null: false
     t.text "allocation_counts", default: "{}", null: false
@@ -89,7 +89,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_100000) do
     t.integer "noah_card_count"
     t.text "notes"
     t.boolean "joint_report", default: false, null: false
+    t.integer "ceremony_schedule_id"
     t.index ["ceremony_date"], name: "index_chobatsu_reports_on_ceremony_date"
+    t.index ["ceremony_schedule_id"], name: "index_chobatsu_reports_on_ceremony_schedule_id", unique: true, where: "ceremony_schedule_id IS NOT NULL"
     t.index ["event_id"], name: "index_chobatsu_reports_on_event_id"
     t.index ["fellowship_id"], name: "index_chobatsu_reports_on_fellowship_id"
     t.index ["region_id"], name: "index_chobatsu_reports_on_region_id"
@@ -210,6 +212,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_100000) do
   add_foreign_key "ceremony_schedules", "fellowships"
   add_foreign_key "chobatsu_report_fellowships", "chobatsu_reports"
   add_foreign_key "chobatsu_report_fellowships", "fellowships"
+  add_foreign_key "chobatsu_reports", "ceremony_schedules"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"
   add_foreign_key "chobatsu_reports", "regions"
