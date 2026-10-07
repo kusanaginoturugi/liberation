@@ -21,7 +21,8 @@
       .number { text-align: right; white-space: nowrap; }
       .joint-schedule-name { line-height: 1.2; }
       .joint-count { padding-top: 0.4mm; padding-bottom: 0.4mm; text-align: left; white-space: normal; }
-      .joint-count-line { display: block; line-height: 1.2; white-space: nowrap; }
+      .joint-count-line { display: flex; justify-content: space-between; gap: 1mm; line-height: 1.2; white-space: nowrap; }
+      .joint-count-value { margin-left: auto; text-align: right; }
       .center { text-align: center; }
       .schedule-fellowship { width: 15%; }
       .schedule-date { width: 20%; }
@@ -67,12 +68,12 @@
                 <% if schedule.joint_schedule? %>
                   <td class="joint-count">
                     <% schedule.joint_fellowship_counts.each do |count| %>
-                      <span class="joint-count-line"><%= count[:name] %> <%= count[:assistant_count] ? number_with_delimiter(count[:assistant_count]) : "-" %></span>
+                      <span class="joint-count-line"><span><%= count[:name] %></span><span class="joint-count-value"><%= count[:assistant_count] ? number_with_delimiter(count[:assistant_count]) : "-" %></span></span>
                     <% end %>
                   </td>
                   <td class="joint-count">
                     <% schedule.joint_fellowship_counts.each do |count| %>
-                      <span class="joint-count-line"><%= count[:name] %> <%= number_with_delimiter(count[:spirit_count]) %></span>
+                      <span class="joint-count-line"><span><%= count[:name] %></span><span class="joint-count-value"><%= number_with_delimiter(count[:spirit_count]) %></span></span>
                     <% end %>
                   </td>
                 <% else %>
