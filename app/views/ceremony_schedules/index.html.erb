@@ -91,6 +91,8 @@
                 <% if schedule.special_schedule? %>
                   <span class="special-schedule-badge">特別</span>海外
                   <span class="special-schedule-location">聖泉珠院</span>
+                <% elsif schedule.joint_schedule? %>
+                  【合同】<br><%= schedule.joint_fellowship_counts.pluck(:name).join("・") %>
                 <% else %>
                   <%= schedule.display_name %>
                 <% end %>

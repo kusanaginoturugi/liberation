@@ -261,7 +261,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     get ceremony_schedules_path(event_id: @event.id)
 
     assert_response :success
-    assert_includes response.body, "埼玉・山梨（合同）"
+    assert_includes response.body, "【合同】"
+    assert_includes response.body, "埼玉・山梨"
     assert_includes response.body, "8<span class=\"joint-spirit-breakdown\">（埼玉4・山梨4）</span>"
     assert_includes response.body, "40<span class=\"joint-spirit-breakdown\">（埼玉20・山梨20）</span>"
     allocation_section = response.body.split("番号割り振り", 2).last
