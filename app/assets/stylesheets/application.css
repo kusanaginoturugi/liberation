@@ -1726,6 +1726,7 @@ body.number-shadow-disabled .serial-grid td {
   .ceremony-schedule-table .summary-actions {
     display: flex;
     align-items: center;
+    flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
     text-align: left;
