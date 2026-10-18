@@ -1,6 +1,7 @@
 class CeremonyScheduleAllocation < ApplicationRecord
   class DistributionError < StandardError; end
   NON_DISTRIBUTION_FELLOWSHIP_NAMES = [ "聖明王院", "大仏殿" ].freeze
+  FIXED_ALLOCATION_COUNTS = { "茨城" => 50 }.freeze
 
   belongs_to :event
   belongs_to :fellowship
@@ -72,23 +73,30 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
   def self.distribute_by_altar_count!(event:, qualified_spirit_count:)
     fellowships = Fellowship.available.to_a
-    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) }.select(&:altar_count?)
+    fixed_allocation_counts = fellowships.filter_map do |fellowship|
+      [ fellowship.id, FIXED_ALLOCATION_COUNTS.fetch(fellowship.name) ] if FIXED_ALLOCATION_COUNTS.key?(fellowship.name)
+    end.to_h
+    remaining_spirit_count = qualified_spirit_count - fixed_allocation_counts.values.sum
+    raise DistributionError, "合格霊数が固定割り振り数を下回っています" if remaining_spirit_count.negative?
+
+    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) || FIXED_ALLOCATION_COUNTS.key?(fellowship.name) }.select(&:altar_count?)
     raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
     total_altar_count = distributing_fellowships.sum(&:altar_count)
     allocation_counts = distributing_fellowships.to_h do |fellowship|
-      [ fellowship.id, qualified_spirit_count * fellowship.altar_count / total_altar_count ]
+      [ fellowship.id, remaining_spirit_count * fellowship.altar_count / total_altar_count ]
     end
-    remaining_count = qualified_spirit_count - allocation_counts.values.sum
+    remaining_count = remaining_spirit_count - allocation_counts.values.sum
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
 
     distributing_fellowships
       .sort_by do |fellowship|
-        remainder = qualified_spirit_count * fellowship.altar_count % total_altar_count
+        remainder = remaining_spirit_count * fellowship.altar_count % total_altar_count
         [ -remainder, fellowship_order.fetch(fellowship.name) ]
       end
       .first(remaining_count)
       .each { |fellowship| allocation_counts[fellowship.id] += 1 }
+    allocation_counts.merge!(fixed_allocation_counts)
 
     timestamp = Time.current
     rows = fellowships.map do |fellowship|

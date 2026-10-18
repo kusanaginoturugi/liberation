@@ -93,23 +93,24 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_equal 61, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
 
-  test "sets Seimeioin and Daibutsuden allocations to zero" do
+  test "sets Seimeioin and Daibutsuden allocations to zero and keeps Ibaraki at fifty" do
     seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", region: @region)
     daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#333333", region: @region)
+    ibaraki = Fellowship.create!(name: "茨城", color_code: "#444444", region: @region)
     CeremonySchedule.create!(
       event: @event, fellowship: seimeiouin, ceremony_at: Time.zone.local(2026, 10, 2, 10),
       place: "聖明王院", assistant_count: 1, spirit_count: 30
     )
     CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 12)
     CeremonyScheduleAllocation.create!(event: @event, fellowship: seimeiouin, spirit_count: 38)
-    @event.event_details.find_by!(region: @region).update!(total_serial_count: 42)
 
-    result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 42)
+    result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 100)
 
     assert result[:rebalanced]
-    assert_equal 42, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 50, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
     assert_equal 0, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: seimeiouin).spirit_count
     assert_equal 0, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: daibutsuden).spirit_count
-    assert_equal 42, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+    assert_equal 50, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: ibaraki).spirit_count
+    assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
   end
 end
