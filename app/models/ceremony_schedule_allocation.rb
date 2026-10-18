@@ -71,7 +71,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
     distribute_by_altar_count!(event:, qualified_spirit_count:)
   end
 
-  def self.distribute_by_altar_count!(event:, qualified_spirit_count:)
+  def self.distribute_by_altar_count!(event:, qualified_spirit_count:, record_snapshot: false)
     fellowships = Fellowship.available.to_a
     fixed_allocation_counts = fellowships.filter_map do |fellowship|
       [ fellowship.id, FIXED_ALLOCATION_COUNTS.fetch(fellowship.name) ] if FIXED_ALLOCATION_COUNTS.key?(fellowship.name)
@@ -110,9 +110,15 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
 
     transaction do
+      if record_snapshot && !CeremonyScheduleAllocationSnapshot.exists?(event:)
+        CeremonyScheduleAllocationSnapshot.create!(
+          event:,
+          allocation_counts: where(event:).pluck(:fellowship_id, :spirit_count).to_h
+        )
+      end
+
       where(event:).delete_all
       insert_all!(rows)
-      CeremonyScheduleAllocationSnapshot.find_by(event:)&.destroy!
     end
 
     { rebalanced: true, distributed: true }

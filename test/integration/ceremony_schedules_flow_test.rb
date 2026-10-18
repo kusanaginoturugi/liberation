@@ -480,7 +480,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal @meeting, @other_user.reload.fellowship
   end
 
-  test "admin can distribute the allocation shortfall by altar count" do
+  test "admin can distribute the qualified spirit count by altar count" do
     odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
     EventDetail.create!(event: @event, region: @region, total_serial_count: 100)
     CeremonySchedule.create!(
@@ -500,14 +500,14 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     post distribute_shortfall_ceremony_schedule_allocations_path, params: { event_id: @event.id }
 
     assert_redirected_to ceremony_schedules_path(event_id: @event.id)
-    assert_equal 37, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
-    assert_equal 63, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+    assert_equal 33, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 67, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
 
     get ceremony_schedules_path(event_id: @event.id)
 
     assert_includes response.body, ">100<"
-    assert_includes response.body, "（＋17）"
-    assert_includes response.body, "（＋33）"
+    assert_includes response.body, "（＋13）"
+    assert_includes response.body, "（＋37）"
 
     post undo_distribution_ceremony_schedule_allocations_path, params: { event_id: @event.id }
 
