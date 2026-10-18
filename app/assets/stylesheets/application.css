@@ -387,6 +387,10 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .allocation-spirit-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
   text-align: right;
 }
 

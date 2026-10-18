@@ -312,6 +312,7 @@ class CeremonySchedulesController < ApplicationController
         fellowship:,
         altar_count: fellowship.altar_count,
         spirit_count: allocation.spirit_count,
+        scheduled_spirit_count: fellowship_spirit_counts.sum,
         allocation:,
         distribution_addition: allocation.spirit_count - fellowship_spirit_counts.sum
       }

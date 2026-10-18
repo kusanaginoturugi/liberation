@@ -72,6 +72,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "合格霊数"
     assert_includes response.body, ">1,650<"
     assert_includes response.body, 'summary-total-label">合格霊数'
+    assert_includes response.body, 'allocation-scheduled-count">20</span>'
     assert_includes response.body, "（＋5）"
     assert_includes response.body, "3壇"
     assert_includes response.body, "schedule-row-even"
@@ -273,7 +274,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     allocation_section = response.body.split("番号割り振り", 2).last
     assert_includes allocation_section, "埼玉"
     assert_includes allocation_section, "山梨"
-    assert_equal 2, allocation_section.scan('value="20"').count
+    assert_equal 2, allocation_section.scan('allocation-scheduled-count">20</span>').count
   end
 
   test "edit form keeps the saved ceremony date in a stable browser format" do
