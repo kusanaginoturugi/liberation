@@ -194,12 +194,29 @@
           <article class="allocation-row <%= index.even? ? "allocation-row-even" : "allocation-row-odd" %>">
             <strong><%= fellowship.name %></strong>
             <span class="allocation-altar-count"><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></span>
-            <span class="allocation-spirit-count">
-              <span class="allocation-scheduled-count"><%= number_with_delimiter(row[:scheduled_spirit_count]) %></span>
-              <% if row[:distribution_addition].nonzero? %>
-                <span class="allocation-addition">（<%= row[:distribution_addition].positive? ? "＋" : "−" %><%= number_with_delimiter(row[:distribution_addition].abs) %>）</span>
+            <% if current_user&.admin? %>
+              <%= form_with model: row[:allocation], class: "allocation-count-form" do |form| %>
+                <%= form.hidden_field :event_id %>
+                <%= form.hidden_field :fellowship_id %>
+                <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onfocus: "this.select()", onchange: "this.form.requestSubmit()" %>
+                <span class="allocation-breakdown">
+                  <span class="allocation-scheduled-count"><%= number_with_delimiter(row[:scheduled_spirit_count]) %></span>
+                  <% if row[:distribution_addition].nonzero? %>
+                    <span class="allocation-addition">（<%= row[:distribution_addition].positive? ? "＋" : "−" %><%= number_with_delimiter(row[:distribution_addition].abs) %>）</span>
+                  <% end %>
+                </span>
               <% end %>
-            </span>
+            <% else %>
+              <span class="allocation-spirit-count">
+                <span class="allocation-final-count"><%= number_with_delimiter(row[:spirit_count]) %></span>
+                <span class="allocation-breakdown">
+                  <span class="allocation-scheduled-count"><%= number_with_delimiter(row[:scheduled_spirit_count]) %></span>
+                  <% if row[:distribution_addition].nonzero? %>
+                    <span class="allocation-addition">（<%= row[:distribution_addition].positive? ? "＋" : "−" %><%= number_with_delimiter(row[:distribution_addition].abs) %>）</span>
+                  <% end %>
+                </span>
+              </span>
+            <% end %>
             <span><%= row[:serial_number_from] ? "#{number_with_delimiter(row[:serial_number_from])} 〜 #{number_with_delimiter(row[:serial_number_to])}" : "-" %></span>
           </article>
         <% end %>

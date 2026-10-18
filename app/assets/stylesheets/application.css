@@ -358,7 +358,8 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-count-form {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: flex-end;
+  gap: 10px;
   width: max-content;
 }
 
@@ -388,10 +389,17 @@ body.number-shadow-disabled .serial-grid td {
 
 .allocation-spirit-count {
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  text-align: right;
+}
+
+.allocation-breakdown {
+  display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
-  text-align: right;
 }
 
 .allocation-row > span:last-child {

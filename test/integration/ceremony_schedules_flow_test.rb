@@ -72,6 +72,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "合格霊数"
     assert_includes response.body, ">1,650<"
     assert_includes response.body, 'summary-total-label">合格霊数'
+    assert_includes response.body, 'allocation-final-count">25</span>'
     assert_includes response.body, 'allocation-scheduled-count">20</span>'
     assert_includes response.body, "（＋5）"
     assert_includes response.body, "3壇"
