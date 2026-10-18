@@ -101,7 +101,7 @@
               <td data-label="場所"><%= schedule.place %></td>
               <td class="summary-number" data-label="引保師数">
                 <% if schedule.joint_assistant_breakdown %>
-                  <span class="joint-count-summary"><span class="joint-spirit-breakdown"><% schedule.joint_assistant_breakdown_lines.each_with_index do |line, index| %><span class="joint-spirit-breakdown__line"><%= "（" if index.zero? %><%= line %><%= "）" if index == schedule.joint_assistant_breakdown_lines.size - 1 %></span><% end %></span><span class="joint-count-total"><%= number_with_delimiter(schedule.assistant_count) %></span></span>
+                  <span class="joint-count-summary"><span class="joint-spirit-breakdown"><% schedule.joint_assistant_breakdown_lines.each do |line| %><span class="joint-spirit-breakdown__line"><%= line %></span><% end %></span><span class="joint-count-total"><%= number_with_delimiter(schedule.assistant_count) %></span></span>
                 <% else %>
                   <%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %>
                 <% end %>
@@ -110,7 +110,7 @@
                 <% if schedule.special_schedule? %>
                   <span class="special-spirit-breakdown"><% schedule.special_spirit_breakdown.each do |name, count| %><span class="special-spirit-breakdown__line"><span><%= name %></span><span><%= number_with_delimiter(count) %></span></span><% end %></span>
                 <% elsif schedule.joint_spirit_breakdown %>
-                  <span class="joint-count-summary"><span class="joint-spirit-breakdown"><% schedule.joint_spirit_breakdown_lines.each_with_index do |line, index| %><span class="joint-spirit-breakdown__line"><%= "（" if index.zero? %><%= line %><%= "）" if index == schedule.joint_spirit_breakdown_lines.size - 1 %></span><% end %></span><span class="joint-count-total"><%= number_with_delimiter(schedule.spirit_count) %></span></span>
+                  <span class="joint-count-summary"><span class="joint-spirit-breakdown"><% schedule.joint_spirit_breakdown_lines.each do |line| %><span class="joint-spirit-breakdown__line"><%= line %></span><% end %></span><span class="joint-count-total"><%= number_with_delimiter(schedule.spirit_count) %></span></span>
                 <% else %>
                   <%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %>
                 <% end %>

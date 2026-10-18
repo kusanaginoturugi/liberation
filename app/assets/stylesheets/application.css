@@ -1049,6 +1049,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .joint-count-summary {
   display: inline-flex;
+  align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   gap: 8px;
@@ -1061,9 +1062,11 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .joint-count-total {
+  flex: 0 0 auto;
   margin-left: auto;
   font-variant-numeric: tabular-nums;
   text-align: right;
+  white-space: nowrap;
 }
 
 .schedule-date-time {
