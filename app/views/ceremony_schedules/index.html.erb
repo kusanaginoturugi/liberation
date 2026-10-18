@@ -211,7 +211,7 @@
                 <% end %>
               </span>
             <% end %>
-            <span><%= number_with_delimiter(row[:serial_number_from]) %> 〜 <%= number_with_delimiter(row[:serial_number_to]) %></span>
+            <span><%= row[:serial_number_from] ? "#{number_with_delimiter(row[:serial_number_from])} 〜 #{number_with_delimiter(row[:serial_number_to])}" : "-" %></span>
           </article>
         <% end %>
       </div>

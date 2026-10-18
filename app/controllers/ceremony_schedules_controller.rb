@@ -322,6 +322,8 @@ class CeremonySchedulesController < ApplicationController
 
     next_number = 1
     rows.each do |row|
+      next unless row[:spirit_count].positive?
+
       row[:serial_number_from] = next_number
       row[:serial_number_to] = next_number + row[:spirit_count] - 1
       next_number = row[:serial_number_to] + 1
