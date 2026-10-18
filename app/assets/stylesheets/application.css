@@ -325,7 +325,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .schedule-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.8fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -338,8 +338,8 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: minmax(7rem, 1fr) 3.5rem minmax(10rem, 12rem) minmax(8.5rem, 1fr);
-  gap: 8px;
+  grid-template-columns: minmax(6rem, 0.9fr) 3rem minmax(9rem, 10rem) minmax(7.5rem, 1.1fr);
+  gap: 6px;
   align-items: center;
 }
 
@@ -1029,7 +1029,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(3),
 .ceremony-schedule-table--with-actions td:nth-child(3) {
-  width: 18%;
+  width: 13%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(4),
@@ -1044,7 +1044,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(6),
 .ceremony-schedule-table--with-actions td:nth-child(6) {
-  width: 15%;
+  width: 20%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(7),
