@@ -67,13 +67,13 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
   def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)
     unless allocated_spirit_count_for(event) > qualified_spirit_count
-      return restore_scheduled_counts!(event:)
+      return restore_scheduled_counts!(event:, qualified_spirit_count:)
     end
 
     snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
     unless snapshot
       trim_overflow!(event:, qualified_spirit_count:)
-      return restore_scheduled_counts!(event:).merge(rebalanced: true)
+      return restore_scheduled_counts!(event:, qualified_spirit_count:).merge(rebalanced: true)
     end
 
     transaction do
@@ -84,7 +84,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
       distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true)
     end
 
-    restore_scheduled_counts!(event:).merge(rebalanced: true)
+    restore_scheduled_counts!(event:, qualified_spirit_count:).merge(rebalanced: true)
   end
 
   def self.undo_distribution!(event:)
@@ -137,39 +137,27 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
   end
 
-  def self.restore_scheduled_counts!(event:)
+  def self.restore_scheduled_counts!(event:, qualified_spirit_count:)
     scheduled_counts = scheduled_spirit_counts_for(event)
-    allocations = where(event:).includes(:fellowship).index_by(&:fellowship_id)
-    deficits = scheduled_counts.filter_map do |fellowship_id, scheduled_count|
-      current_count = allocations[fellowship_id]&.spirit_count || scheduled_count
-      [ fellowship_id, scheduled_count - current_count ] if current_count < scheduled_count
-    end
-    return { rebalanced: false, restored: false } if deficits.empty?
-
-    donors = allocations.values.select do |allocation|
-      allocation.spirit_count > scheduled_counts.fetch(allocation.fellowship_id, 0)
-    end.sort_by do |allocation|
-      [ allocation.fellowship.name == "聖明王院" ? 0 : 1, allocation.fellowship_id ]
-    end
-    return { rebalanced: false, restored: false } if donors.empty?
+    scheduled_total = scheduled_counts.values.sum
+    return { rebalanced: false, restored: false } if qualified_spirit_count > scheduled_total
 
     transaction do
-      deficits.each do |fellowship_id, deficit|
-        recipient = allocations[fellowship_id] || find_or_create_by!(event:, fellowship_id:) do |allocation|
-          allocation.spirit_count = scheduled_counts.fetch(fellowship_id)
-        end
+      where(event:).delete_all
+      scheduled_counts.each do |fellowship_id, spirit_count|
+        create!(event:, fellowship_id:, spirit_count:)
+      end
 
-        donors.each do |donor|
-          break if deficit.zero?
+      remaining_reduction = scheduled_total - qualified_spirit_count
+      allocations = where(event:).includes(:fellowship).to_a.sort_by do |allocation|
+        [ allocation.fellowship.name == "聖明王院" ? 0 : 1, allocation.fellowship_id ]
+      end
+      allocations.each do |allocation|
+        break if remaining_reduction.zero?
 
-          donor_floor = scheduled_counts.fetch(donor.fellowship_id, 0)
-          transfer = [ donor.spirit_count - donor_floor, deficit ].min
-          next unless transfer.positive?
-
-          donor.update!(spirit_count: donor.spirit_count - transfer)
-          recipient.update!(spirit_count: recipient.spirit_count + transfer)
-          deficit -= transfer
-        end
+        reduction = [ allocation.spirit_count, remaining_reduction ].min
+        allocation.update!(spirit_count: allocation.spirit_count - reduction)
+        remaining_reduction -= reduction
       end
     end
 
