@@ -11,8 +11,9 @@ class CeremonySchedulesController < ApplicationController
     @schedule_sort_direction = schedule_sort_direction
     @next_schedule_sort_direction = next_schedule_sort_direction
     @ceremony_schedules = schedules_for_selected_event
-    @regular_spirit_total = regular_schedules_for_selected_event.sum(&:spirit_count)
+    @scheduled_spirit_total = regular_schedules_for_selected_event.sum(&:spirit_count)
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
+    @display_spirit_total = @qualified_spirit_count || @scheduled_spirit_total
     @allocation_sort_direction = allocation_sort_direction
     @next_allocation_sort_direction = next_allocation_sort_direction
     @distribution_additions = CeremonyScheduleAllocation.distribution_additions_for(@selected_event)
@@ -24,8 +25,9 @@ class CeremonySchedulesController < ApplicationController
   def export
     @schedule_sort_direction = schedule_sort_direction
     @ceremony_schedules = schedules_for_selected_event
-    @regular_spirit_total = regular_schedules_for_selected_event.sum(&:spirit_count)
+    @scheduled_spirit_total = regular_schedules_for_selected_event.sum(&:spirit_count)
     @qualified_spirit_count = qualified_spirit_count_for(@selected_event)
+    @display_spirit_total = @qualified_spirit_count || @scheduled_spirit_total
     @allocation_sort_direction = allocation_sort_direction
     @distribution_additions = CeremonyScheduleAllocation.distribution_additions_for(@selected_event)
     @allocation_rows = allocation_rows_for(regular_schedules_for_selected_event)

@@ -41,7 +41,7 @@
   <section class="panel schedule-workspace__schedule">
     <div class="panel-header schedule-panel-header">
       <h2>予定一覧</h2>
-      <p class="schedule-spirit-total">霊数合計 <strong><%= number_with_delimiter(@regular_spirit_total) %></strong></p>
+      <p class="schedule-spirit-total">予定霊数合計 <strong><%= number_with_delimiter(@scheduled_spirit_total) %></strong></p>
       <p class="schedule-qualified-total">合格霊数 <strong><%= @qualified_spirit_count ? number_with_delimiter(@qualified_spirit_count) : "未設定" %></strong></p>
       <div class="schedule-panel-actions">
         <%= link_to "PDFダウンロード", export_ceremony_schedules_path(
@@ -134,8 +134,8 @@
         <% unless @ceremony_schedules.empty? %>
           <tfoot>
             <tr class="summary-total-row">
-              <td colspan="4" class="summary-total-label">合計</td>
-              <td class="summary-number"><%= number_with_delimiter(@regular_spirit_total) %></td>
+              <td colspan="4" class="summary-total-label"><%= @qualified_spirit_count ? "合格霊数" : "予定霊数合計" %></td>
+              <td class="summary-number"><%= number_with_delimiter(@display_spirit_total) %></td>
               <td></td>
               <% if user_signed_in? %><td></td><% end %>
             </tr>
@@ -144,7 +144,7 @@
       </table>
     </div>
     <% unless @ceremony_schedules.empty? %>
-      <p class="mobile-summary-total">霊数合計 <strong><%= number_with_delimiter(@regular_spirit_total) %></strong></p>
+      <p class="mobile-summary-total"><%= @qualified_spirit_count ? "合格霊数" : "予定霊数合計" %> <strong><%= number_with_delimiter(@display_spirit_total) %></strong></p>
     <% end %>
   </section>
   <section class="panel schedule-workspace__allocations">
