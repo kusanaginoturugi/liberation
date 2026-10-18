@@ -67,8 +67,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, older_schedule.place
     assert_includes response.body, newer_schedule.place
     assert_operator response.body.index(older_schedule.place), :<, response.body.index(newer_schedule.place)
-    assert_includes response.body, "予定霊数合計"
-    assert_includes response.body, ">35<"
+    assert_not_includes response.body, "予定霊数合計"
     assert_includes response.body, "合格霊数"
     assert_includes response.body, ">1,650<"
     assert_includes response.body, 'summary-total-label">合格霊数'

@@ -41,7 +41,9 @@
   <section class="panel schedule-workspace__schedule">
     <div class="panel-header schedule-panel-header">
       <h2>予定一覧</h2>
-      <p class="schedule-spirit-total">予定霊数合計 <strong><%= number_with_delimiter(@scheduled_spirit_total) %></strong></p>
+      <% unless @qualified_spirit_count %>
+        <p class="schedule-spirit-total">予定霊数合計 <strong><%= number_with_delimiter(@scheduled_spirit_total) %></strong></p>
+      <% end %>
       <p class="schedule-qualified-total">合格霊数 <strong><%= @qualified_spirit_count ? number_with_delimiter(@qualified_spirit_count) : "未設定" %></strong></p>
       <div class="schedule-panel-actions">
         <%= link_to "PDFダウンロード", export_ceremony_schedules_path(
