@@ -184,7 +184,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes allocation_section, "（−204）"
   end
 
-  test "number allocations include a fixed allocation without a schedule" do
+  test "number allocations exclude an Ibaraki allocation without a schedule" do
     ibaraki = Fellowship.create!(name: "茨城", color_code: "#222222", display_order: 3, region: @region)
     CeremonySchedule.create!(
       fellowship: @meeting,
@@ -199,8 +199,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     get ceremony_schedules_path
 
     allocation_section = response.body.split("番号割り振り", 2).last
-    assert_includes allocation_section, "茨城"
-    assert_includes allocation_section, "21 〜 70"
+    assert_not_includes allocation_section, "茨城"
   end
 
   test "schedule page reports when Cloudflare PDF is not configured" do

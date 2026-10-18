@@ -1,7 +1,6 @@
 class CeremonyScheduleAllocation < ApplicationRecord
   class DistributionError < StandardError; end
   NON_DISTRIBUTION_FELLOWSHIP_NAMES = [ "聖明王院", "大仏殿" ].freeze
-  FIXED_ALLOCATION_COUNTS = { "茨城" => 50 }.freeze
 
   belongs_to :event
   belongs_to :fellowship
@@ -32,15 +31,12 @@ class CeremonyScheduleAllocation < ApplicationRecord
   def self.distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: false)
     fellowships = Fellowship.available.to_a
     scheduled_counts = scheduled_spirit_counts_for(event)
-    fixed_allocation_counts = fellowships.filter_map do |fellowship|
-      [ fellowship.id, FIXED_ALLOCATION_COUNTS.fetch(fellowship.name) ] if FIXED_ALLOCATION_COUNTS.key?(fellowship.name)
-    end.to_h
     distributing_fellowships = fellowships
-      .reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) || FIXED_ALLOCATION_COUNTS.key?(fellowship.name) }
+      .reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) }
       .select(&:altar_count?)
     raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
-    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) } + fixed_allocation_counts.values.sum
+    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) }
     shortfall = qualified_spirit_count - scheduled_total
     raise DistributionError, "合格霊数が予定霊数を下回っています" if shortfall.negative?
 
@@ -68,8 +64,6 @@ class CeremonyScheduleAllocation < ApplicationRecord
       rows = fellowships.map do |fellowship|
         spirit_count = if fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES)
           0
-        elsif fixed_allocation_counts.key?(fellowship.id)
-          fixed_allocation_counts.fetch(fellowship.id)
         elsif additions.key?(fellowship.id)
           scheduled_counts.fetch(fellowship.id, 0) + additions.fetch(fellowship.id)
         else
@@ -90,13 +84,8 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
   def self.distribute_by_altar_count!(event:, qualified_spirit_count:, record_snapshot: false)
     fellowships = Fellowship.available.to_a
-    fixed_allocation_counts = fellowships.filter_map do |fellowship|
-      [ fellowship.id, FIXED_ALLOCATION_COUNTS.fetch(fellowship.name) ] if FIXED_ALLOCATION_COUNTS.key?(fellowship.name)
-    end.to_h
-    remaining_spirit_count = qualified_spirit_count - fixed_allocation_counts.values.sum
-    raise DistributionError, "合格霊数が固定割り振り数を下回っています" if remaining_spirit_count.negative?
-
-    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) || FIXED_ALLOCATION_COUNTS.key?(fellowship.name) }.select(&:altar_count?)
+    remaining_spirit_count = qualified_spirit_count
+    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) }.select(&:altar_count?)
     raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
     total_altar_count = distributing_fellowships.sum(&:altar_count)
@@ -113,8 +102,6 @@ class CeremonyScheduleAllocation < ApplicationRecord
       end
       .first(remaining_count)
       .each { |fellowship| allocation_counts[fellowship.id] += 1 }
-    allocation_counts.merge!(fixed_allocation_counts)
-
     timestamp = Time.current
     rows = fellowships.map do |fellowship|
       {
