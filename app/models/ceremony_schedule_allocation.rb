@@ -143,21 +143,23 @@ class CeremonyScheduleAllocation < ApplicationRecord
     return { rebalanced: false, restored: false } if qualified_spirit_count > scheduled_total
 
     transaction do
-      where(event:).delete_all
-      scheduled_counts.each do |fellowship_id, spirit_count|
-        create!(event:, fellowship_id:, spirit_count:)
-      end
-
+      adjusted_counts = scheduled_counts.dup
       remaining_reduction = scheduled_total - qualified_spirit_count
-      allocations = where(event:).includes(:fellowship).to_a.sort_by do |allocation|
-        [ allocation.fellowship.name == "聖明王院" ? 0 : 1, allocation.fellowship_id ]
+      fellowships = Fellowship.where(id: scheduled_counts.keys).index_by(&:id)
+      fellowship_ids = scheduled_counts.keys.sort_by do |fellowship_id|
+        [ fellowships.fetch(fellowship_id).name == "聖明王院" ? 0 : 1, fellowship_id ]
       end
-      allocations.each do |allocation|
+      fellowship_ids.each do |fellowship_id|
         break if remaining_reduction.zero?
 
-        reduction = [ allocation.spirit_count, remaining_reduction ].min
-        allocation.update!(spirit_count: allocation.spirit_count - reduction)
+        reduction = [ adjusted_counts.fetch(fellowship_id), remaining_reduction ].min
+        adjusted_counts[fellowship_id] -= reduction
         remaining_reduction -= reduction
+      end
+
+      where(event:).delete_all
+      fellowship_ids.each do |fellowship_id|
+        create!(event:, fellowship_id:, spirit_count: adjusted_counts.fetch(fellowship_id))
       end
     end
 

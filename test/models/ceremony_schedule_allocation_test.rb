@@ -100,6 +100,7 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     )
     CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 12)
     CeremonyScheduleAllocation.create!(event: @event, fellowship: seimeiouin, spirit_count: 38)
+    @event.event_details.find_by!(region: @region).update!(total_serial_count: 42)
 
     result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 42)
 
