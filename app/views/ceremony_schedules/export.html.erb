@@ -31,11 +31,11 @@
       .special-count .joint-count-value { margin-left: auto; }
       .center { text-align: center; }
       .schedule-fellowship { width: 15%; }
-      .schedule-date { width: 20%; }
+      .schedule-date { width: 20%; text-align: center; }
       .schedule-place { width: 25%; }
       .schedule-assistants { width: 12%; }
       .schedule-spirits { width: 11%; }
-      .schedule-minister { width: 17%; }
+      .schedule-minister { width: 17%; text-align: center; }
       .allocation-fellowship { width: 30%; }
       .allocation-altars { width: 10%; }
       .allocation-spirits { width: 12%; }
@@ -82,7 +82,7 @@
                     <%= schedule.display_name %>
                   <% end %>
                 </td>
-                <td><%= schedule.ceremony_at.strftime("%-m/%-d") %><br><%= schedule.ceremony_at.strftime("%H:%M") %></td>
+                <td class="schedule-date"><%= schedule.ceremony_at.strftime("%-m/%-d") %><br><%= schedule.ceremony_at.strftime("%H:%M") %></td>
                 <td><%= schedule.place %></td>
                 <% if schedule.joint_schedule? %>
                   <td class="joint-count">
@@ -102,7 +102,7 @@
                   <td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td>
                   <td class="number"><%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %></td>
                 <% end %>
-                <td><%= schedule.minister_name.presence || "-" %></td>
+                <td class="schedule-minister"><%= schedule.minister_name.presence || "-" %></td>
               </tr>
             <% end %>
           <% end %>
