@@ -1047,6 +1047,31 @@ body.number-shadow-disabled .serial-grid td {
   white-space: nowrap;
 }
 
+.joint-count-summary {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  text-align: left;
+}
+
+.joint-count-summary .joint-spirit-breakdown {
+  margin-top: 0;
+  text-align: left;
+}
+
+.joint-count-total {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.schedule-date-time {
+  display: inline-flex;
+  flex-direction: column;
+  white-space: nowrap;
+}
+
 .summary-table {
   min-width: 960px;
 }

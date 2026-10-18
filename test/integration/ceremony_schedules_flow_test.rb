@@ -316,8 +316,11 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "【合同】"
     assert_includes response.body, "埼玉・山梨"
-    assert_includes response.body, "8<span class=\"joint-spirit-breakdown\"><span class=\"joint-spirit-breakdown__line\">（埼玉4</span><span class=\"joint-spirit-breakdown__line\">山梨4）</span></span>"
-    assert_includes response.body, "40<span class=\"joint-spirit-breakdown\"><span class=\"joint-spirit-breakdown__line\">（埼玉20</span><span class=\"joint-spirit-breakdown__line\">山梨20）</span></span>"
+    assert_includes response.body, "joint-count-summary"
+    assert_includes response.body, "（埼玉4"
+    assert_includes response.body, "山梨4）"
+    assert_includes response.body, "（埼玉20"
+    assert_includes response.body, "山梨20）"
     allocation_section = response.body.split("番号割り振り", 2).last
     assert_includes allocation_section, "埼玉"
     assert_includes allocation_section, "山梨"

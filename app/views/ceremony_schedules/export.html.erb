@@ -23,6 +23,9 @@
       .joint-count { padding-top: 0.4mm; padding-bottom: 0.4mm; text-align: left; white-space: normal; }
       .joint-count-line { display: flex; justify-content: space-between; gap: 1mm; line-height: 1.2; white-space: nowrap; }
       .joint-count-value { margin-left: auto; text-align: right; }
+      .joint-count-summary { display: flex; justify-content: space-between; gap: 1mm; width: 100%; }
+      .joint-count-details { display: flex; flex-direction: column; text-align: left; }
+      .joint-count-total { margin-left: auto; text-align: right; }
       .special-count .joint-count-line { justify-content: space-between; }
       .special-count .joint-count-value { margin-left: auto; }
       .center { text-align: center; }
@@ -73,18 +76,14 @@
                     <%= schedule.display_name %>
                   <% end %>
                 </td>
-                <td><%= schedule.ceremony_at.strftime("%Y/%m/%d　　%H:%M") %></td>
+                <td><%= schedule.ceremony_at.strftime("%-m/%-d") %><br><%= schedule.ceremony_at.strftime("%H:%M") %></td>
                 <td><%= schedule.place %></td>
                 <% if schedule.joint_schedule? %>
                   <td class="joint-count">
-                    <% schedule.joint_fellowship_counts.each do |count| %>
-                      <span class="joint-count-line"><span><%= count[:name] %></span><span class="joint-count-value"><%= count[:assistant_count] ? number_with_delimiter(count[:assistant_count]) : "-" %></span></span>
-                    <% end %>
+                    <span class="joint-count-summary"><span class="joint-count-details"><% schedule.joint_fellowship_counts.each_with_index do |count, index| %><span><%= "（" if index.zero? %><%= count[:name] %><%= count[:assistant_count] ? number_with_delimiter(count[:assistant_count]) : "-" %><%= "）" if index == schedule.joint_fellowship_counts.size - 1 %></span><% end %></span><span class="joint-count-total"><%= number_with_delimiter(schedule.assistant_count) %></span></span>
                   </td>
                   <td class="joint-count">
-                    <% schedule.joint_fellowship_counts.each do |count| %>
-                      <span class="joint-count-line"><span><%= count[:name] %></span><span class="joint-count-value"><%= number_with_delimiter(count[:spirit_count]) %></span></span>
-                    <% end %>
+                    <span class="joint-count-summary"><span class="joint-count-details"><% schedule.joint_fellowship_counts.each_with_index do |count, index| %><span><%= "（" if index.zero? %><%= count[:name] %><%= number_with_delimiter(count[:spirit_count]) %><%= "）" if index == schedule.joint_fellowship_counts.size - 1 %></span><% end %></span><span class="joint-count-total"><%= number_with_delimiter(schedule.spirit_count) %></span></span>
                   </td>
                 <% elsif schedule.special_schedule? %>
                   <td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td>
