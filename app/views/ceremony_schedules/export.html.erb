@@ -34,7 +34,14 @@
       .allocation-altars { width: 15%; }
       .allocation-spirits { width: 18%; }
       .allocation-numbers { width: 32%; }
-      .allocation-table td { text-align: center; }
+      .allocation-table td { vertical-align: middle; }
+      .allocation-table td.allocation-fellowship { text-align: left; }
+      .allocation-table td.allocation-altars,
+      .allocation-table td.allocation-numbers { text-align: right; }
+      .allocation-counts { display: flex; align-items: center; justify-content: flex-end; gap: 2mm; font-variant-numeric: tabular-nums; }
+      .allocation-final-count { min-width: 9mm; text-align: right; }
+      .allocation-breakdown { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3mm; text-align: right; }
+      .allocation-addition { color: #6c58ab; font-size: 6.4pt; font-weight: 700; white-space: nowrap; }
       .empty { text-align: center; }
     </style>
   </head>
@@ -97,7 +104,22 @@
             <tr><td colspan="4" class="empty">番号を割り振る予定はまだありません</td></tr>
           <% else %>
             <% @allocation_rows.each do |row| %>
-              <tr><td><%= row[:fellowship].name %></td><td><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></td><td class="number"><%= number_with_delimiter(row[:spirit_count]) %></td><td class="center"><%= row[:serial_number_from] ? "#{number_with_delimiter(row[:serial_number_from])} 〜 #{number_with_delimiter(row[:serial_number_to])}" : "-" %></td></tr>
+              <tr>
+                <td class="allocation-fellowship"><%= row[:fellowship].name %></td>
+                <td class="allocation-altars"><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></td>
+                <td class="allocation-spirits">
+                  <span class="allocation-counts">
+                    <span class="allocation-final-count"><%= number_with_delimiter(row[:spirit_count]) %></span>
+                    <span class="allocation-breakdown">
+                      <span><%= number_with_delimiter(row[:scheduled_spirit_count]) %></span>
+                      <% if row[:distribution_addition].nonzero? %>
+                        <span class="allocation-addition">（<%= row[:distribution_addition].positive? ? "＋" : "−" %><%= number_with_delimiter(row[:distribution_addition].abs) %>）</span>
+                      <% end %>
+                    </span>
+                  </span>
+                </td>
+                <td class="allocation-numbers"><%= row[:serial_number_from] ? "#{number_with_delimiter(row[:serial_number_from])} 〜 #{number_with_delimiter(row[:serial_number_to])}" : "-" %></td>
+              </tr>
             <% end %>
           <% end %>
         </tbody>
