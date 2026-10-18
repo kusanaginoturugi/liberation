@@ -338,8 +338,8 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: 8rem 3.25rem 11.5rem 9rem;
-  gap: 6px;
+  grid-template-columns: minmax(5.5rem, 1fr) 4rem 12rem 10rem;
+  column-gap: 16px;
   align-items: center;
 }
 
@@ -457,7 +457,7 @@ body.number-shadow-disabled .serial-grid td {
   flex: 1 1 max-content;
 }
 
-@media (min-width: 961px) and (max-width: 1180px) {
+@media (min-width: 961px) and (max-width: 1280px) {
   .schedule-workspace {
     grid-template-columns: 1fr;
   }
@@ -470,9 +470,18 @@ body.number-shadow-disabled .serial-grid td {
   font-weight: 700;
 }
 
-.allocation-list__header > :nth-child(n + 2),
+.allocation-list__header > * {
+  text-align: center;
+}
+
+.allocation-sort-link {
+  display: block;
+  text-align: center;
+}
+
 .allocation-row > span:last-child {
   text-align: right;
+  width: 100%;
 }
 
 .allocation-sort-link {
