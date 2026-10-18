@@ -338,7 +338,7 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: 8rem 4rem minmax(18rem, 1.4fr) minmax(10rem, 1fr);
+  grid-template-columns: 8rem 4rem 4rem 4.5rem minmax(10rem, 1fr);
   column-gap: 0;
   align-items: center;
 }
@@ -356,11 +356,8 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .allocation-count-form {
-  display: grid;
-  grid-template-columns: 3.5rem 4rem;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
+  display: flex;
+  justify-content: flex-end;
   width: auto;
 }
 
@@ -390,12 +387,6 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .allocation-spirit-count {
-  display: grid;
-  grid-template-columns: 3.5rem 4rem;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-  width: auto;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -406,6 +397,18 @@ body.number-shadow-disabled .serial-grid td {
   align-items: flex-end;
   gap: 2px;
   width: 4rem;
+}
+
+.allocation-scheduled-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.allocation-scheduled-header small {
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  line-height: 1.1;
 }
 
 .allocation-scheduled-count,
@@ -1736,11 +1739,19 @@ body.number-shadow-disabled .serial-grid td {
   .allocation-count-form,
   .allocation-spirit-count {
     grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+  }
+
+  .allocation-breakdown {
+    grid-column: 2;
+    grid-row: 3;
     justify-self: end;
   }
 
   .allocation-row > span:last-child {
     grid-column: 1 / -1;
+    grid-row: 4;
     color: var(--muted);
   }
 
