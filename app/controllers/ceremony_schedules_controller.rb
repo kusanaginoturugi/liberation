@@ -320,6 +320,12 @@ class CeremonySchedulesController < ApplicationController
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
     rows = rows.sort_by { |row| fellowship_order.fetch(row[:fellowship].name, Float::INFINITY) } if @allocation_sort_direction == :asc
     rows = rows.sort_by { |row| fellowship_order.fetch(row[:fellowship].name, Float::INFINITY) }.reverse if @allocation_sort_direction == :desc
+    regular_rows, non_distribution_rows = rows.partition do |row|
+      !row[:fellowship].name.in?(CeremonyScheduleAllocation::NON_DISTRIBUTION_FELLOWSHIP_NAMES)
+    end
+    rows = regular_rows + non_distribution_rows
+
+    non_distribution_rows.each { |row| row[:distribution_addition] = 0 }
 
     next_number = 1
     rows.each do |row|

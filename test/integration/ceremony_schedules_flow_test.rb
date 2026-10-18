@@ -157,6 +157,33 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_operator allocation_section.index("山梨"), :<, allocation_section.index("大江戸")
   end
 
+  test "number allocations keep non-distribution fellowships at the bottom" do
+    seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", display_order: 3, region: @region)
+    CeremonySchedule.create!(
+      fellowship: seimeiouin,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 1, 10, 0),
+      place: "聖明王院",
+      assistant_count: 1,
+      spirit_count: 204
+    )
+    CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 2, 10, 0),
+      place: "大江戸会館",
+      assistant_count: 1,
+      spirit_count: 20
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: seimeiouin, spirit_count: 0)
+
+    get ceremony_schedules_path
+
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("大江戸"), :<, allocation_section.index("聖明王院")
+    assert_not_includes allocation_section, "（−204）"
+  end
+
   test "schedule page reports when Cloudflare PDF is not configured" do
     CeremonySchedule.create!(
       fellowship: @meeting,
