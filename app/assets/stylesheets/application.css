@@ -325,7 +325,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .schedule-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: 20px;
   align-items: start;
 }
