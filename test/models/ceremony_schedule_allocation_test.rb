@@ -59,4 +59,19 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_nil CeremonyScheduleAllocationSnapshot.find_by(event: @event)
     assert_empty CeremonyScheduleAllocation.distribution_additions_for(@event)
   end
+
+  test "rebalances a prior altar distribution when the qualified spirit count is lowered" do
+    odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
+    CeremonySchedule.create!(
+      event: @event, fellowship: odaiba, ceremony_at: Time.zone.local(2026, 10, 2, 10),
+      place: "お台場会館", assistant_count: 1, spirit_count: 20
+    )
+    CeremonyScheduleAllocation.distribute_shortfall!(event: @event, qualified_spirit_count: 100)
+
+    result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 92)
+
+    assert result[:rebalanced]
+    assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+    assert_equal 52, CeremonyScheduleAllocation.distribution_additions_for(@event).values.sum
+  end
 end

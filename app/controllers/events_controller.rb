@@ -121,6 +121,7 @@ class EventsController < ApplicationController
     detail = event.event_details.find_or_initialize_by(region_id: primary_region_id)
     detail.total_serial_count = total_serial_count
     detail.save!
+    CeremonyScheduleAllocation.rebalance_for_qualified_count!(event:, qualified_spirit_count: total_serial_count)
   end
 
   def default_total_serial_count

@@ -27,7 +27,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
   end
 
-  def self.distribute_shortfall!(event:, qualified_spirit_count:)
+  def self.distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: false)
     current_total = allocated_spirit_count_for(event)
     shortfall = qualified_spirit_count - current_total
     return { shortfall:, distributed: false } unless shortfall.positive?
@@ -49,9 +49,11 @@ class CeremonyScheduleAllocation < ApplicationRecord
       .each { |fellowship| additions[fellowship.id] += 1 }
 
     transaction do
-      snapshot = CeremonyScheduleAllocationSnapshot.find_or_initialize_by(event:)
-      snapshot.allocation_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
-      snapshot.save!
+      unless preserve_snapshot
+        snapshot = CeremonyScheduleAllocationSnapshot.find_or_initialize_by(event:)
+        snapshot.allocation_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
+        snapshot.save!
+      end
 
       fellowships.each do |fellowship|
         allocation = find_or_initialize_by(event:, fellowship:)
@@ -61,6 +63,23 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
 
     { shortfall:, distributed: true }
+  end
+
+  def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)
+    return { rebalanced: false } unless allocated_spirit_count_for(event) > qualified_spirit_count
+
+    snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
+    return { rebalanced: false } unless snapshot
+
+    transaction do
+      where(event:).delete_all
+      snapshot.allocation_counts.each do |fellowship_id, spirit_count|
+        create!(event:, fellowship_id:, spirit_count:)
+      end
+      distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true)
+    end
+
+    { rebalanced: true }
   end
 
   def self.undo_distribution!(event:)

@@ -14,6 +14,10 @@ class EventDetailsController < ApplicationController
 
   def update
     if @event_detail.update(event_detail_params)
+      CeremonyScheduleAllocation.rebalance_for_qualified_count!(
+        event: @event,
+        qualified_spirit_count: @event_detail.total_serial_count
+      )
       redirect_to event_event_details_path(@event), notice: "合格霊数を更新しました"
     else
       render :edit, status: :unprocessable_content
