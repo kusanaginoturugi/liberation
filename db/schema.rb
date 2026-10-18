@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_102000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_103000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.integer "event_id", null: false
     t.text "allocation_counts", default: "{}", null: false
@@ -56,6 +56,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_102000) do
     t.integer "serial_number_from"
     t.integer "serial_number_to"
     t.boolean "joint_schedule", default: false, null: false
+    t.integer "seisenjuin_serial_number_from"
+    t.integer "seisenjuin_serial_number_to"
     t.index ["ceremony_at"], name: "index_ceremony_schedules_on_ceremony_at"
     t.index ["event_id"], name: "index_ceremony_schedules_on_event_id"
     t.index ["fellowship_id"], name: "index_ceremony_schedules_on_fellowship_id"

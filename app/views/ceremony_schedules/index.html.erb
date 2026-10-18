@@ -103,7 +103,11 @@
                 <%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %><% if schedule.joint_assistant_breakdown %><span class="joint-spirit-breakdown"><% schedule.joint_assistant_breakdown_lines.each_with_index do |line, index| %><span class="joint-spirit-breakdown__line"><%= "（" if index.zero? %><%= line %><%= "）" if index == schedule.joint_assistant_breakdown_lines.size - 1 %></span><% end %></span><% end %>
               </td>
               <td class="summary-number" data-label="霊数">
-                <%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %><% if schedule.joint_spirit_breakdown %><span class="joint-spirit-breakdown"><% schedule.joint_spirit_breakdown_lines.each_with_index do |line, index| %><span class="joint-spirit-breakdown__line"><%= "（" if index.zero? %><%= line %><%= "）" if index == schedule.joint_spirit_breakdown_lines.size - 1 %></span><% end %></span><% end %>
+                <% if schedule.special_schedule? %>
+                  <span class="special-spirit-breakdown"><% schedule.special_spirit_breakdown.each do |name, count| %><span class="special-spirit-breakdown__line"><span><%= name %></span><span><%= number_with_delimiter(count) %></span></span><% end %></span>
+                <% else %>
+                  <%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %><% if schedule.joint_spirit_breakdown %><span class="joint-spirit-breakdown"><% schedule.joint_spirit_breakdown_lines.each_with_index do |line, index| %><span class="joint-spirit-breakdown__line"><%= "（" if index.zero? %><%= line %><%= "）" if index == schedule.joint_spirit_breakdown_lines.size - 1 %></span><% end %></span><% end %>
+                <% end %>
               </td>
               <td data-label="超抜点伝師"><%= schedule.minister_name.presence || "-" %></td>
               <% if user_signed_in? %>

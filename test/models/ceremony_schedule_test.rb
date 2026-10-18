@@ -54,18 +54,23 @@ class CeremonyScheduleTest < ActiveSupport::TestCase
     assert duplicate.errors[:event_id].any?
   end
 
-  test "calculates the special schedule total from its number range" do
+  test "calculates the special schedule total from its overseas and Seisenjuin number ranges" do
     schedule = CeremonySchedule.new(
       event: @event,
       special_schedule: true,
       ceremony_at: Time.zone.local(2026, 10, 18, 10, 0),
       place: "聖泉珠院",
       serial_number_from: 201,
-      serial_number_to: 250
+      serial_number_to: 210,
+      seisenjuin_serial_number_from: 301,
+      seisenjuin_serial_number_to: 302
     )
 
     assert_predicate schedule, :valid?
-    assert_equal 50, schedule.special_spirit_total
-    assert_equal 50, schedule.spirit_count
+    assert_equal 12, schedule.special_spirit_total
+    assert_equal 10, schedule.overseas_spirit_count
+    assert_equal 2, schedule.seisenjuin_spirit_count
+    assert_equal [ [ "海外", 10 ], [ "聖泉珠院", 2 ] ], schedule.special_spirit_breakdown
+    assert_equal 12, schedule.spirit_count
   end
 end

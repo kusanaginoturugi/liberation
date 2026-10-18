@@ -340,7 +340,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     post session_path, params: { login_id: admin.login_id, password: "password123" }
     get new_ceremony_schedule_path(event_id: @event.id)
     assert_includes response.body, "聖泉珠院・海外として登録"
-    assert_includes response.body, "番号"
+    assert_includes response.body, "海外番号"
+    assert_includes response.body, "聖泉珠院番号"
     assert_includes response.body, "data-special-serial-total"
     assert_includes response.body, "data-special-spirit-count"
 
@@ -354,6 +355,10 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
           place: "聖泉珠院",
           assistant_count: "",
           spirit_count: "",
+          serial_number_from: 101,
+          serial_number_to: 110,
+          seisenjuin_serial_number_from: 201,
+          seisenjuin_serial_number_to: 202,
           minister_name: ""
         }
       }
@@ -364,13 +369,16 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_equal seimeiouin, special_schedule.fellowship
     assert_equal "聖明王院", special_schedule.place
     assert_nil special_schedule.assistant_count
-    assert_nil special_schedule.spirit_count
+    assert_equal 12, special_schedule.spirit_count
 
     get ceremony_schedules_path(event_id: @event.id)
     assert_includes response.body, "特別</span>海外"
     assert_includes response.body, "special-schedule-location\">聖泉珠院"
     assert_includes response.body, "特別"
     assert_includes response.body, "schedule-row-special"
+    assert_includes response.body, "special-spirit-breakdown"
+    assert_includes response.body, ">海外</span><span>10</span>"
+    assert_includes response.body, ">聖泉珠院</span><span>2</span>"
     assert_includes response.body, ">40<"
 
     allocation_section = response.body.split("番号割り振り", 2).last

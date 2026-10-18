@@ -9,7 +9,8 @@ class CeremonySchedule < ApplicationRecord
   validates :ceremony_at, :place, presence: true
   validates :fellowship, :assistant_count, :spirit_count, presence: true, unless: :special_schedule?
   validates :assistant_count, :spirit_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :serial_number_from, :serial_number_to, numericality: { only_integer: true, greater_than_or_equal_to: 1 }, allow_nil: true
+  validates :serial_number_from, :serial_number_to, :seisenjuin_serial_number_from, :seisenjuin_serial_number_to,
+            numericality: { only_integer: true, greater_than_or_equal_to: 1 }, allow_nil: true
   validates :event_id, uniqueness: { conditions: -> { where(special_schedule: true) } }, if: :special_schedule?
   validate :special_serial_number_range_is_complete
   validate :special_serial_number_range_is_in_order
@@ -94,9 +95,24 @@ class CeremonySchedule < ApplicationRecord
   end
 
   def special_spirit_total
-    return unless serial_number_from && serial_number_to
+    return unless special_schedule?
+    return if [ serial_number_from, serial_number_to, seisenjuin_serial_number_from, seisenjuin_serial_number_to ].all?(&:blank?)
 
-    serial_number_to - serial_number_from + 1
+    overseas_spirit_count + seisenjuin_spirit_count
+  end
+
+  def overseas_spirit_count
+    serial_number_range_total(serial_number_from, serial_number_to)
+  end
+
+  def seisenjuin_spirit_count
+    serial_number_range_total(seisenjuin_serial_number_from, seisenjuin_serial_number_to)
+  end
+
+  def special_spirit_breakdown
+    return [] unless special_schedule?
+
+    [ [ "海外", overseas_spirit_count ], [ "聖泉珠院", seisenjuin_spirit_count ] ]
   end
 
   private
@@ -117,21 +133,42 @@ class CeremonySchedule < ApplicationRecord
 
   def special_serial_number_range_is_complete
     return unless special_schedule?
-    return if serial_number_from.blank? == serial_number_to.blank?
 
-    errors.add(:base, "番号の始と終は両方入力してください")
+    validate_serial_number_range_is_complete(:serial_number_from, :serial_number_to, "海外番号")
+    validate_serial_number_range_is_complete(:seisenjuin_serial_number_from, :seisenjuin_serial_number_to, "聖泉珠院番号")
   end
 
   def special_serial_number_range_is_in_order
-    return unless special_schedule? && serial_number_from && serial_number_to
-    return if serial_number_to >= serial_number_from
+    return unless special_schedule?
 
-    errors.add(:serial_number_to, "は始の番号以上にしてください")
+    validate_serial_number_range_is_in_order(:serial_number_from, :serial_number_to, "海外番号")
+    validate_serial_number_range_is_in_order(:seisenjuin_serial_number_from, :seisenjuin_serial_number_to, "聖泉珠院番号")
   end
 
   def joint_schedule_is_not_special_schedule
     return unless joint_schedule? && special_schedule?
 
     errors.add(:base, "合同予定と聖泉珠院・海外は同時に登録できません")
+  end
+
+  def serial_number_range_total(from, to)
+    return 0 unless from && to
+
+    to - from + 1
+  end
+
+  def validate_serial_number_range_is_complete(from_attribute, to_attribute, label)
+    return if public_send(from_attribute).blank? == public_send(to_attribute).blank?
+
+    errors.add(:base, "#{label}の始と終は両方入力してください")
+  end
+
+  def validate_serial_number_range_is_in_order(from_attribute, to_attribute, label)
+    from = public_send(from_attribute)
+    to = public_send(to_attribute)
+    return unless from && to
+    return if to >= from
+
+    errors.add(to_attribute, "は#{label}の始の番号以上にしてください")
   end
 end

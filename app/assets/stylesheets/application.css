@@ -992,6 +992,10 @@ body.number-shadow-disabled .serial-grid td {
   font-weight: 700;
 }
 
+.special-schedule-number-range__label {
+  margin-top: 14px;
+}
+
 .joint-schedule-section {
   padding: 14px;
   border: 1px solid var(--panel-border);
@@ -1291,6 +1295,23 @@ body.number-shadow-disabled .serial-grid td {
   color: #c62828;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.special-spirit-breakdown {
+  display: inline-grid;
+  gap: 4px;
+  min-width: 8.5em;
+}
+
+.special-spirit-breakdown__line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  text-align: left;
+}
+
+.special-spirit-breakdown__line span:last-child {
+  text-align: right;
 }
 
 .field-label {

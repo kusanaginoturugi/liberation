@@ -181,11 +181,18 @@
     <% end %>
 
     <div class="field special-schedule-number-range" data-special-schedule-number-range hidden>
-      <span class="field-label">番号</span>
+      <span class="field-label">海外番号</span>
       <div class="special-schedule-number-range__inputs">
         <label>始<%= form.number_field :serial_number_from, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_serial_from: true } %></label>
         <label>終<%= form.number_field :serial_number_to, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_serial_to: true } %></label>
       </div>
+      <p class="special-schedule-number-range__total" data-special-overseas-serial-total>海外 合計 - 霊</p>
+      <span class="field-label special-schedule-number-range__label">聖泉珠院番号</span>
+      <div class="special-schedule-number-range__inputs">
+        <label>始<%= form.number_field :seisenjuin_serial_number_from, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_seisenjuin_serial_from: true } %></label>
+        <label>終<%= form.number_field :seisenjuin_serial_number_to, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_seisenjuin_serial_to: true } %></label>
+      </div>
+      <p class="special-schedule-number-range__total" data-special-seisenjuin-serial-total>聖泉珠院 合計 - 霊</p>
       <p class="special-schedule-number-range__total" data-special-serial-total>合計 - 霊</p>
     </div>
 

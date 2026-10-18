@@ -83,6 +83,13 @@
                       <span class="joint-count-line"><span><%= count[:name] %></span><span class="joint-count-value"><%= number_with_delimiter(count[:spirit_count]) %></span></span>
                     <% end %>
                   </td>
+                <% elsif schedule.special_schedule? %>
+                  <td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td>
+                  <td class="joint-count">
+                    <% schedule.special_spirit_breakdown.each do |name, count| %>
+                      <span class="joint-count-line"><span><%= name %></span><span class="joint-count-value"><%= number_with_delimiter(count) %></span></span>
+                    <% end %>
+                  </td>
                 <% else %>
                   <td class="number"><%= schedule.assistant_count ? number_with_delimiter(schedule.assistant_count) : "-" %></td>
                   <td class="number"><%= schedule.spirit_count ? number_with_delimiter(schedule.spirit_count) : "-" %></td>

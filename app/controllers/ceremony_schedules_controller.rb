@@ -108,6 +108,8 @@ class CeremonySchedulesController < ApplicationController
       :spirit_count,
       :serial_number_from,
       :serial_number_to,
+      :seisenjuin_serial_number_from,
+      :seisenjuin_serial_number_to,
       :minister_name,
       :special_schedule,
       :joint_schedule
