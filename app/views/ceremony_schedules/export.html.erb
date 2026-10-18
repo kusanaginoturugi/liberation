@@ -111,7 +111,7 @@
     <section>
       <div class="section-heading"><h2>番号割り振り</h2><p>伝道会ごとの霊数合計</p></div>
       <table class="allocation-table">
-        <thead><tr><th class="allocation-fellowship">伝道会名</th><th class="allocation-altars">壇数</th><th class="allocation-spirits">霊数</th><th class="allocation-requested">希望数<br>（追加数）</th><th class="allocation-numbers">番号</th></tr></thead>
+        <thead><tr><th class="allocation-fellowship">伝道会名</th><th class="allocation-altars">壇数</th><th class="allocation-requested">希望数<br>（追加数）</th><th class="allocation-spirits">霊数</th><th class="allocation-numbers">番号</th></tr></thead>
         <tbody>
           <% if @allocation_rows.empty? %>
             <tr><td colspan="5" class="empty">番号を割り振る予定はまだありません</td></tr>
@@ -120,9 +120,6 @@
               <tr>
                 <td class="allocation-fellowship"><%= row[:fellowship].name %></td>
                 <td class="allocation-altars"><%= "#{row[:altar_count]}壇" if row[:altar_count].positive? %></td>
-                <td class="allocation-spirits">
-                  <span class="allocation-final-count"><%= number_with_delimiter(row[:spirit_count]) %></span>
-                </td>
                 <td class="allocation-requested">
                   <span class="allocation-breakdown">
                     <span><%= number_with_delimiter(row[:scheduled_spirit_count]) %></span>
@@ -130,6 +127,9 @@
                       <span class="allocation-addition">（<%= row[:distribution_addition].positive? ? "＋" : "−" %><%= number_with_delimiter(row[:distribution_addition].abs) %>）</span>
                     <% end %>
                   </span>
+                </td>
+                <td class="allocation-spirits">
+                  <span class="allocation-final-count"><%= number_with_delimiter(row[:spirit_count]) %></span>
                 </td>
                 <td class="allocation-numbers"><%= row[:serial_number_from] ? "#{number_with_delimiter(row[:serial_number_from])} 〜 #{number_with_delimiter(row[:serial_number_to])}" : "-" %></td>
               </tr>

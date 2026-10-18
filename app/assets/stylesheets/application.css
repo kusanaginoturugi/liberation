@@ -1770,14 +1770,14 @@ body.number-shadow-disabled .serial-grid td {
     text-align: left;
   }
 
-  .allocation-count-form,
-  .allocation-spirit-count {
+  .allocation-breakdown {
     grid-column: 2;
     grid-row: 2;
     justify-self: end;
   }
 
-  .allocation-breakdown {
+  .allocation-count-form,
+  .allocation-spirit-count {
     grid-column: 2;
     grid-row: 3;
     justify-self: end;
