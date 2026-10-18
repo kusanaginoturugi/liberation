@@ -1,5 +1,6 @@
 class CeremonyScheduleAllocation < ApplicationRecord
   class DistributionError < StandardError; end
+  NON_DISTRIBUTION_FELLOWSHIP_NAMES = [ "聖明王院", "大仏殿" ].freeze
 
   belongs_to :event
   belongs_to :fellowship
@@ -66,25 +67,47 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)
-    unless allocated_spirit_count_for(event) > qualified_spirit_count
-      return restore_scheduled_counts!(event:, qualified_spirit_count:)
-    end
+    distribute_by_altar_count!(event:, qualified_spirit_count:)
+  end
 
-    snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
-    unless snapshot
-      trim_overflow!(event:, qualified_spirit_count:)
-      return restore_scheduled_counts!(event:, qualified_spirit_count:).merge(rebalanced: true)
+  def self.distribute_by_altar_count!(event:, qualified_spirit_count:)
+    fellowships = Fellowship.available.to_a
+    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) }.select(&:altar_count?)
+    raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
+
+    total_altar_count = distributing_fellowships.sum(&:altar_count)
+    allocation_counts = distributing_fellowships.to_h do |fellowship|
+      [ fellowship.id, qualified_spirit_count * fellowship.altar_count / total_altar_count ]
+    end
+    remaining_count = qualified_spirit_count - allocation_counts.values.sum
+    fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
+
+    distributing_fellowships
+      .sort_by do |fellowship|
+        remainder = qualified_spirit_count * fellowship.altar_count % total_altar_count
+        [ -remainder, fellowship_order.fetch(fellowship.name) ]
+      end
+      .first(remaining_count)
+      .each { |fellowship| allocation_counts[fellowship.id] += 1 }
+
+    timestamp = Time.current
+    rows = fellowships.map do |fellowship|
+      {
+        event_id: event.id,
+        fellowship_id: fellowship.id,
+        spirit_count: allocation_counts.fetch(fellowship.id, 0),
+        created_at: timestamp,
+        updated_at: timestamp
+      }
     end
 
     transaction do
       where(event:).delete_all
-      snapshot.allocation_counts.each do |fellowship_id, spirit_count|
-        create!(event:, fellowship_id:, spirit_count:)
-      end
-      distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true)
+      insert_all!(rows)
+      CeremonyScheduleAllocationSnapshot.find_by(event:)&.destroy!
     end
 
-    restore_scheduled_counts!(event:, qualified_spirit_count:).merge(rebalanced: true)
+    { rebalanced: true, distributed: true }
   end
 
   def self.undo_distribution!(event:)

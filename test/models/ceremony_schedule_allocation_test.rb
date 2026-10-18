@@ -60,7 +60,7 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_empty CeremonyScheduleAllocation.distribution_additions_for(@event)
   end
 
-  test "rebalances a prior altar distribution when the qualified spirit count is lowered" do
+  test "rebalances by altar count when the qualified spirit count is lowered" do
     odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
     CeremonySchedule.create!(
       event: @event, fellowship: odaiba, ceremony_at: Time.zone.local(2026, 10, 2, 10),
@@ -72,10 +72,11 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
 
     assert result[:rebalanced]
     assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
-    assert_equal 52, CeremonyScheduleAllocation.distribution_additions_for(@event).values.sum
+    assert_equal 31, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 61, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
 
-  test "trims the last allocation when a prior distribution snapshot is unavailable" do
+  test "rebalances by altar count when a prior distribution snapshot is unavailable" do
     odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
     CeremonySchedule.create!(
       event: @event, fellowship: odaiba, ceremony_at: Time.zone.local(2026, 10, 2, 10),
@@ -89,11 +90,12 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
 
     assert result[:rebalanced]
     assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
-    assert_equal 42, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+    assert_equal 61, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
 
-  test "uses Seimeioin to absorb the difference from the scheduled counts" do
+  test "sets Seimeioin and Daibutsuden allocations to zero" do
     seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", region: @region)
+    daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#333333", region: @region)
     CeremonySchedule.create!(
       event: @event, fellowship: seimeiouin, ceremony_at: Time.zone.local(2026, 10, 2, 10),
       place: "聖明王院", assistant_count: 1, spirit_count: 30
@@ -104,9 +106,10 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
 
     result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 42)
 
-    assert result[:restored]
-    assert_equal 20, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
-    assert_equal 22, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: seimeiouin).spirit_count
+    assert result[:rebalanced]
+    assert_equal 42, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 0, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: seimeiouin).spirit_count
+    assert_equal 0, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: daibutsuden).spirit_count
     assert_equal 42, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
   end
 end
