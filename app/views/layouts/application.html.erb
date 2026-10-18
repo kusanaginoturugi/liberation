@@ -323,8 +323,9 @@
           const numberRange = form.querySelector("[data-special-schedule-number-range]");
           const overseasSerialFrom = form.querySelector("[data-special-serial-from]");
           const overseasSerialTo = form.querySelector("[data-special-serial-to]");
-          const seisenjuinSerialFrom = form.querySelector("[data-special-seisenjuin-serial-from]");
-          const seisenjuinSerialTo = form.querySelector("[data-special-seisenjuin-serial-to]");
+          const seisenjuinNumberList = form.querySelector("[data-special-seisenjuin-number-list]");
+          const addSeisenjuinNumber = form.querySelector("[data-add-special-seisenjuin-number]");
+          const seisenjuinNumberTemplate = form.querySelector("[data-special-seisenjuin-number-template]");
           const overseasSerialTotal = form.querySelector("[data-special-overseas-serial-total]");
           const seisenjuinSerialTotal = form.querySelector("[data-special-seisenjuin-serial-total]");
           const serialTotal = form.querySelector("[data-special-serial-total]");
@@ -340,7 +341,10 @@
               return Number.isInteger(from) && Number.isInteger(to) && from > 0 && to >= from ? to - from + 1 : null;
             };
             const overseasTotal = rangeTotal(overseasSerialFrom, overseasSerialTo);
-            const seisenjuinTotal = rangeTotal(seisenjuinSerialFrom, seisenjuinSerialTo);
+            const seisenjuinNumbers = Array.from(form.querySelectorAll("[data-special-seisenjuin-serial-number]"))
+              .filter((input) => input instanceof HTMLInputElement && Number.isInteger(Number(input.value)) && Number(input.value) > 0)
+              .map((input) => Number(input.value));
+            const seisenjuinTotal = new Set(seisenjuinNumbers).size;
             const total = (overseasTotal || 0) + (seisenjuinTotal || 0);
 
             if (overseasSerialTotal) overseasSerialTotal.textContent = overseasTotal ? `海外 合計 ${overseasTotal} 霊` : "海外 合計 - 霊";
@@ -376,8 +380,20 @@
           toggle.addEventListener("change", updateSpecialScheduleFields);
           overseasSerialFrom?.addEventListener("input", updateSerialTotal);
           overseasSerialTo?.addEventListener("input", updateSerialTotal);
-          seisenjuinSerialFrom?.addEventListener("input", updateSerialTotal);
-          seisenjuinSerialTo?.addEventListener("input", updateSerialTotal);
+          seisenjuinNumberList?.addEventListener("input", updateSerialTotal);
+          addSeisenjuinNumber?.addEventListener("click", () => {
+            if (!(seisenjuinNumberList instanceof Element) || !(seisenjuinNumberTemplate instanceof HTMLTemplateElement)) return;
+
+            seisenjuinNumberList.insertAdjacentHTML("beforeend", seisenjuinNumberTemplate.innerHTML);
+            seisenjuinNumberList.querySelector("[data-special-seisenjuin-number-row]:last-child input")?.focus();
+          });
+          seisenjuinNumberList?.addEventListener("click", (event) => {
+            if (!(event.target instanceof Element) || !event.target.closest("[data-remove-special-seisenjuin-number]")) return;
+
+            const row = event.target.closest("[data-special-seisenjuin-number-row]");
+            row?.remove();
+            updateSerialTotal();
+          });
           updateSpecialScheduleFields();
         });
 

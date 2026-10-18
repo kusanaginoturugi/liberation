@@ -9,7 +9,7 @@ class CeremonySchedule < ApplicationRecord
   validates :ceremony_at, :place, presence: true
   validates :fellowship, :assistant_count, :spirit_count, presence: true, unless: :special_schedule?
   validates :assistant_count, :spirit_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :serial_number_from, :serial_number_to, :seisenjuin_serial_number_from, :seisenjuin_serial_number_to,
+  validates :serial_number_from, :serial_number_to,
             numericality: { only_integer: true, greater_than_or_equal_to: 1 }, allow_nil: true
   validates :event_id, uniqueness: { conditions: -> { where(special_schedule: true) } }, if: :special_schedule?
   validate :special_serial_number_range_is_complete
@@ -96,7 +96,7 @@ class CeremonySchedule < ApplicationRecord
 
   def special_spirit_total
     return unless special_schedule?
-    return if [ serial_number_from, serial_number_to, seisenjuin_serial_number_from, seisenjuin_serial_number_to ].all?(&:blank?)
+    return if [ serial_number_from, serial_number_to ].all?(&:blank?) && seisenjuin_serial_numbers.empty? && legacy_seisenjuin_number_range_empty?
 
     overseas_spirit_count + seisenjuin_spirit_count
   end
@@ -106,6 +106,8 @@ class CeremonySchedule < ApplicationRecord
   end
 
   def seisenjuin_spirit_count
+    return seisenjuin_serial_numbers.size if seisenjuin_serial_numbers.present?
+
     serial_number_range_total(seisenjuin_serial_number_from, seisenjuin_serial_number_to)
   end
 
@@ -113,6 +115,21 @@ class CeremonySchedule < ApplicationRecord
     return [] unless special_schedule?
 
     [ [ "海外", overseas_spirit_count ], [ "聖泉珠院", seisenjuin_spirit_count ] ]
+  end
+
+  def seisenjuin_serial_numbers
+    JSON.parse(self[:seisenjuin_serial_numbers].presence || "[]").filter_map do |number|
+      parsed_number = Integer(number, exception: false)
+      parsed_number if parsed_number&.positive?
+    end
+  end
+
+  def seisenjuin_serial_numbers=(numbers)
+    values = Array(numbers).filter_map do |number|
+      parsed_number = Integer(number, exception: false)
+      parsed_number if parsed_number&.positive?
+    end
+    self[:seisenjuin_serial_numbers] = values.uniq.to_json
   end
 
   private
@@ -135,14 +152,12 @@ class CeremonySchedule < ApplicationRecord
     return unless special_schedule?
 
     validate_serial_number_range_is_complete(:serial_number_from, :serial_number_to, "海外番号")
-    validate_serial_number_range_is_complete(:seisenjuin_serial_number_from, :seisenjuin_serial_number_to, "聖泉珠院番号")
   end
 
   def special_serial_number_range_is_in_order
     return unless special_schedule?
 
     validate_serial_number_range_is_in_order(:serial_number_from, :serial_number_to, "海外番号")
-    validate_serial_number_range_is_in_order(:seisenjuin_serial_number_from, :seisenjuin_serial_number_to, "聖泉珠院番号")
   end
 
   def joint_schedule_is_not_special_schedule
@@ -155,6 +170,10 @@ class CeremonySchedule < ApplicationRecord
     return 0 unless from && to
 
     to - from + 1
+  end
+
+  def legacy_seisenjuin_number_range_empty?
+    seisenjuin_serial_number_from.blank? && seisenjuin_serial_number_to.blank?
   end
 
   def validate_serial_number_range_is_complete(from_attribute, to_attribute, label)

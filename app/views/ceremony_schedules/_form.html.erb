@@ -188,10 +188,21 @@
       </div>
       <p class="special-schedule-number-range__total" data-special-overseas-serial-total>海外 合計 - 霊</p>
       <span class="field-label special-schedule-number-range__label">聖泉珠院番号</span>
-      <div class="special-schedule-number-range__inputs">
-        <label>始<%= form.number_field :seisenjuin_serial_number_from, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_seisenjuin_serial_from: true } %></label>
-        <label>終<%= form.number_field :seisenjuin_serial_number_to, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_seisenjuin_serial_to: true } %></label>
+      <div class="special-seisenjuin-number-list" data-special-seisenjuin-number-list>
+        <% (ceremony_schedule.seisenjuin_serial_numbers.presence || [ nil ]).each do |number| %>
+          <div class="special-seisenjuin-number-list__row" data-special-seisenjuin-number-row>
+            <%= number_field_tag "ceremony_schedule[seisenjuin_serial_numbers][]", number, min: 1, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, special_seisenjuin_serial_number: true } %>
+            <button type="button" class="button-secondary compact-button" data-remove-special-seisenjuin-number aria-label="番号を削除">削除</button>
+          </div>
+        <% end %>
       </div>
+      <button type="button" class="button-secondary compact-button" data-add-special-seisenjuin-number>番号を追加</button>
+      <template data-special-seisenjuin-number-template>
+        <div class="special-seisenjuin-number-list__row" data-special-seisenjuin-number-row>
+          <input type="number" min="1" inputmode="numeric" pattern="[0-9]*" name="ceremony_schedule[seisenjuin_serial_numbers][]" data-numeric-only="true" data-special-seisenjuin-serial-number="true">
+          <button type="button" class="button-secondary compact-button" data-remove-special-seisenjuin-number aria-label="番号を削除">削除</button>
+        </div>
+      </template>
       <p class="special-schedule-number-range__total" data-special-seisenjuin-serial-total>聖泉珠院 合計 - 霊</p>
       <p class="special-schedule-number-range__total" data-special-serial-total>合計 - 霊</p>
     </div>

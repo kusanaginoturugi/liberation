@@ -996,6 +996,18 @@ body.number-shadow-disabled .serial-grid td {
   margin-top: 14px;
 }
 
+.special-seisenjuin-number-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.special-seisenjuin-number-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
 .joint-schedule-section {
   padding: 14px;
   border: 1px solid var(--panel-border);

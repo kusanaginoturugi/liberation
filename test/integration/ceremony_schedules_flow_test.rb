@@ -357,8 +357,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
           spirit_count: "",
           serial_number_from: 101,
           serial_number_to: 110,
-          seisenjuin_serial_number_from: 201,
-          seisenjuin_serial_number_to: 202,
+          seisenjuin_serial_numbers: [ 201, 209 ],
           minister_name: ""
         }
       }

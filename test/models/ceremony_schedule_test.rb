@@ -62,8 +62,7 @@ class CeremonyScheduleTest < ActiveSupport::TestCase
       place: "聖泉珠院",
       serial_number_from: 201,
       serial_number_to: 210,
-      seisenjuin_serial_number_from: 301,
-      seisenjuin_serial_number_to: 302
+      seisenjuin_serial_numbers: [ 301, 305 ]
     )
 
     assert_predicate schedule, :valid?
