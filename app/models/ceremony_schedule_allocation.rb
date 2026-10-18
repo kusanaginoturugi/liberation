@@ -69,7 +69,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
     return { rebalanced: false } unless allocated_spirit_count_for(event) > qualified_spirit_count
 
     snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
-    return { rebalanced: false } unless snapshot
+    return trim_overflow!(event:, qualified_spirit_count:) unless snapshot
 
     transaction do
       where(event:).delete_all
@@ -96,6 +96,26 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   private
+
+  def self.trim_overflow!(event:, qualified_spirit_count:)
+    overflow = allocated_spirit_count_for(event) - qualified_spirit_count
+    schedule_times = CeremonySchedule.where(event:).regular.group(:fellowship_id).minimum(:ceremony_at)
+    allocations = where(event:).includes(:fellowship).to_a.sort_by do |allocation|
+      [ schedule_times.fetch(allocation.fellowship_id, Time.utc(9999, 12, 31)), allocation.fellowship_id ]
+    end
+
+    transaction do
+      allocations.reverse_each do |allocation|
+        break if overflow.zero?
+
+        reduction = [ allocation.spirit_count, overflow ].min
+        allocation.update!(spirit_count: allocation.spirit_count - reduction)
+        overflow -= reduction
+      end
+    end
+
+    { rebalanced: true }
+  end
 
   def self.effective_spirit_count_for(event, allocation_counts)
     scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)

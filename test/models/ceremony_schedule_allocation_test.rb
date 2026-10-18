@@ -74,4 +74,21 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
     assert_equal 52, CeremonyScheduleAllocation.distribution_additions_for(@event).values.sum
   end
+
+  test "trims the last allocation when a prior distribution snapshot is unavailable" do
+    odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
+    CeremonySchedule.create!(
+      event: @event, fellowship: odaiba, ceremony_at: Time.zone.local(2026, 10, 2, 10),
+      place: "お台場会館", assistant_count: 1, spirit_count: 20
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 50)
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: odaiba, spirit_count: 50)
+    @event.event_details.find_by!(region: @region).update!(total_serial_count: 92)
+
+    result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 92)
+
+    assert result[:rebalanced]
+    assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+    assert_equal 42, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+  end
 end
