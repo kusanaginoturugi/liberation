@@ -337,9 +337,8 @@ body.number-shadow-disabled .serial-grid td {
 
 .allocation-list__header,
 .allocation-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: 0;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -361,7 +360,7 @@ body.number-shadow-disabled .serial-grid td {
   align-items: center;
   gap: 10px;
   justify-content: center;
-  width: 100%;
+  width: auto;
 }
 
 .allocation-addition {
@@ -395,7 +394,7 @@ body.number-shadow-disabled .serial-grid td {
   align-items: center;
   gap: 10px;
   justify-content: center;
-  width: 100%;
+  width: auto;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -481,7 +480,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .allocation-row > span:last-child {
   text-align: right;
-  width: 100%;
+  width: auto;
 }
 
 .allocation-sort-link {
@@ -1685,6 +1684,7 @@ body.number-shadow-disabled .serial-grid td {
   }
 
   .allocation-row {
+    display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 6px 8px;
   }
