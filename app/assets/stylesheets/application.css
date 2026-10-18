@@ -1131,7 +1131,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(3),
 .ceremony-schedule-table--with-actions td:nth-child(3) {
-  width: 18%;
+  width: 12%;
 }
 
 .ceremony-schedule-table--with-actions th:nth-child(4),
@@ -1151,7 +1151,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .ceremony-schedule-table--with-actions th:nth-child(7),
 .ceremony-schedule-table--with-actions td:nth-child(7) {
-  width: 10%;
+  width: 16%;
 }
 
 .ceremony-schedule-table--with-actions td:nth-child(3) {
