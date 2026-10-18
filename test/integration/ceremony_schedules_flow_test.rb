@@ -50,6 +50,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
       spirit_count: 15,
       minister_name: "佐藤点伝師"
     )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 25)
 
     get ceremony_schedules_path
 
@@ -71,6 +72,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "合格霊数"
     assert_includes response.body, ">1,650<"
     assert_includes response.body, 'summary-total-label">合格霊数'
+    assert_includes response.body, "（＋5）"
     assert_includes response.body, "3壇"
     assert_includes response.body, "schedule-row-even"
     assert_includes response.body, "schedule-row-odd"

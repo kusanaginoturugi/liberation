@@ -313,7 +313,7 @@ class CeremonySchedulesController < ApplicationController
         altar_count: fellowship.altar_count,
         spirit_count: allocation.spirit_count,
         allocation:,
-        distribution_addition: @distribution_additions.fetch(fellowship.id, 0)
+        distribution_addition: allocation.spirit_count - fellowship_spirit_counts.sum
       }
     end
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
