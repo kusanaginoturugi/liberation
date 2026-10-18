@@ -39,14 +39,14 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
 
     result = CeremonyScheduleAllocation.distribute_shortfall!(event: @event, qualified_spirit_count: 100)
 
-    assert_equal 50, result[:shortfall]
+    assert_equal 60, result[:shortfall]
     assert result[:distributed]
-    assert_equal 37, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
-    assert_equal 53, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
-    assert_nil CeremonyScheduleAllocation.find_by(event: @event, fellowship: seimeiouin)
+    assert_equal 40, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 60, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+    assert_equal 0, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: seimeiouin).spirit_count
     assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
-    assert_equal 17, CeremonyScheduleAllocation.distribution_additions_for(@event).fetch(@meeting.id)
-    assert_equal 33, CeremonyScheduleAllocation.distribution_additions_for(@event).fetch(odaiba.id)
+    assert_equal 20, CeremonyScheduleAllocation.distribution_additions_for(@event).fetch(@meeting.id)
+    assert_equal 40, CeremonyScheduleAllocation.distribution_additions_for(@event).fetch(odaiba.id)
   end
 
   test "restores the allocation values from before distribution" do

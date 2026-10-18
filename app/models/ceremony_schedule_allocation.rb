@@ -30,19 +30,26 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   def self.distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: false)
-    current_total = allocated_spirit_count_for(event)
-    shortfall = qualified_spirit_count - current_total
-    return { shortfall:, distributed: false } unless shortfall.positive?
+    fellowships = Fellowship.available.to_a
+    scheduled_counts = scheduled_spirit_counts_for(event)
+    fixed_allocation_counts = fellowships.filter_map do |fellowship|
+      [ fellowship.id, FIXED_ALLOCATION_COUNTS.fetch(fellowship.name) ] if FIXED_ALLOCATION_COUNTS.key?(fellowship.name)
+    end.to_h
+    distributing_fellowships = fellowships
+      .reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) || FIXED_ALLOCATION_COUNTS.key?(fellowship.name) }
+      .select(&:altar_count?)
+    raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
-    fellowships = Fellowship.available.where("altar_count > 0").to_a
-    raise DistributionError, "壇数が設定された伝道会がありません" if fellowships.empty?
+    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) } + fixed_allocation_counts.values.sum
+    shortfall = qualified_spirit_count - scheduled_total
+    raise DistributionError, "合格霊数が予定霊数を下回っています" if shortfall.negative?
 
-    total_altar_count = fellowships.sum(&:altar_count)
-    additions = fellowships.to_h { |fellowship| [ fellowship.id, shortfall * fellowship.altar_count / total_altar_count ] }
+    total_altar_count = distributing_fellowships.sum(&:altar_count)
+    additions = distributing_fellowships.to_h { |fellowship| [ fellowship.id, shortfall * fellowship.altar_count / total_altar_count ] }
     undistributed_count = shortfall - additions.values.sum
     fellowship_order = Fellowship::AVAILABLE_NAMES.each_with_index.to_h
 
-    fellowships
+    distributing_fellowships
       .sort_by do |fellowship|
         remainder = shortfall * fellowship.altar_count % total_altar_count
         [ -remainder, fellowship_order.fetch(fellowship.name) ]
@@ -51,20 +58,30 @@ class CeremonyScheduleAllocation < ApplicationRecord
       .each { |fellowship| additions[fellowship.id] += 1 }
 
     transaction do
-      unless preserve_snapshot
-        snapshot = CeremonyScheduleAllocationSnapshot.find_or_initialize_by(event:)
-        snapshot.allocation_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
-        snapshot.save!
+      if !preserve_snapshot && !CeremonyScheduleAllocationSnapshot.exists?(event:)
+        CeremonyScheduleAllocationSnapshot.create!(
+          event:,
+          allocation_counts: where(event:).pluck(:fellowship_id, :spirit_count).to_h
+        )
       end
 
-      fellowships.each do |fellowship|
-        allocation = find_or_initialize_by(event:, fellowship:)
-        allocation.spirit_count = allocation.spirit_count || scheduled_spirit_counts_for(event).fetch(fellowship.id, 0)
-        allocation.update!(spirit_count: allocation.spirit_count + additions.fetch(fellowship.id))
+      rows = fellowships.map do |fellowship|
+        spirit_count = if fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES)
+          0
+        elsif fixed_allocation_counts.key?(fellowship.id)
+          fixed_allocation_counts.fetch(fellowship.id)
+        elsif additions.key?(fellowship.id)
+          scheduled_counts.fetch(fellowship.id, 0) + additions.fetch(fellowship.id)
+        else
+          scheduled_counts.fetch(fellowship.id, 0)
+        end
+        { event_id: event.id, fellowship_id: fellowship.id, spirit_count:, created_at: Time.current, updated_at: Time.current }
       end
+      where(event:).delete_all
+      insert_all!(rows)
     end
 
-    { shortfall:, distributed: true }
+    { shortfall:, distributed: true, scheduled_total: }
   end
 
   def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)

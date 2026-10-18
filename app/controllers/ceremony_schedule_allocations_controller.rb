@@ -20,12 +20,8 @@ class CeremonyScheduleAllocationsController < ApplicationController
       return
     end
 
-    CeremonyScheduleAllocation.distribute_by_altar_count!(
-      event:,
-      qualified_spirit_count:,
-      record_snapshot: true
-    )
-    redirect_to ceremony_schedules_path(event_id: event.id), notice: "合格霊数を壇数で配分しました"
+    result = CeremonyScheduleAllocation.distribute_shortfall!(event:, qualified_spirit_count:)
+    redirect_to ceremony_schedules_path(event_id: event.id), notice: "予定霊数との差分 #{result[:shortfall]}霊を壇数で配分しました"
   rescue CeremonyScheduleAllocation::DistributionError, ActiveRecord::RecordInvalid => e
     redirect_to ceremony_schedules_path(event_id: event.id), alert: e.message
   end
