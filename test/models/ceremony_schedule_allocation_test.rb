@@ -60,7 +60,7 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_empty CeremonyScheduleAllocation.distribution_additions_for(@event)
   end
 
-  test "rebalances by altar count when the qualified spirit count is lowered" do
+  test "adds only the shortfall by altar count when the qualified spirit count changes" do
     odaiba = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region)
     CeremonySchedule.create!(
       event: @event, fellowship: odaiba, ceremony_at: Time.zone.local(2026, 10, 2, 10),
@@ -72,8 +72,8 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
 
     assert result[:rebalanced]
     assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
-    assert_equal 31, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
-    assert_equal 61, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+    assert_equal 37, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 55, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
 
   test "rebalances by altar count when a prior distribution snapshot is unavailable" do
@@ -90,7 +90,7 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
 
     assert result[:rebalanced]
     assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
-    assert_equal 61, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
+    assert_equal 55, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
 
   test "sets Seimeioin and Daibutsuden allocations to zero and keeps Ibaraki at fifty" do

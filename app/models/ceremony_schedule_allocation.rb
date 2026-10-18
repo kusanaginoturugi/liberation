@@ -85,7 +85,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)
-    distribute_by_altar_count!(event:, qualified_spirit_count:)
+    distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true).merge(rebalanced: true)
   end
 
   def self.distribute_by_altar_count!(event:, qualified_spirit_count:, record_snapshot: false)
