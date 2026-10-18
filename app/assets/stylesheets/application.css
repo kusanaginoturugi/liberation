@@ -338,10 +338,35 @@ body.number-shadow-disabled .serial-grid td {
 .allocation-list__header,
 .allocation-row {
   display: grid;
-  grid-template-columns: 8rem 5rem 5rem 5.5rem 10rem;
+  grid-template-columns: minmax(0, 1fr) 4rem 1.5rem 4.5rem 0.5rem 4rem minmax(0, 1fr);
   column-gap: 0;
-  justify-content: space-between;
   align-items: center;
+}
+
+.allocation-list__header > :nth-child(1),
+.allocation-row > strong {
+  grid-column: 1;
+}
+
+.allocation-list__header > :nth-child(2),
+.allocation-row > .allocation-altar-count {
+  grid-column: 2;
+}
+
+.allocation-list__header > :nth-child(3),
+.allocation-row > .allocation-breakdown {
+  grid-column: 4;
+}
+
+.allocation-list__header > :nth-child(4),
+.allocation-row > .allocation-count-form,
+.allocation-row > .allocation-spirit-count {
+  grid-column: 6;
+}
+
+.allocation-list__header > :nth-child(5),
+.allocation-row > span:last-child {
+  grid-column: 7;
 }
 
 .allocation-count-form input {
