@@ -87,12 +87,15 @@
         <tbody>
           <% @ceremony_schedules.each_with_index do |schedule, index| %>
             <tr class="<%= schedule.special_schedule? ? "schedule-row-special" : (index.even? ? "schedule-row-even" : "schedule-row-odd") %>">
-              <td data-label="伝道会名">
+              <td class="<%= "joint-schedule-name" if schedule.joint_schedule? %>" data-label="伝道会名">
                 <% if schedule.special_schedule? %>
                   <span class="special-schedule-badge">特別</span>海外
                   <span class="special-schedule-location">聖泉珠院</span>
                 <% elsif schedule.joint_schedule? %>
-                  【合同】<br><%= schedule.joint_fellowship_counts.pluck(:name).join("・") %>
+                  【合同】
+                  <% schedule.joint_fellowship_counts.each do |count| %>
+                    <span class="joint-schedule-name__fellowship"><%= count[:name] %></span>
+                  <% end %>
                 <% else %>
                   <%= schedule.display_name %>
                 <% end %>

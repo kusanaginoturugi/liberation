@@ -315,7 +315,8 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "【合同】"
-    assert_includes response.body, "埼玉・山梨"
+    assert_includes response.body, 'class="joint-schedule-name__fellowship">埼玉</span>'
+    assert_includes response.body, 'class="joint-schedule-name__fellowship">山梨</span>'
     assert_includes response.body, "joint-count-summary"
     assert_includes response.body, "埼玉4"
     assert_includes response.body, "山梨4"

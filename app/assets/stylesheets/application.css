@@ -1042,6 +1042,11 @@ body.number-shadow-disabled .serial-grid td {
   white-space: nowrap;
 }
 
+.joint-schedule-name__fellowship {
+  display: block;
+  white-space: nowrap;
+}
+
 .joint-spirit-breakdown__line {
   display: block;
   white-space: nowrap;
