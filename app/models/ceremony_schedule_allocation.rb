@@ -16,7 +16,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
     snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
     return {} unless snapshot
 
-    scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)
+    scheduled_counts = scheduled_spirit_counts_for(event)
     previous_counts = snapshot.allocation_counts
     current_counts = where(event:).pluck(:fellowship_id, :spirit_count).to_h
 
@@ -57,7 +57,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
       fellowships.each do |fellowship|
         allocation = find_or_initialize_by(event:, fellowship:)
-        allocation.spirit_count = allocation.spirit_count || CeremonySchedule.where(event:, fellowship:).regular.sum(:spirit_count)
+        allocation.spirit_count = allocation.spirit_count || scheduled_spirit_counts_for(event).fetch(fellowship.id, 0)
         allocation.update!(spirit_count: allocation.spirit_count + additions.fetch(fellowship.id))
       end
     end
@@ -66,10 +66,15 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)
-    return { rebalanced: false } unless allocated_spirit_count_for(event) > qualified_spirit_count
+    unless allocated_spirit_count_for(event) > qualified_spirit_count
+      return restore_scheduled_counts!(event:)
+    end
 
     snapshot = CeremonyScheduleAllocationSnapshot.find_by(event:)
-    return trim_overflow!(event:, qualified_spirit_count:) unless snapshot
+    unless snapshot
+      trim_overflow!(event:, qualified_spirit_count:)
+      return restore_scheduled_counts!(event:).merge(rebalanced: true)
+    end
 
     transaction do
       where(event:).delete_all
@@ -79,7 +84,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
       distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true)
     end
 
-    { rebalanced: true }
+    restore_scheduled_counts!(event:).merge(rebalanced: true)
   end
 
   def self.undo_distribution!(event:)
@@ -99,16 +104,24 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
   def self.trim_overflow!(event:, qualified_spirit_count:)
     overflow = allocated_spirit_count_for(event) - qualified_spirit_count
+    scheduled_counts = scheduled_spirit_counts_for(event)
     schedule_times = CeremonySchedule.where(event:).regular.group(:fellowship_id).minimum(:ceremony_at)
     allocations = where(event:).includes(:fellowship).to_a.sort_by do |allocation|
-      [ schedule_times.fetch(allocation.fellowship_id, Time.utc(9999, 12, 31)), allocation.fellowship_id ]
+      [
+        allocation.fellowship.name == "聖明王院" ? 0 : 1,
+        -schedule_times.fetch(allocation.fellowship_id, Time.utc(9999, 12, 31)).to_i,
+        allocation.fellowship_id
+      ]
     end
 
     transaction do
-      allocations.reverse_each do |allocation|
+      allocations.each do |allocation|
         break if overflow.zero?
 
-        reduction = [ allocation.spirit_count, overflow ].min
+        reducible_count = [ allocation.spirit_count - scheduled_counts.fetch(allocation.fellowship_id, 0), 0 ].max
+        reduction = [ reducible_count, overflow ].min
+        next if reduction.zero?
+
         allocation.update!(spirit_count: allocation.spirit_count - reduction)
         overflow -= reduction
       end
@@ -118,9 +131,56 @@ class CeremonyScheduleAllocation < ApplicationRecord
   end
 
   def self.effective_spirit_count_for(event, allocation_counts)
-    scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)
+    scheduled_counts = scheduled_spirit_counts_for(event)
     (scheduled_counts.keys | allocation_counts.keys).sum do |fellowship_id|
       allocation_counts.fetch(fellowship_id, scheduled_counts.fetch(fellowship_id, 0))
+    end
+  end
+
+  def self.restore_scheduled_counts!(event:)
+    scheduled_counts = scheduled_spirit_counts_for(event)
+    allocations = where(event:).includes(:fellowship).index_by(&:fellowship_id)
+    deficits = scheduled_counts.filter_map do |fellowship_id, scheduled_count|
+      current_count = allocations[fellowship_id]&.spirit_count || scheduled_count
+      [ fellowship_id, scheduled_count - current_count ] if current_count < scheduled_count
+    end
+    return { rebalanced: false, restored: false } if deficits.empty?
+
+    donors = allocations.values.select do |allocation|
+      allocation.spirit_count > scheduled_counts.fetch(allocation.fellowship_id, 0)
+    end.sort_by do |allocation|
+      [ allocation.fellowship.name == "聖明王院" ? 0 : 1, allocation.fellowship_id ]
+    end
+    return { rebalanced: false, restored: false } if donors.empty?
+
+    transaction do
+      deficits.each do |fellowship_id, deficit|
+        recipient = allocations[fellowship_id] || find_or_create_by!(event:, fellowship_id:) do |allocation|
+          allocation.spirit_count = scheduled_counts.fetch(fellowship_id)
+        end
+
+        donors.each do |donor|
+          break if deficit.zero?
+
+          donor_floor = scheduled_counts.fetch(donor.fellowship_id, 0)
+          transfer = [ donor.spirit_count - donor_floor, deficit ].min
+          next unless transfer.positive?
+
+          donor.update!(spirit_count: donor.spirit_count - transfer)
+          recipient.update!(spirit_count: recipient.spirit_count + transfer)
+          deficit -= transfer
+        end
+      end
+    end
+
+    { rebalanced: false, restored: true }
+  end
+
+  def self.scheduled_spirit_counts_for(event)
+    CeremonySchedule.where(event:).regular.includes(ceremony_schedule_fellowships: :fellowship).each_with_object(Hash.new(0)) do |schedule, counts|
+      schedule.allocation_contributions.each do |fellowship, spirit_count|
+        counts[fellowship.id] += spirit_count
+      end
     end
   end
 
@@ -132,7 +192,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
     allocation_counts = self.class.where(event:).pluck(:fellowship_id, :spirit_count).to_h
     allocation_counts[fellowship_id] = spirit_count
-    scheduled_counts = CeremonySchedule.where(event:).regular.group(:fellowship_id).sum(:spirit_count)
+    scheduled_counts = self.class.send(:scheduled_spirit_counts_for, event)
     allocated_count = (scheduled_counts.keys | allocation_counts.keys).sum do |scheduled_fellowship_id|
       allocation_counts.fetch(scheduled_fellowship_id, scheduled_counts.fetch(scheduled_fellowship_id, 0))
     end

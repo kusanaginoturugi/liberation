@@ -91,4 +91,21 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_equal 92, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
     assert_equal 42, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: odaiba).spirit_count
   end
+
+  test "restores a fellowship's allocation to its scheduled count using the Seimeioin excess" do
+    seimeiouin = Fellowship.create!(name: "聖明王院", color_code: "#222222", region: @region)
+    CeremonySchedule.create!(
+      event: @event, fellowship: seimeiouin, ceremony_at: Time.zone.local(2026, 10, 2, 10),
+      place: "聖明王院", assistant_count: 1, spirit_count: 30
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 12)
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: seimeiouin, spirit_count: 88)
+
+    result = CeremonyScheduleAllocation.rebalance_for_qualified_count!(event: @event, qualified_spirit_count: 100)
+
+    assert result[:restored]
+    assert_equal 20, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 80, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: seimeiouin).spirit_count
+    assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+  end
 end
