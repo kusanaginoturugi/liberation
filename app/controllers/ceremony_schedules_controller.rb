@@ -305,7 +305,10 @@ class CeremonySchedulesController < ApplicationController
     eligible_fellowships = Fellowship.available.where("altar_count > 0").to_a
     fellowships += eligible_fellowships.reject { |fellowship| fellowships.include?(fellowship) }
     allocated_fellowships = CeremonyScheduleAllocation.where(event: @selected_event).includes(:fellowship).map(&:fellowship)
-      .select { |fellowship| fellowship.name.in?(Fellowship::AVAILABLE_NAMES) }
+      .select do |fellowship|
+        fellowship.name.in?(Fellowship::AVAILABLE_NAMES) &&
+          (!fellowship.name.in?(CeremonyScheduleAllocation::HIDE_WITHOUT_SCHEDULE_FELLOWSHIP_NAMES) || schedules_by_fellowship.key?(fellowship))
+      end
     fellowships += allocated_fellowships.reject { |fellowship| fellowships.include?(fellowship) }
 
     rows = fellowships.map do |fellowship|

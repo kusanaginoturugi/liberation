@@ -183,6 +183,26 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes allocation_section, "（−204）"
   end
 
+  test "Daibutsuden receives the final twenty numbers" do
+    daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#222222", display_order: 3, region: @region)
+    CeremonySchedule.create!(
+      fellowship: @meeting,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 1, 10, 0),
+      place: "大江戸会館",
+      assistant_count: 1,
+      spirit_count: 80
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 80)
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: daibutsuden, spirit_count: 20)
+
+    get ceremony_schedules_path
+
+    allocation_section = response.body.split("番号割り振り", 2).last
+    assert_operator allocation_section.index("大江戸"), :<, allocation_section.index("大仏殿")
+    assert_includes allocation_section, ">81 〜 100<"
+  end
+
   test "number allocations exclude an Ibaraki allocation without a schedule" do
     ibaraki = Fellowship.create!(name: "茨城", color_code: "#222222", display_order: 3, region: @region)
     CeremonySchedule.create!(
