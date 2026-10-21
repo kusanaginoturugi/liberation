@@ -1,7 +1,7 @@
 class CeremonyScheduleAllocation < ApplicationRecord
   class DistributionError < StandardError; end
   NON_DISTRIBUTION_FELLOWSHIP_NAMES = [ "聖明王院", "大仏殿" ].freeze
-  FIXED_ALLOCATION_COUNTS = { "大仏殿" => 20 }.freeze
+  DAIBUTSUDEN_FELLOWSHIP_NAME = "大仏殿"
   HIDE_WITHOUT_SCHEDULE_FELLOWSHIP_NAMES = [ "聖明王院" ].freeze
 
   belongs_to :event
@@ -34,13 +34,12 @@ class CeremonyScheduleAllocation < ApplicationRecord
     fellowships = Fellowship.available.to_a
     scheduled_counts = scheduled_spirit_counts_for(event)
     allocation_fellowships = allocation_fellowships_for(fellowships, scheduled_counts)
-    fixed_allocation_counts = fixed_allocation_counts_for(allocation_fellowships)
     distributing_fellowships = fellowships
-      .reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) || FIXED_ALLOCATION_COUNTS.key?(fellowship.name) }
+      .reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) }
       .select(&:altar_count?)
     raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
-    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) } + fixed_allocation_counts.values.sum
+    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) } + daibutsuden_scheduled_count(fellowships, scheduled_counts)
     shortfall = qualified_spirit_count - scheduled_total
     raise DistributionError, "合格霊数が予定霊数を下回っています" if shortfall.negative?
 
@@ -66,8 +65,8 @@ class CeremonyScheduleAllocation < ApplicationRecord
       end
 
       rows = allocation_fellowships.map do |fellowship|
-        spirit_count = if fixed_allocation_counts.key?(fellowship.id)
-          fixed_allocation_counts.fetch(fellowship.id)
+        spirit_count = if fellowship.name == DAIBUTSUDEN_FELLOWSHIP_NAME
+          scheduled_counts.fetch(fellowship.id, 0)
         elsif fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES)
           0
         elsif additions.key?(fellowship.id)
@@ -92,11 +91,10 @@ class CeremonyScheduleAllocation < ApplicationRecord
     fellowships = Fellowship.available.to_a
     scheduled_counts = scheduled_spirit_counts_for(event)
     allocation_fellowships = allocation_fellowships_for(fellowships, scheduled_counts)
-    fixed_allocation_counts = fixed_allocation_counts_for(allocation_fellowships)
-    remaining_spirit_count = qualified_spirit_count - fixed_allocation_counts.values.sum
-    raise DistributionError, "合格霊数が固定割り振り数を下回っています" if remaining_spirit_count.negative?
+    remaining_spirit_count = qualified_spirit_count - daibutsuden_scheduled_count(fellowships, scheduled_counts)
+    raise DistributionError, "合格霊数が予定霊数を下回っています" if remaining_spirit_count.negative?
 
-    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) || FIXED_ALLOCATION_COUNTS.key?(fellowship.name) }.select(&:altar_count?)
+    distributing_fellowships = fellowships.reject { |fellowship| fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES) }.select(&:altar_count?)
     raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
     total_altar_count = distributing_fellowships.sum(&:altar_count)
@@ -118,7 +116,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
       {
         event_id: event.id,
         fellowship_id: fellowship.id,
-        spirit_count: fixed_allocation_counts.fetch(fellowship.id, allocation_counts.fetch(fellowship.id, 0)),
+        spirit_count: fellowship.name == DAIBUTSUDEN_FELLOWSHIP_NAME ? scheduled_counts.fetch(fellowship.id, 0) : allocation_counts.fetch(fellowship.id, 0),
         created_at: timestamp,
         updated_at: timestamp
       }
@@ -154,16 +152,15 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
   private
 
-  def self.fixed_allocation_counts_for(fellowships)
-    fellowships.filter_map do |fellowship|
-      [ fellowship.id, FIXED_ALLOCATION_COUNTS.fetch(fellowship.name) ] if FIXED_ALLOCATION_COUNTS.key?(fellowship.name)
-    end.to_h
-  end
-
   def self.allocation_fellowships_for(fellowships, scheduled_counts)
     fellowships.reject do |fellowship|
       fellowship.name.in?(HIDE_WITHOUT_SCHEDULE_FELLOWSHIP_NAMES) && !scheduled_counts.key?(fellowship.id)
     end
+  end
+
+  def self.daibutsuden_scheduled_count(fellowships, scheduled_counts)
+    daibutsuden = fellowships.find { |fellowship| fellowship.name == DAIBUTSUDEN_FELLOWSHIP_NAME }
+    scheduled_counts.fetch(daibutsuden&.id, 0)
   end
 
   def self.trim_overflow!(event:, qualified_spirit_count:)

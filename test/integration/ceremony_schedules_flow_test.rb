@@ -183,7 +183,7 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_not_includes allocation_section, "（−204）"
   end
 
-  test "Daibutsuden receives the final twenty numbers" do
+  test "Daibutsuden receives its scheduled count at the final numbers" do
     daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#222222", display_order: 3, region: @region)
     CeremonySchedule.create!(
       fellowship: @meeting,
@@ -191,16 +191,24 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
       ceremony_at: Time.zone.local(2026, 5, 1, 10, 0),
       place: "大江戸会館",
       assistant_count: 1,
-      spirit_count: 80
+      spirit_count: 50
     )
-    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 80)
-    CeremonyScheduleAllocation.create!(event: @event, fellowship: daibutsuden, spirit_count: 20)
+    CeremonySchedule.create!(
+      fellowship: daibutsuden,
+      event: @event,
+      ceremony_at: Time.zone.local(2026, 5, 2, 10, 0),
+      place: "大仏殿",
+      assistant_count: 1,
+      spirit_count: 50
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 50)
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: daibutsuden, spirit_count: 50)
 
     get ceremony_schedules_path
 
     allocation_section = response.body.split("番号割り振り", 2).last
     assert_operator allocation_section.index("大江戸"), :<, allocation_section.index("大仏殿")
-    assert_includes allocation_section, ">81 〜 100<"
+    assert_includes allocation_section, ">51 〜 100<"
   end
 
   test "number allocations exclude an Ibaraki allocation without a schedule" do
