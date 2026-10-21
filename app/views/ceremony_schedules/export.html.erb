@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title><%= @selected_event.name %> 挙行予定表</title>
     <style>
-      @page { size: A4 portrait; margin: 7mm; }
+      @page { size: A4 portrait; margin: 7mm 7mm 2mm; }
       * { box-sizing: border-box; }
       body { margin: 0; color: #000; font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; font-size: 7.4pt; line-height: 1.1; }
       h1, h2, p { margin: 0; }
@@ -13,6 +13,7 @@
       .document-header, .section-heading { display: flex; align-items: baseline; justify-content: space-between; }
       .document-header { border-bottom: 1px solid #000; margin-bottom: 2.5mm; padding-bottom: 1.2mm; }
       .section-heading { margin: 2mm 0 1mm; }
+      .allocation-section { margin-top: 5mm; break-inside: avoid; page-break-inside: avoid; }
       .totals { display: flex; gap: 4mm; font-weight: 700; }
       table { width: 100%; border-collapse: collapse; table-layout: fixed; }
       tr { height: 7.2mm; }
@@ -110,7 +111,7 @@
       </table>
     </section>
 
-    <section>
+    <section class="allocation-section">
       <div class="section-heading"><h2>番号割り振り</h2><p>伝道会ごとの霊数合計</p></div>
       <table class="allocation-table">
         <thead><tr><th class="allocation-fellowship">伝道会名</th><th class="allocation-altars">壇数</th><th class="allocation-requested">希望数<br>（追加数）</th><th class="allocation-spirits">霊数</th><th class="allocation-numbers">番号</th></tr></thead>
