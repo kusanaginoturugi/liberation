@@ -41,10 +41,28 @@ class CeremonyScheduleAllocationsController < ApplicationController
   end
 
   def save_allocation(allocation)
+    if allocation.fellowship.name == CeremonyScheduleAllocation::DAIBUTSUDEN_FELLOWSHIP_NAME
+      qualified_spirit_count = EventDetail.find_by(event: allocation.event, region_id: primary_region_id)&.total_serial_count
+      unless qualified_spirit_count
+        redirect_to ceremony_schedules_path(event_id: allocation.event_id), alert: "合格霊数が設定されていません"
+        return
+      end
+
+      CeremonyScheduleAllocation.rebalance_for_daibutsuden_count!(
+        event: allocation.event,
+        qualified_spirit_count:,
+        daibutsuden_count: allocation.spirit_count
+      )
+      redirect_to ceremony_schedules_path(event_id: allocation.event_id), notice: "大仏殿の霊数に合わせて割り振りを更新しました"
+      return
+    end
+
     if allocation.save
       redirect_to ceremony_schedules_path(event_id: allocation.event_id), notice: "割り振り霊数を更新しました"
     else
       redirect_to ceremony_schedules_path(event_id: allocation.event_id), alert: allocation.errors.full_messages.to_sentence
     end
+  rescue CeremonyScheduleAllocation::DistributionError, ActiveRecord::RecordInvalid => e
+    redirect_to ceremony_schedules_path(event_id: allocation.event_id), alert: e.message
   end
 end

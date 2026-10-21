@@ -211,6 +211,71 @@ class CeremonySchedulesFlowTest < ActionDispatch::IntegrationTest
     assert_includes allocation_section, ">51 〜 100<"
   end
 
+  test "admin can manually change Daibutsuden while keeping the qualified total" do
+    daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#222222", display_order: 3, region: @region)
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 100)
+    CeremonySchedule.create!(
+      fellowship: @meeting, event: @event, ceremony_at: Time.zone.local(2026, 5, 1, 10, 0),
+      place: "大江戸会館", assistant_count: 1, spirit_count: 50
+    )
+    CeremonySchedule.create!(
+      fellowship: daibutsuden, event: @event, ceremony_at: Time.zone.local(2026, 5, 2, 10, 0),
+      place: "大仏殿", assistant_count: 1, spirit_count: 50
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 50)
+    daibutsuden_allocation = CeremonyScheduleAllocation.create!(event: @event, fellowship: daibutsuden, spirit_count: 50)
+    admin = User.create!(
+      name: "管理者", email: "admin-daibutsuden@example.com", password: "password123", password_confirmation: "password123",
+      region: @region, admin: true
+    )
+
+    post session_path, params: { login_id: admin.login_id, password: "password123" }
+    patch ceremony_schedule_allocation_path(daibutsuden_allocation), params: {
+      ceremony_schedule_allocation: { event_id: @event.id, fellowship_id: daibutsuden.id, spirit_count: 40 }
+    }
+
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
+    assert_equal 60, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 40, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: daibutsuden).spirit_count
+    assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+  end
+
+  test "updating Daibutsuden's schedule resets its allocation to the scheduled count" do
+    daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#222222", display_order: 3, region: @region)
+    EventDetail.create!(event: @event, region: @region, total_serial_count: 100)
+    CeremonySchedule.create!(
+      fellowship: @meeting, event: @event, ceremony_at: Time.zone.local(2026, 5, 1, 10, 0),
+      place: "大江戸会館", assistant_count: 1, spirit_count: 50
+    )
+    daibutsuden_schedule = CeremonySchedule.create!(
+      fellowship: daibutsuden, event: @event, ceremony_at: Time.zone.local(2026, 5, 2, 10, 0),
+      place: "大仏殿", assistant_count: 1, spirit_count: 50
+    )
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: daibutsuden, spirit_count: 40)
+    CeremonyScheduleAllocation.create!(event: @event, fellowship: @meeting, spirit_count: 60)
+    admin = User.create!(
+      name: "管理者", email: "admin-daibutsuden-schedule@example.com", password: "password123", password_confirmation: "password123",
+      region: @region, admin: true
+    )
+
+    post session_path, params: { login_id: admin.login_id, password: "password123" }
+    patch ceremony_schedule_path(daibutsuden_schedule), params: {
+      ceremony_schedule: {
+        fellowship_id: daibutsuden.id,
+        ceremony_at: "2026-05-02T10:00",
+        place: "大仏殿",
+        assistant_count: 1,
+        spirit_count: 30,
+        minister_name: ""
+      }
+    }
+
+    assert_redirected_to ceremony_schedules_path(event_id: @event.id)
+    assert_equal 30, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: daibutsuden).spirit_count
+    assert_equal 70, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+  end
+
   test "number allocations exclude an Ibaraki allocation without a schedule" do
     ibaraki = Fellowship.create!(name: "茨城", color_code: "#222222", display_order: 3, region: @region)
     CeremonySchedule.create!(

@@ -113,4 +113,22 @@ class CeremonyScheduleAllocationTest < ActiveSupport::TestCase
     assert_nil CeremonyScheduleAllocation.find_by(event: @event, fellowship: ibaraki)
     assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
   end
+
+  test "rebalances the other fellowships when Daibutsuden is manually changed" do
+    daibutsuden = Fellowship.create!(name: "大仏殿", color_code: "#333333", region: @region)
+    CeremonySchedule.create!(
+      event: @event, fellowship: daibutsuden, ceremony_at: Time.zone.local(2026, 10, 2, 10),
+      place: "大仏殿", assistant_count: 1, spirit_count: 50
+    )
+
+    CeremonyScheduleAllocation.rebalance_for_daibutsuden_count!(
+      event: @event,
+      qualified_spirit_count: 100,
+      daibutsuden_count: 40
+    )
+
+    assert_equal 60, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: @meeting).spirit_count
+    assert_equal 40, CeremonyScheduleAllocation.find_by!(event: @event, fellowship: daibutsuden).spirit_count
+    assert_equal 100, CeremonyScheduleAllocation.allocated_spirit_count_for(@event)
+  end
 end

@@ -30,7 +30,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
     end
   end
 
-  def self.distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: false)
+  def self.distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: false, daibutsuden_count: nil)
     fellowships = Fellowship.available.to_a
     scheduled_counts = scheduled_spirit_counts_for(event)
     allocation_fellowships = allocation_fellowships_for(fellowships, scheduled_counts)
@@ -39,7 +39,12 @@ class CeremonyScheduleAllocation < ApplicationRecord
       .select(&:altar_count?)
     raise DistributionError, "壇数が設定された伝道会がありません" if distributing_fellowships.empty?
 
-    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) } + daibutsuden_scheduled_count(fellowships, scheduled_counts)
+    daibutsuden_count ||= daibutsuden_scheduled_count(fellowships, scheduled_counts)
+    unless daibutsuden_count.is_a?(Integer) && daibutsuden_count >= 0
+      raise DistributionError, "大仏殿の霊数を0以上で入力してください"
+    end
+
+    scheduled_total = distributing_fellowships.sum { |fellowship| scheduled_counts.fetch(fellowship.id, 0) } + daibutsuden_count
     shortfall = qualified_spirit_count - scheduled_total
     raise DistributionError, "合格霊数が予定霊数を下回っています" if shortfall.negative?
 
@@ -66,7 +71,7 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
       rows = allocation_fellowships.map do |fellowship|
         spirit_count = if fellowship.name == DAIBUTSUDEN_FELLOWSHIP_NAME
-          scheduled_counts.fetch(fellowship.id, 0)
+          daibutsuden_count
         elsif fellowship.name.in?(NON_DISTRIBUTION_FELLOWSHIP_NAMES)
           0
         elsif additions.key?(fellowship.id)
@@ -85,6 +90,10 @@ class CeremonyScheduleAllocation < ApplicationRecord
 
   def self.rebalance_for_qualified_count!(event:, qualified_spirit_count:)
     distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true).merge(rebalanced: true)
+  end
+
+  def self.rebalance_for_daibutsuden_count!(event:, qualified_spirit_count:, daibutsuden_count:)
+    distribute_shortfall!(event:, qualified_spirit_count:, preserve_snapshot: true, daibutsuden_count:).merge(rebalanced: true)
   end
 
   def self.distribute_by_altar_count!(event:, qualified_spirit_count:, record_snapshot: false)

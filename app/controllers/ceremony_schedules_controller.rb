@@ -190,9 +190,11 @@ class CeremonySchedulesController < ApplicationController
       @joint_schedule_contributions.each do |contribution|
         @ceremony_schedule.ceremony_schedule_fellowships.create!(contribution)
       end
+      reset_daibutsuden_allocation!
     end
     true
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid, CeremonyScheduleAllocation::DistributionError => e
+    @ceremony_schedule.errors.add(:base, e.message) if e.is_a?(CeremonyScheduleAllocation::DistributionError)
     false
   end
 
@@ -201,6 +203,18 @@ class CeremonySchedulesController < ApplicationController
     return if current_user&.admin?
 
     @ceremony_schedule.fellowship = current_user.fellowship
+  end
+
+  def reset_daibutsuden_allocation!
+    return unless @ceremony_schedule.fellowship.name == CeremonyScheduleAllocation::DAIBUTSUDEN_FELLOWSHIP_NAME
+
+    qualified_spirit_count = qualified_spirit_count_for(@ceremony_schedule.event)
+    return unless qualified_spirit_count
+
+    CeremonyScheduleAllocation.rebalance_for_qualified_count!(
+      event: @ceremony_schedule.event,
+      qualified_spirit_count:
+    )
   end
 
   def authorized_fellowship?(fellowship)
