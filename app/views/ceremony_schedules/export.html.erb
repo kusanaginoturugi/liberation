@@ -13,7 +13,7 @@
       .document-header, .section-heading { display: flex; align-items: baseline; justify-content: space-between; }
       .document-header { border-bottom: 1px solid #000; margin-bottom: 2.5mm; padding-bottom: 1.2mm; }
       .section-heading { margin: 2mm 0 1mm; }
-      .allocation-section { margin-top: 50mm; break-inside: avoid; page-break-inside: avoid; }
+      .allocation-section { margin-top: 8mm; break-inside: avoid; page-break-inside: avoid; }
       .totals { display: flex; gap: 4mm; font-weight: 700; }
       table { width: 100%; border-collapse: collapse; table-layout: fixed; }
       tr { height: 6.3mm; }
@@ -43,6 +43,8 @@
       .allocation-requested { width: 16%; }
       .allocation-numbers { width: 32%; }
       .allocation-table td { vertical-align: middle; }
+      .allocation-table { font-size: 10pt; }
+      .allocation-table tr { height: 10.5mm; }
       .allocation-table td.allocation-fellowship { text-align: left; }
       .allocation-table td.allocation-altars,
       .allocation-table td.allocation-requested,
@@ -52,6 +54,7 @@
       .allocation-final-count { display: inline-block; min-width: 9mm; text-align: right; vertical-align: middle; }
       .allocation-breakdown { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 0.3mm; text-align: right; vertical-align: middle; }
       .allocation-addition { color: #6c58ab; font-size: 6.4pt; font-weight: 700; white-space: nowrap; }
+      .allocation-table .allocation-addition { font-size: 8.6pt; }
       .empty { text-align: center; }
     </style>
   </head>
