@@ -89,7 +89,7 @@
 
     <p class="print-note">この画面は印刷用です。ブラウザの印刷機能から PDF 保存してください。</p>
 
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       window.addEventListener("load", () => window.print());
     </script>
   </body>

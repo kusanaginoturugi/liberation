@@ -23,5 +23,9 @@ module Liberation
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Disable browser features the application does not use.
+    # Rails' permissions_policy DSL still emits the older Feature-Policy header.
+    config.action_dispatch.default_headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
   end
 end

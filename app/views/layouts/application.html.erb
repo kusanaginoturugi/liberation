@@ -71,7 +71,7 @@
     </header>
     <%= yield %>
 
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       (() => {
         const initializeApplication = () => {
         const normalizeNumericValue = (value) =>

@@ -53,7 +53,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
       row.addEventListener("click", () => {

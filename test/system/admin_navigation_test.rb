@@ -32,4 +32,17 @@ class AdminNavigationTest < ApplicationSystemTestCase
     management_button.click
     assert_selector management_menu, visible: true
   end
+
+  test "inline scripts run under the content security policy" do
+    visit new_session_path
+    fill_in "ログインID", with: @admin.login_id
+    fill_in "パスワード", with: "password123"
+    click_button "ログイン"
+
+    assert_selector "html[data-application-listeners-bound='true']", visible: :all
+
+    visit users_path
+    find(".clickable-row[data-href]", text: @admin.name).click
+    assert_current_path edit_user_path(@admin)
+  end
 end

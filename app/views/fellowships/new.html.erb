@@ -65,7 +65,7 @@
   </section>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   document.addEventListener("DOMContentLoaded", () => {
     const picker = document.querySelector("[data-color-target='picker']");
     const text = document.querySelector("[data-color-target='text']");
