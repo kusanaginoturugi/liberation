@@ -468,6 +468,8 @@ class ChobatsuReportsController < ApplicationController
 
   def csv_escape(value)
     text = value.to_s
+    # Keep spreadsheet apps from evaluating user-entered text as a formula.
+    text = "'#{text}" if value.is_a?(String) && text.match?(/\A[=+\-@\t\r]/)
     return text unless text.match?(/[",\n]/)
 
     %("#{text.gsub('"', '""')}")

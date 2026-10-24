@@ -127,6 +127,9 @@ class SessionsController < ApplicationController
     if user_by_subject && user_by_email && user_by_subject != user_by_email
       raise AuthentikClient::Error, "Authentikの利用者情報が既存の利用者と一致しません"
     end
+    if user_by_subject.nil? && user_by_email&.authentik_subject.present?
+      raise AuthentikClient::Error, "Authentikの利用者情報が既存の利用者と一致しません"
+    end
 
     user_by_subject || user_by_email || User.new
   end

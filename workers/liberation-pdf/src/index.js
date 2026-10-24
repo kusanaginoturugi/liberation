@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env) {
-    if (request.method !== "POST" || request.headers.get("Authorization") !== `Bearer ${env.PDF_TOKEN}`) {
+    if (!env.PDF_TOKEN || request.method !== "POST" || request.headers.get("Authorization") !== `Bearer ${env.PDF_TOKEN}`) {
       return new Response("Unauthorized", { status: 401 });
     }
 

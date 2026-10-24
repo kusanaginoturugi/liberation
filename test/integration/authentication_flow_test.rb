@@ -115,6 +115,24 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "別のAuthentik利用者に結び付いたユーザーにはメールアドレスで結び付けません" do
+    @user.update!(authentik_subject: "authentik-original-1")
+
+    with_authentik do
+      claims = {
+        "sub" => "authentik-other-1",
+        "email" => @user.email,
+        "name" => "別の利用者",
+        "groups" => [ "liberation-admin" ]
+      }
+
+      complete_authentik_login(claims)
+
+      assert_redirected_to new_session_path
+      assert_equal "authentik-original-1", @user.reload.authentik_subject
+    end
+  end
+
   test "Authentikの伝道会グループで新しい担当者を作成します" do
     with_authentik do
       claims = {

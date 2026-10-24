@@ -2,6 +2,8 @@ class OverseasChobatsuEntriesController < ApplicationController
   before_action :load_events
   before_action :set_selected_event
   before_action :require_admin!, only: [ :update_assignments, :auto_fill_assignments, :reset_assignments ]
+  rate_limit to: 20, within: 1.minute, only: :export,
+             with: -> { render plain: "PDFの作成が混み合っています。しばらくしてからお試しください", status: :too_many_requests }
 
   def index
     load_entries

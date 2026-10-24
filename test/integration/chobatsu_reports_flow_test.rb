@@ -442,6 +442,26 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "2026/04/09,#{@meeting.name},2,4"
   end
 
+  test "report csv neutralizes spreadsheet formulas" do
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 9),
+      region: @region,
+      event: @event,
+      user: @user,
+      fellowship: @meeting,
+      participant_count: 2,
+      serial_number_from: 1,
+      serial_number_to: 4,
+      merit_fee_total: 20000,
+      notes: "=HYPERLINK(\"https://example.com\")"
+    )
+
+    get export_chobatsu_reports_path(format: :csv, event_id: @event.id, encoding: :utf8)
+
+    assert_response :success
+    assert_includes response.body, %("'=HYPERLINK(""https://example.com"")")
+  end
+
   test "report page exports csv with utf-8 bom" do
     ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 9),

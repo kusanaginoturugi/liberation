@@ -1,5 +1,7 @@
 class CeremonySchedulesController < ApplicationController
   allow_unauthenticated_access only: [ :index, :export ]
+  rate_limit to: 20, within: 1.minute, only: :export,
+             with: -> { render plain: "PDFの作成が混み合っています。しばらくしてからお試しください", status: :too_many_requests }
 
   before_action :set_ceremony_schedule, only: [ :edit, :update, :destroy ]
   before_action :load_events
