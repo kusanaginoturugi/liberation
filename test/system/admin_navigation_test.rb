@@ -44,5 +44,11 @@ class AdminNavigationTest < ApplicationSystemTestCase
     visit users_path
     find(".clickable-row[data-href]", text: @admin.name).click
     assert_current_path edit_user_path(@admin)
+
+    newer_event = Event.create!(name: "第76次修霊超抜式")
+    visit root_path
+    assert_text "対象超抜式: #{newer_event.name}"
+    select "第75次修霊超抜式", from: "超抜式"
+    assert_text "対象超抜式: 第75次修霊超抜式"
   end
 end

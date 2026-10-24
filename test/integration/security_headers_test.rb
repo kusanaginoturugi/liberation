@@ -11,7 +11,14 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
     nonce = policy[/script-src 'self' 'nonce-([^']+)'/, 1]
     assert nonce.present?
     assert_includes response.body, %(<script nonce="#{nonce}">)
-    assert_no_match(/<script>/, response.body)
+    assert_not_includes response.body, "<script>"
+  end
+
+  test "views do not use inline event handlers blocked by the content security policy" do
+    handler = /(?<![\w-])on[a-z]+(?::\s*["']|=["'])/
+    offenders = Dir[Rails.root.join("app/views/**/*.erb")].select { |path| File.read(path).match?(handler) }
+
+    assert_empty offenders
   end
 
   test "pages restrict unused browser features" do

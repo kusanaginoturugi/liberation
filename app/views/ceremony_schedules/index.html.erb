@@ -21,7 +21,7 @@
       <%= form_with url: ceremony_schedules_path, method: :get, class: "region-filter-form" do |form| %>
         <div class="field">
           <%= form.label :event_id, "超抜式" %>
-          <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event.id }, { onchange: "this.form.requestSubmit()" } %>
+          <%= form.collection_select :event_id, @events, :id, :name, { selected: @selected_event.id }, { data: { auto_submit: true } } %>
         </div>
       <% end %>
       <% if @selected_event.judgment_ceremony_on || @selected_event.chobatsu_starts_on || @selected_event.chobatsu_ends_on %>
@@ -220,7 +220,7 @@
               <%= form_with model: row[:allocation], class: "allocation-count-form" do |form| %>
                 <%= form.hidden_field :event_id %>
                 <%= form.hidden_field :fellowship_id %>
-                <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true }, onfocus: "this.select()", onchange: "this.form.requestSubmit()" %>
+                <%= form.number_field :spirit_count, min: 0, inputmode: "numeric", pattern: "[0-9]*", data: { numeric_only: true, select_on_focus: true, auto_submit: true } %>
               <% end %>
             <% else %>
               <span class="allocation-breakdown">

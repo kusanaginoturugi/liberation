@@ -30,6 +30,7 @@ SE_CHROME_PATH=/usr/bin/chromium SE_CHROMEDRIVER=/usr/bin/chromedriver bin/rails
 ## セキュリティヘッダー
 
 - CSP は `config/initializers/content_security_policy.rb`。`script-src 'self' 'nonce-…'` なので、ビューに `<script>` を書くときは `<script nonce="<%= content_security_policy_nonce %>">` にする。付け忘れるとその script は CSP で止まる。`test/integration/security_headers_test.rb` がヘッダーとレイアウトの nonce を、`test/system/admin_navigation_test.rb` がレイアウトと利用者一覧の script が実際に動くことを確認している。
+- `onchange=` などの inline イベントハンドラーも CSP で止まる。セレクトの自動送信は `data: { auto_submit: true }`、フォーカス時の全選択は `data: { select_on_focus: true }` を付け、レイアウトの委譲リスナーで処理する。ビューに inline ハンドラーがあると `security_headers_test.rb` が失敗する。
 - `style-src` は `'unsafe-inline'` を許可している。ビューが `style=` 属性を使うため。nonce を `style-src` に付けると `'unsafe-inline'` が無効になるので付けない。
 - `Permissions-Policy` は `config/application.rb` の `default_headers`。Rails の `permissions_policy` DSL は旧 `Feature-Policy` ヘッダーを出すので使っていない。
 - HSTS (`max-age=63072000; includeSubDomains`) は `config.force_ssl` の Rails 既定値。
@@ -56,4 +57,5 @@ SE_CHROME_PATH=/usr/bin/chromium SE_CHROMEDRIVER=/usr/bin/chromedriver bin/rails
   - PDF Worker で `PDF_TOKEN` が未設定なら 401 を返す (未設定だと `Bearer undefined` で通るため)。本番の Worker は設定済みで、`Bearer undefined` は 401 だった。この修正の Worker への反映は、Worker のある Cloudflare アカウントで `wrangler deploy` が必要。
 - ヘッダー: CSP (inline script は nonce)、`Permissions-Policy` を追加。
 - GitHub: Actions を commit SHA で固定、`permissions: contents: read`、`persist-credentials: false`、CI の週次実行と `bundler-audit`、deploy のシークレットを Deploy ステップだけに渡す。CodeQL (actions / ruby / javascript-typescript) と Dependency Review を追加。Dependabot alerts (vulnerability-alerts) を有効化。Dependabot security updates は無効のまま。
-- 検証: `bin/rails test` 101 件、`test:system` 2 件、rubocop、brakeman が通る。system test は layout の nonce を外すと失敗することを確認した。
+- 検証: `bin/rails test` 102 件、`test:system` 2 件、rubocop、brakeman が通る。system test は layout の nonce を外すと失敗することを確認した。
+- CSP の反映後、本番のトップページで `onchange="this.form.requestSubmit()"` (超抜式の切り替え) が止まっていた。ビュー検索が1行の `<script>` と `on*=` しか見ておらず、`onchange:` のような Ruby のオプションを見落とした。超抜式・聖院・伝道会の自動送信、配分数欄の `onfocus` / `onchange`、超抜式一覧の「設定」リンクの `onclick` を data 属性と委譲リスナーに置き換え、inline ハンドラーを検出するテストと、自動送信を確かめる system test を足した。

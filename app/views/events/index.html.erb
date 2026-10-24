@@ -43,7 +43,7 @@
               <% if event.closed? %>
                 <span class="muted-text">変更不可</span>
               <% else %>
-                <%= link_to "設定", edit_event_path(event), class: "text-link", onclick: "event.stopPropagation();" %>
+                <%= link_to "設定", edit_event_path(event), class: "text-link" %>
               <% end %>
             </td>
           </tr>
@@ -56,7 +56,9 @@
 <script nonce="<%= content_security_policy_nonce %>">
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".clickable-row[data-href]").forEach((row) => {
-      row.addEventListener("click", () => {
+      row.addEventListener("click", (event) => {
+        if (event.target instanceof Element && event.target.closest("a")) return;
+
         window.location.href = row.dataset.href;
       });
 

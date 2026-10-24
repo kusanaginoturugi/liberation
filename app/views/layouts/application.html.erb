@@ -195,6 +195,21 @@
           sanitizeLoginIdField(loginIdField);
           }, true);
 
+          // Inline on* handlers are blocked by the Content-Security-Policy, so forms opt in with data attributes.
+          document.addEventListener("change", (event) => {
+            if (!(event.target instanceof HTMLSelectElement || event.target instanceof HTMLInputElement)) return;
+            if (event.target.dataset.autoSubmit !== "true") return;
+
+            event.target.form?.requestSubmit();
+          });
+
+          document.addEventListener("focusin", (event) => {
+            if (!(event.target instanceof HTMLInputElement)) return;
+            if (event.target.dataset.selectOnFocus !== "true") return;
+
+            event.target.select();
+          });
+
           const closeNavigationMenus = () => {
             document.querySelectorAll("details.nav-dropdown[open]").forEach((dropdown) => {
               dropdown.open = false;
