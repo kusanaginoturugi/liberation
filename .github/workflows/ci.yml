@@ -5,6 +5,12 @@ on:
   pull_request:
   push:
     branches: [ main ]
+  schedule:
+    # 依存の新しい脆弱性を週次で検出する (deploy は push / workflow_dispatch のみ)
+    - cron: "0 0 * * 1"
+
+permissions:
+  contents: read
 
 jobs:
   scan_ruby:
@@ -12,10 +18,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: .ruby-version
           bundler-cache: true
@@ -23,15 +31,20 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
+      - name: Scan for known security vulnerabilities in gems used
+        run: bin/bundler-audit check --update
+
   scan_js:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: .ruby-version
           bundler-cache: true
@@ -48,10 +61,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: .ruby-version
           bundler-cache: true
@@ -73,10 +88,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config google-chrome-stable
 
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: .ruby-version
           bundler-cache: true
@@ -88,7 +105,7 @@ jobs:
         run: bin/rails db:test:prepare test test:system
 
       - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:
           name: screenshots
@@ -103,12 +120,9 @@ jobs:
       - lint
       - test
     runs-on: ubuntu-latest
-    env:
-      AUTHENTIK_CLIENT_SECRET: ${{ secrets.AUTHENTIK_CLIENT_SECRET }}
-      CLOUDFLARE_PDF_TOKEN: ${{ secrets.CLOUDFLARE_PDF_TOKEN }}
 
     steps:
-      - uses: tailscale/github-action@v4
+      - uses: tailscale/github-action@99a8333667fff04fdd6cffb46dfd409f8329a7bf # v4.3.0
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
@@ -117,6 +131,8 @@ jobs:
       - name: Deploy
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          AUTHENTIK_CLIENT_SECRET: ${{ secrets.AUTHENTIK_CLIENT_SECRET }}
+          CLOUDFLARE_PDF_TOKEN: ${{ secrets.CLOUDFLARE_PDF_TOKEN }}
         run: |
           install -m 600 /dev/null ~/deploy_key
           printf '%s\n' "$SSH_KEY" > ~/deploy_key

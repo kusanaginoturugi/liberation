@@ -6,7 +6,7 @@
 
 ## 接続経路
 
-1. `tailscale/github-action@v3` が OAuth client で runner を tailnet に参加させる。runner には `tag:ci` が付き、ジョブ終了後に自動で消える。
+1. `tailscale/github-action` (v4、commit SHA で固定) が OAuth client で runner を tailnet に参加させる。runner には `tag:ci` が付き、ジョブ終了後に自動で消える。
 2. runner は CI 専用鍵で `admin@showway-t4g.tailb46b1.ts.net` の `65522` 番へ SSH する。このポートはアプリが動く nspawn コンテナの sshd に届く。
 3. コンテナ内の `/home/admin/liberation` で `scripts/deploy.sh` を実行する。
 
