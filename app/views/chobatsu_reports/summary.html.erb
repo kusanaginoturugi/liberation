@@ -66,7 +66,18 @@
       <table class="admin-table summary-table">
         <thead>
           <tr>
-            <th style="width: 3em">No.</th>
+            <th style="width: 3em">
+              <%= link_to summary_chobatsu_reports_path(
+                    event_id: @selected_event&.id,
+                    region_id: @selected_region&.id,
+                    sort: :number,
+                    direction: @summary_sort_column == :number && @summary_sort_direction == :asc ? :desc : :asc
+                  ),
+                  class: "summary-sort-link" do %>
+                No.
+                <span><%= @summary_sort_column == :number && @summary_sort_direction == :desc ? "▲" : "▼" %></span>
+              <% end %>
+            </th>
             <th style="width: 7em">
               <%= link_to summary_chobatsu_reports_path(
                     event_id: @selected_event&.id,

@@ -375,11 +375,20 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def summary_sort_column
-    params[:sort] == "ceremony_date" ? :ceremony_date : :fellowship
+    case params[:sort]
+    when "number"
+      :number
+    when "ceremony_date"
+      :ceremony_date
+    else
+      :fellowship
+    end
   end
 
   def ordered_summary_reports(reports)
     case @summary_sort_column
+    when :number
+      reports.reorder(id: @summary_sort_direction)
     when :ceremony_date
       reports.reorder(ceremony_date: @summary_sort_direction, id: @summary_sort_direction)
     else

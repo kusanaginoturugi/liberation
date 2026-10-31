@@ -345,6 +345,48 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "▲"
   end
 
+  test "summary page sorts by registration number" do
+    first_report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 8),
+      region: @region,
+      event: @event,
+      user: @user,
+      fellowship: @meeting,
+      participant_count: 1,
+      serial_number_from: 1,
+      serial_number_to: 1,
+      merit_fee_total: 5000
+    )
+    second_report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 10),
+      region: @region,
+      event: @event,
+      user: @user,
+      fellowship: @meeting,
+      participant_count: 1,
+      serial_number_from: 2,
+      serial_number_to: 2,
+      merit_fee_total: 5000
+    )
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :number }
+
+    assert_response :success
+    ascending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    assert_equal [ first_report.ceremony_date.strftime("%Y/%m/%d"), second_report.ceremony_date.strftime("%Y/%m/%d") ],
+                 ascending_dates.first(2)
+    assert_includes response.body, "No."
+    assert_includes response.body, "▼"
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :number, direction: :desc }
+
+    assert_response :success
+    descending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    assert_equal [ second_report.ceremony_date.strftime("%Y/%m/%d"), first_report.ceremony_date.strftime("%Y/%m/%d") ],
+                 descending_dates.first(2)
+    assert_includes response.body, "▲"
+  end
+
   test "past event reports cannot be edited or deleted" do
     report = ChobatsuReport.create!(
       ceremony_date: Date.current,
