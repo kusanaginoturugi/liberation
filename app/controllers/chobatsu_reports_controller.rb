@@ -325,9 +325,11 @@ class ChobatsuReportsController < ApplicationController
     @selected_event = selected_event_for_index
     @summary_sort_column = summary_sort_column
     @summary_sort_direction = summary_sort_direction
-    @summary_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
-                     .includes(:user)
-                     .yield_self { |reports| ordered_summary_reports(reports) }
+    reports = reports_for_region_and_event(@selected_region.id, @selected_event.id).includes(:user)
+    @summary_report_numbers = reports.reorder(ceremony_date: :asc, id: :asc).ids.each_with_index.to_h do |id, index|
+      [ id, index + 1 ]
+    end
+    @summary_reports = ordered_summary_reports(reports)
   rescue ActiveRecord::RecordNotFound
     @regions = []
     @events = []
@@ -388,7 +390,7 @@ class ChobatsuReportsController < ApplicationController
   def ordered_summary_reports(reports)
     case @summary_sort_column
     when :number
-      reports.reorder(id: @summary_sort_direction)
+      reports.reorder(ceremony_date: @summary_sort_direction, id: @summary_sort_direction)
     when :ceremony_date
       reports.reorder(ceremony_date: @summary_sort_direction, id: @summary_sort_direction)
     else

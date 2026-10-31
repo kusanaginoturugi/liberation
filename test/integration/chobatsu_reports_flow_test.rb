@@ -345,7 +345,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "▲"
   end
 
-  test "summary page sorts by registration number" do
+  test "summary page numbers and sorts reports by ceremony date" do
     first_report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 8),
       region: @region,
@@ -385,6 +385,41 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ second_report.ceremony_date.strftime("%Y/%m/%d"), first_report.ceremony_date.strftime("%Y/%m/%d") ],
                  descending_dates.first(2)
     assert_includes response.body, "▲"
+  end
+
+  test "summary page keeps numbers in chronological order when grouped by fellowship" do
+    @meeting.update!(display_order: 2)
+    first_meeting = Fellowship.create!(name: "一番会場", color_code: "#111111", display_order: 1, region: @region, enabled: true)
+    later_report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 10),
+      region: @region,
+      event: @event,
+      user: @user,
+      fellowship: first_meeting,
+      participant_count: 1,
+      serial_number_from: 1,
+      serial_number_to: 1,
+      merit_fee_total: 5000
+    )
+    earlier_report = ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 8),
+      region: @region,
+      event: @event,
+      user: @user,
+      fellowship: @meeting,
+      participant_count: 1,
+      serial_number_from: 2,
+      serial_number_to: 2,
+      merit_fee_total: 5000
+    )
+
+    get summary_chobatsu_reports_path, params: { event_id: @event.id }
+
+    assert_response :success
+    assert_operator response.body.index(later_report.ceremony_date.strftime("%Y/%m/%d")), :<,
+                    response.body.index(earlier_report.ceremony_date.strftime("%Y/%m/%d"))
+    number_cells = response.body.scan(%r{<td data-label="No\.">(\d+)</td>}).flatten
+    assert_equal [ "2", "1" ], number_cells.first(2)
   end
 
   test "past event reports cannot be edited or deleted" do

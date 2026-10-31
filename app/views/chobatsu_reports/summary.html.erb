@@ -123,7 +123,7 @@
         <tbody>
           <% @summary_reports.each_with_index do |report, index| %>
             <tr>
-              <td data-label="No."><%= index + 1 %></td>
+              <td data-label="No."><%= @summary_report_numbers[report.id] %></td>
               <td data-label="挙行日"><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
               <td data-label="伝道会名">
                 <% report.report_display_name_lines.each do |line| %><span class="joint-report-line"><%= line %></span><% end %>
