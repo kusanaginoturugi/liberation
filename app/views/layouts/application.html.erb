@@ -224,6 +224,12 @@
           document.addEventListener("click", (event) => {
             if (!(event.target instanceof Element)) return;
 
+            const clickableRow = event.target.closest(".clickable-row[data-href]");
+            if (clickableRow) {
+              window.location.href = clickableRow.dataset.href;
+              return;
+            }
+
             if (event.target.closest(".nav-dropdown__item")) {
               closeNavigationMenus();
               return;
@@ -232,6 +238,17 @@
             if (event.target.closest(".nav-dropdown")) return;
 
             closeNavigationMenus();
+          });
+
+          document.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            if (!(event.target instanceof Element)) return;
+
+            const clickableRow = event.target.closest(".clickable-row[data-href]");
+            if (!clickableRow) return;
+
+            event.preventDefault();
+            window.location.href = clickableRow.dataset.href;
           });
         }
 
