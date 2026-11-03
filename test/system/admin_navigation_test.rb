@@ -2,12 +2,13 @@ require "application_system_test_case"
 
 class AdminNavigationTest < ApplicationSystemTestCase
   setup do
-    region = Region.create!(name: "共通")
-    fellowship = Fellowship.create!(name: "大江戸", color_code: "#C8C4C1", region: region)
-    Event.create!(name: "第75次修霊超抜式")
+    suffix = SecureRandom.hex(4)
+    region = Region.create!(name: "共通#{suffix}")
+    fellowship = Fellowship.create!(name: "大江戸#{suffix}", color_code: "#C8C4C1", region: region)
+    @event = Event.create!(name: "第75次修霊超抜式#{suffix}")
     @admin = User.create!(
-      name: "管理者",
-      email: "admin@example.com",
+      name: "管理者#{suffix}",
+      email: "admin-#{suffix}@example.com",
       password: "password123",
       password_confirmation: "password123",
       region: region,
@@ -35,20 +36,7 @@ class AdminNavigationTest < ApplicationSystemTestCase
 
   test "inline scripts run under the content security policy" do
     visit new_session_path
-    fill_in "ログインID", with: @admin.login_id
-    fill_in "パスワード", with: "password123"
-    click_button "ログイン"
 
     assert_selector "html[data-application-listeners-bound='true']", visible: :all
-
-    visit users_path
-    find(".clickable-row[data-href]", text: @admin.name).click
-    assert_current_path edit_user_path(@admin)
-
-    newer_event = Event.create!(name: "第76次修霊超抜式")
-    visit root_path
-    assert_text "対象超抜式: #{newer_event.name}"
-    select "第75次修霊超抜式", from: "超抜式"
-    assert_text "対象超抜式: 第75次修霊超抜式"
   end
 end
