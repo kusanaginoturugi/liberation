@@ -22,4 +22,8 @@ module ChobatsuReportsHelper
   def remaining_serial_count(total_serial_count, reports)
     [ total_serial_count.to_i - used_serial_count(reports), 0 ].max
   end
+
+  def yen_amount(amount)
+    number_to_currency(amount, unit: "円", format: "%n%u", precision: 0)
+  end
 end
