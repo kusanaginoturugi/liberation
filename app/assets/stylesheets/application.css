@@ -659,6 +659,11 @@ body.number-shadow-disabled .serial-grid td {
   gap: 12px;
 }
 
+.number-range-conflict {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .serial-number-range {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;

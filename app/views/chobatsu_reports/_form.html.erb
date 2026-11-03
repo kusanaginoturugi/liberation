@@ -10,7 +10,7 @@
 <% secondary_to = report.joint_secondary_serial_number_to.presence || secondary_contribution&.serial_number_to %>
 <% schedule_linked = report.ceremony_schedule_id.present? %>
 
-<%= form_with(model: report, class: "report-form", data: { joint_report_form: true, joint_report: report.joint_report? }) do |form| %>
+<%= form_with(model: report, class: "report-form", data: { joint_report_form: true, joint_report: report.joint_report?, serial_number_conflicts_url: serial_number_conflicts_chobatsu_reports_path, event_id: report.event_id, report_id: report.id }) do |form| %>
   <%= form.hidden_field :ceremony_schedule_id %>
   <div class="field-grid">
     <div class="field <%= "field-with-error" if report.errors[:ceremony_date].any? %>">
@@ -109,6 +109,76 @@
         const meritOutput = form.querySelector("[data-calc-target='meritOutput']");
         const mirokujiOutput = form.querySelector("[data-calc-target='mirokujiOutput']");
         const regionRefundOutput = form.querySelector("[data-calc-target='regionRefundOutput']");
+        const conflictUrl = form.dataset.serialNumberConflictsUrl;
+        const conflictCache = new Map();
+
+        const fellowshipIdFor = (list) => {
+          switch (list.dataset.fellowshipSource) {
+            case "joint_primary": return primaryFellowship?.value;
+            case "joint_secondary": return secondaryFellowship?.value;
+            default: return form.querySelector("[name='chobatsu_report[fellowship_id]']")?.value;
+          }
+        };
+
+        const rangeValues = (range) => {
+          const from = Number.parseInt(range.querySelector("[data-number-range-from]")?.value, 10);
+          const to = Number.parseInt(range.querySelector("[data-number-range-to]")?.value || from, 10);
+          return Number.isNaN(from) || Number.isNaN(to) || to < from ? null : { from, to };
+        };
+
+        const addRangeConflict = (range, message) => {
+          if (range.querySelector("[data-number-range-conflict]")) return;
+          const warning = document.createElement("p");
+          warning.className = "field-error number-range-conflict";
+          warning.dataset.numberRangeConflict = "true";
+          warning.textContent = message;
+          range.appendChild(warning);
+        };
+
+        const clearRangeConflicts = () => form.querySelectorAll("[data-number-range-conflict]").forEach((warning) => warning.remove());
+
+        const checkRangeConflicts = async () => {
+          clearRangeConflicts();
+          const lists = Array.from(form.querySelectorAll("[data-number-range-list], [data-joint-number-range-list]"))
+            .filter((list) => !list.querySelector("[data-number-range-from]")?.disabled);
+
+          lists.forEach((list) => {
+            const ranges = Array.from(list.querySelectorAll("[data-number-range]")).filter((range) => !range.hidden);
+            ranges.forEach((range, index) => {
+              const current = rangeValues(range);
+              if (!current) return;
+              ranges.slice(index + 1).forEach((otherRange) => {
+                const other = rangeValues(otherRange);
+                if (other && current.from <= other.to && current.to >= other.from) {
+                  addRangeConflict(range, "同じ報告内で使用修霊番号が重複しています");
+                  addRangeConflict(otherRange, "同じ報告内で使用修霊番号が重複しています");
+                }
+              });
+            });
+          });
+
+          await Promise.all(lists.map(async (list) => {
+            const fellowshipId = fellowshipIdFor(list);
+            if (!conflictUrl || !fellowshipId) return;
+
+            const cacheKey = String(fellowshipId);
+            if (!conflictCache.has(cacheKey)) {
+              const url = new URL(conflictUrl, window.location.origin);
+              url.search = new URLSearchParams({ event_id: form.dataset.eventId, fellowship_id: fellowshipId, report_id: form.dataset.reportId || "" });
+              const response = await fetch(url, { headers: { Accept: "application/json" } });
+              if (!response.ok) return;
+              conflictCache.set(cacheKey, (await response.json()).ranges);
+            }
+
+            if (fellowshipIdFor(list) !== fellowshipId) return;
+            const registeredRanges = conflictCache.get(cacheKey) || [];
+            Array.from(list.querySelectorAll("[data-number-range]")).filter((range) => !range.hidden).forEach((range) => {
+              const current = rangeValues(range);
+              const overlap = current && registeredRanges.find((registered) => current.from <= registered.to && current.to >= registered.from);
+              if (overlap) addRangeConflict(range, `登録済みの番号 ${overlap.from}〜${overlap.to}（${overlap.ceremony_date}）と重複しています`);
+            });
+          }));
+        };
 
         const updateJointLabels = () => {
           const nameFor = (select, fallback) => select?.value ? select.selectedOptions[0]?.textContent?.trim() : fallback;
@@ -148,16 +218,24 @@
         };
 
         toggle?.addEventListener("change", updateMode);
-        primaryFellowship?.addEventListener("change", updateJointLabels);
-        secondaryFellowship?.addEventListener("change", updateJointLabels);
+        primaryFellowship?.addEventListener("change", () => { updateJointLabels(); checkRangeConflicts(); });
+        secondaryFellowship?.addEventListener("change", () => { updateJointLabels(); checkRangeConflicts(); });
         form.addEventListener("input", (event) => {
-          if (event.target.matches("[data-number-range-from], [data-number-range-to]")) updateTotals();
+          if (event.target.matches("[data-number-range-from], [data-number-range-to]")) {
+            updateTotals();
+            checkRangeConflicts();
+          }
+          if (event.target.matches("[name='chobatsu_report[fellowship_id]']")) checkRangeConflicts();
+        });
+        form.addEventListener("change", (event) => {
+          if (event.target.matches("[name='chobatsu_report[fellowship_id]']")) checkRangeConflicts();
         });
         form.querySelectorAll("[data-number-range-list]").forEach((list) => {
           const additions = list.querySelector("[data-additional-number-ranges]");
           const template = list.querySelector("[data-number-range-template]");
           list.querySelector("[data-add-number-range]").addEventListener("click", () => {
             additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
+            checkRangeConflicts();
           });
           list.addEventListener("click", (event) => {
             if (!event.target.matches("[data-remove-number-range]")) return;
@@ -171,6 +249,7 @@
               range.remove();
             }
             updateTotals();
+            checkRangeConflicts();
           });
         });
         form.querySelectorAll("[data-joint-number-range-list]").forEach((list) => {
@@ -179,14 +258,17 @@
           list.querySelector("[data-add-joint-number-range]").addEventListener("click", () => {
             additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
             updateJointLabels();
+            checkRangeConflicts();
           });
           list.addEventListener("click", (event) => {
             if (!event.target.matches("[data-remove-number-range]")) return;
             event.target.closest("[data-number-range]").remove();
             updateTotals();
+            checkRangeConflicts();
           });
         });
         updateMode();
+        checkRangeConflicts();
       });
     };
 

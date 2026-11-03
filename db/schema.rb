@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_21_101000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_123000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.integer "event_id", null: false
     t.text "allocation_counts", default: "{}", null: false
@@ -83,6 +83,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_101000) do
     t.datetime "updated_at", null: false
     t.index ["chobatsu_report_id"], name: "index_chobatsu_report_fellowships_on_chobatsu_report_id"
     t.index ["fellowship_id"], name: "index_chobatsu_report_fellowships_on_fellowship_id"
+  end
+
+  create_table "chobatsu_report_serial_number_allocations", force: :cascade do |t|
+    t.integer "chobatsu_report_id", null: false
+    t.integer "event_id", null: false
+    t.integer "fellowship_id", null: false
+    t.integer "serial_number", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chobatsu_report_id"], name: "idx_on_chobatsu_report_id_d945604c87"
+    t.index ["event_id", "fellowship_id", "serial_number"], name: "idx_report_allocations_event_fellowship_number", unique: true
+    t.index ["event_id"], name: "index_chobatsu_report_serial_number_allocations_on_event_id"
+    t.index ["fellowship_id"], name: "idx_on_fellowship_id_5d672a7721"
   end
 
   create_table "chobatsu_reports", force: :cascade do |t|
@@ -225,6 +238,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_21_101000) do
   add_foreign_key "chobatsu_report_fellowship_serial_number_ranges", "chobatsu_report_fellowships"
   add_foreign_key "chobatsu_report_fellowships", "chobatsu_reports"
   add_foreign_key "chobatsu_report_fellowships", "fellowships"
+  add_foreign_key "chobatsu_report_serial_number_allocations", "chobatsu_reports"
+  add_foreign_key "chobatsu_report_serial_number_allocations", "events"
+  add_foreign_key "chobatsu_report_serial_number_allocations", "fellowships"
   add_foreign_key "chobatsu_reports", "ceremony_schedules"
   add_foreign_key "chobatsu_reports", "events"
   add_foreign_key "chobatsu_reports", "fellowships"

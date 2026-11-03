@@ -632,6 +632,53 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "重複しています"
   end
 
+  test "same range can be registered by another fellowship in the same event" do
+    other_fellowship = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region, enabled: true)
+    ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      region: @region,
+      event: @next_event,
+      fellowship: @meeting,
+      participant_count: 2,
+      serial_number_from: 10,
+      serial_number_to: 12,
+      merit_fee_total: 15_000
+    )
+
+    assert_difference("ChobatsuReport.count", 1) do
+      post chobatsu_reports_path, params: {
+        chobatsu_report: {
+          ceremony_date: Date.current,
+          fellowship_id: other_fellowship.id,
+          participant_count: 1,
+          serial_number_from: 10,
+          serial_number_to: 12
+        }
+      }
+    end
+
+    assert_redirected_to root_path
+  end
+
+  test "number conflict endpoint returns only the selected fellowship ranges" do
+    other_fellowship = Fellowship.create!(name: "お台場", color_code: "#111111", region: @region, enabled: true)
+    ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      region: @region,
+      event: @next_event,
+      fellowship: @meeting,
+      participant_count: 2,
+      serial_number_from: 10,
+      serial_number_to: 12,
+      merit_fee_total: 15_000
+    )
+
+    get serial_number_conflicts_chobatsu_reports_path(event_id: @next_event.id, fellowship_id: other_fellowship.id)
+
+    assert_response :success
+    assert_equal [], response.parsed_body.fetch("ranges")
+  end
+
   test "same range can be used in another event" do
     ChobatsuReport.create!(
       ceremony_date: Date.current,

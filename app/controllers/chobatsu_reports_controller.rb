@@ -37,6 +37,18 @@ class ChobatsuReportsController < ApplicationController
   def summary
   end
 
+  def serial_number_conflicts
+    event = Event.find(params[:event_id])
+    fellowship = Fellowship.find(params[:fellowship_id])
+    ranges = ChobatsuReport.serial_number_ranges_for(
+      event: event,
+      fellowship: fellowship,
+      excluding_report_id: params[:report_id].presence
+    )
+
+    render json: { ranges: ranges }
+  end
+
   def export
     @export_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
                       .includes(:user)
@@ -209,16 +221,38 @@ class ChobatsuReportsController < ApplicationController
 
   def save_chobatsu_report
     ChobatsuReport.transaction do
-      @chobatsu_report.save!
-      @chobatsu_report.chobatsu_report_fellowships.destroy_all
-      @joint_report_contributions.each do |contribution|
-        contribution.chobatsu_report = @chobatsu_report
-        contribution.save!
+      @chobatsu_report.event.with_lock do
+        @chobatsu_report.save!
+        @chobatsu_report.chobatsu_report_fellowships.destroy_all
+        @joint_report_contributions.each do |contribution|
+          contribution.chobatsu_report = @chobatsu_report
+          contribution.save!
+        end
+        rebuild_serial_number_allocations
       end
     end
     true
   rescue ActiveRecord::RecordInvalid
     false
+  rescue ActiveRecord::RecordNotUnique
+    @chobatsu_report.errors.add(:base, "使用修霊番号が既存データと重複しています。番号を確認してください")
+    false
+  end
+
+  def rebuild_serial_number_allocations
+    @chobatsu_report.serial_number_allocations.delete_all
+    allocations = @chobatsu_report.number_range_contributions.flat_map do |fellowship, from, to|
+      (from..to).map do |serial_number|
+        {
+          event_id: @chobatsu_report.event_id,
+          fellowship_id: fellowship.id,
+          serial_number: serial_number,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      end
+    end
+    @chobatsu_report.serial_number_allocations.insert_all!(allocations) if allocations.any?
   end
 
   def joint_additional_ranges(attributes)

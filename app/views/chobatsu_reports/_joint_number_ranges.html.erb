@@ -1,7 +1,7 @@
 <% additional_ranges = contribution&.additional_serial_number_ranges || [] %>
 <% label_data = field_prefix == "joint_primary" ? { joint_primary_label: true } : { joint_secondary_label: true } %>
 <% label_attribute = field_prefix == "joint_primary" ? "joint-primary-label" : "joint-secondary-label" %>
-<div class="number-range-list" data-joint-number-range-list>
+<div class="number-range-list" data-joint-number-range-list data-fellowship-source="<%= field_prefix %>">
   <div class="serial-number-range" data-number-range>
     <div class="field"><%= tag.label "#{fellowship_name}の使用修霊番号(始)", data: label_data %><%= number_field_tag "chobatsu_report[#{field_prefix}_serial_number_from]", serial_number_from, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_from: true, joint_report_input: true } %></div>
     <div class="field"><%= tag.label "#{fellowship_name}の使用修霊番号(終)", data: label_data %><%= number_field_tag "chobatsu_report[#{field_prefix}_serial_number_to]", serial_number_to, min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_to: true, joint_report_input: true } %></div>

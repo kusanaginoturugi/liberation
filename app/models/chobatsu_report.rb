@@ -16,6 +16,7 @@ class ChobatsuReport < ApplicationRecord
   belongs_to :ceremony_schedule, optional: true
   has_many :serial_number_ranges, dependent: :destroy
   has_many :chobatsu_report_fellowships, dependent: :destroy
+  has_many :serial_number_allocations, class_name: "ChobatsuReportSerialNumberAllocation", dependent: :destroy
   accepts_nested_attributes_for :serial_number_ranges, allow_destroy: true, reject_if: :all_blank
 
   before_validation :assign_region_from_meeting
@@ -109,6 +110,17 @@ class ChobatsuReport < ApplicationRecord
     usage_count * 5000
   end
 
+  def self.serial_number_ranges_for(event:, fellowship:, excluding_report_id: nil)
+    reports = where(event: event).where.not(id: excluding_report_id)
+             .includes(:serial_number_ranges, chobatsu_report_fellowships: :additional_serial_number_ranges)
+
+    reports.flat_map do |report|
+      report.number_range_contributions.filter_map do |report_fellowship, from, to|
+        { from: from, to: to, ceremony_date: report.ceremony_date } if report_fellowship.id == fellowship.id
+      end
+    end
+  end
+
   def mirokuji_share
     (calculated_merit_fee_total * 0.65).to_i
   end
@@ -159,10 +171,14 @@ class ChobatsuReport < ApplicationRecord
       return
     end
 
-    overlap = self.class.where.not(id:).where(region_id: region_id, event_id: event_id).includes(:serial_number_ranges).find do |report|
-      ranges.any? { |range| report.number_ranges.any? { |other| range.first <= other.last && range.last >= other.first } }
+    number_range_contributions.each do |report_fellowship, from, to|
+      overlap = self.class.serial_number_ranges_for(event: event, fellowship: report_fellowship, excluding_report_id: id).find do |other|
+        from <= other[:to] && to >= other[:from]
+      end
+      next unless overlap
+
+      errors.add(:base, "#{report_fellowship.name}の使用修霊番号#{formatted_range(from, to)}は、#{overlap[:ceremony_date].strftime('%Y/%m/%d')}の登録済み番号#{formatted_range(overlap[:from], overlap[:to])}と重複しています")
     end
-    errors.add(:base, "使用修霊番号が既存データと重複しています") if overlap
   end
 
   def region_matches_fellowship
@@ -188,5 +204,9 @@ class ChobatsuReport < ApplicationRecord
 
   def formatted_number(number)
     number.to_i.to_s.reverse.scan(/.{1,3}/).join(",").reverse
+  end
+
+  def formatted_range(from, to)
+    "#{formatted_number(from)}〜#{formatted_number(to)}"
   end
 end

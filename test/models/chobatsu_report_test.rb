@@ -140,6 +140,33 @@ class ChobatsuReportTest < ActiveSupport::TestCase
     assert next_event_report.valid?
   end
 
+  test "same serial range can be reused by another fellowship in the same event" do
+    ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      event: @event,
+      region: @region,
+      fellowship: @meeting,
+      participant_count: 2,
+      serial_number_from: 20,
+      serial_number_to: 25,
+      merit_fee_total: 10_000
+    )
+    other_fellowship = Fellowship.create!(name: "羽田", color_code: "#111111", region: @region)
+
+    reused_range_report = ChobatsuReport.new(
+      ceremony_date: Date.current,
+      event: @event,
+      region: @region,
+      fellowship: other_fellowship,
+      participant_count: 1,
+      serial_number_from: 20,
+      serial_number_to: 25,
+      merit_fee_total: 5_000
+    )
+
+    assert_predicate reused_range_report, :valid?
+  end
+
   test "serial number upper bound must be within total count" do
     report = ChobatsuReport.new(
       ceremony_date: Date.current,
