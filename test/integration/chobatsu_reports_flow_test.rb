@@ -261,7 +261,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "超抜霊数"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"
-    assert_includes response.body, ">20,000<"
+    assert_includes response.body, ">20,000円<"
     assert_includes response.body, ">13,000<"
     assert_includes response.body, ">3,000<"
     assert_includes response.body, @user.name
