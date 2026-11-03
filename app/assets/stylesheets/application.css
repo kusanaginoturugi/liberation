@@ -1199,6 +1199,16 @@ body.number-shadow-disabled .serial-grid td {
   font-variant-numeric: tabular-nums;
 }
 
+.summary-table .summary-fellowship {
+  color: #214b9b;
+  font-weight: 700;
+}
+
+.summary-table .summary-spirit-count {
+  color: #087443;
+  font-weight: 700;
+}
+
 .ceremony-schedule-table tbody tr.schedule-row-even {
   background: rgba(255, 255, 255, 0.58);
 }
