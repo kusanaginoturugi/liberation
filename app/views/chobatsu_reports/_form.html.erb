@@ -111,6 +111,8 @@
         const regionRefundOutput = form.querySelector("[data-calc-target='regionRefundOutput']");
         const conflictUrl = form.dataset.serialNumberConflictsUrl;
         const conflictCache = new Map();
+        let nextNumberRangeKey = Date.now();
+        const newNumberRangeKey = () => String(++nextNumberRangeKey);
 
         const fellowshipIdFor = (list) => {
           switch (list.dataset.fellowshipSource) {
@@ -234,7 +236,7 @@
           const additions = list.querySelector("[data-additional-number-ranges]");
           const template = list.querySelector("[data-number-range-template]");
           list.querySelector("[data-add-number-range]").addEventListener("click", () => {
-            additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
+            additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", newNumberRangeKey()));
             checkRangeConflicts();
           });
           list.addEventListener("click", (event) => {
@@ -256,7 +258,7 @@
           const additions = list.querySelector("[data-additional-number-ranges]");
           const template = list.querySelector("[data-joint-number-range-template]");
           list.querySelector("[data-add-joint-number-range]").addEventListener("click", () => {
-            additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", `${Date.now()}_${Math.random().toString(36).slice(2)}`));
+            additions.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("NEW_RECORD", newNumberRangeKey()));
             updateJointLabels();
             checkRangeConflicts();
           });

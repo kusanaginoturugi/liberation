@@ -132,6 +132,38 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ [ 20, 21 ] ], report.serial_number_ranges.pluck(:serial_number_from, :serial_number_to)
   end
 
+  test "updating a report saves an added serial number range" do
+    report = ChobatsuReport.create!(
+      ceremony_date: Date.current,
+      region: @region,
+      event: @next_event,
+      fellowship: @meeting,
+      participant_count: 15,
+      serial_number_from: 1031,
+      serial_number_to: 1050,
+      merit_fee_total: 100_000,
+      user: @user
+    )
+
+    assert_difference("report.serial_number_ranges.count", 1) do
+      patch chobatsu_report_path(report), params: {
+        chobatsu_report: {
+          ceremony_date: report.ceremony_date,
+          fellowship_id: @meeting.id,
+          participant_count: 15,
+          serial_number_from: 1031,
+          serial_number_to: 1050,
+          serial_number_ranges_attributes: {
+            "1731234567891" => { serial_number_from: 1623, serial_number_to: 1631, _destroy: "0" }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to summary_chobatsu_reports_path(event_id: @next_event.id)
+    assert_equal [ [ 1623, 1631 ] ], report.reload.serial_number_ranges.pluck(:serial_number_from, :serial_number_to)
+  end
+
   test "creating a joint report keeps fellowship counts and number ranges separate" do
     odaiba = Fellowship.create!(name: "お台場", color_code: "#123456", region: @region, enabled: true)
 
