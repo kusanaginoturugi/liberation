@@ -300,11 +300,11 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal report.user, @user
   end
 
-  test "summary page groups by evangelism meeting by default" do
+  test "summary page sorts newest ceremony date first by default" do
     @meeting.update!(display_order: 2)
     first_meeting = Fellowship.create!(name: "一番会場", color_code: "#111111", display_order: 1, region: @region, enabled: true)
 
-    ChobatsuReport.create!(
+    newer_report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 10),
       region: @region,
       event: @event,
@@ -315,7 +315,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       serial_number_to: 1,
       merit_fee_total: 5000
     )
-    ChobatsuReport.create!(
+    older_report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 8),
       region: @region,
       event: @event,
@@ -330,9 +330,10 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
     assert_response :success
-    assert_operator response.body.index(first_meeting.name), :<, response.body.index(@meeting.name)
-    assert_includes response.body, "伝道会名"
-    assert_includes response.body, "▼"
+    dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
+    assert_equal [ newer_report.ceremony_date.strftime("%Y/%m/%d"), older_report.ceremony_date.strftime("%Y/%m/%d") ], dates.first(2)
+    assert_includes response.body, "挙行日"
+    assert_includes response.body, "▲"
   end
 
   test "summary page sorts by ceremony date" do

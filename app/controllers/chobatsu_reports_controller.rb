@@ -407,6 +407,8 @@ class ChobatsuReportsController < ApplicationController
   end
 
   def summary_sort_direction
+    return :desc if params[:sort].blank?
+
     params[:direction] == "desc" ? :desc : :asc
   end
 
@@ -417,7 +419,7 @@ class ChobatsuReportsController < ApplicationController
     when "ceremony_date"
       :ceremony_date
     else
-      :fellowship
+      :ceremony_date
     end
   end
 
