@@ -62,6 +62,22 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "今回のみ"
   end
 
+  test "Authentik設定時はログイン画面を経由せず直接Authentikへ移動する" do
+    with_authentik do
+      get new_session_path
+
+      assert_redirected_to authentik_login_path
+    end
+  end
+
+  test "Authentik設定時は保護された画面から直接Authentikへ移動する" do
+    with_authentik do
+      get new_chobatsu_report_path
+
+      assert_redirected_to authentik_login_path
+    end
+  end
+
   test "remember me cookie restores login after session cookie is cleared" do
     post session_path, params: { login_id: @user.login_id, password: "password123", remember_me: "1" }
 

@@ -2,6 +2,11 @@ class SessionsController < ApplicationController
   allow_unauthenticated_access only: [ :new, :create, :destroy, :authentik, :callback ]
 
   def new
+    if current_user
+      redirect_to root_path
+    elsif AuthentikClient.configured? && flash[:alert].blank?
+      redirect_to authentik_login_path
+    end
   end
 
   def create

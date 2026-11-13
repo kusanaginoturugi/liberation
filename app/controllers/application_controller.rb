@@ -25,7 +25,11 @@ class ApplicationController < ActionController::Base
     return if current_user
     return if self.class.respond_to?(:allow_unauthenticated_actions) && self.class.allow_unauthenticated_actions.include?(action_name.to_sym)
 
-    redirect_to User.exists? ? new_session_path : new_user_path
+    if User.exists? && AuthentikClient.configured?
+      redirect_to authentik_login_path
+    else
+      redirect_to User.exists? ? new_session_path : new_user_path
+    end
   end
 
   def start_session_for(user, remember_me: true)
