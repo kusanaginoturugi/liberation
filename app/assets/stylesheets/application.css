@@ -1123,9 +1123,19 @@ body.number-shadow-disabled .serial-grid td {
   table-layout: fixed;
 }
 
+.summary-table th:nth-child(1),
+.summary-table td:nth-child(1) {
+  width: 4%;
+}
+
+.summary-table th:nth-child(2),
+.summary-table td:nth-child(2) {
+  width: 7%;
+}
+
 .summary-table th:nth-child(3),
 .summary-table td:nth-child(3) {
-  width: 9%;
+  width: 8%;
 }
 
 .summary-table th:nth-child(4),
@@ -1141,6 +1151,33 @@ body.number-shadow-disabled .serial-grid td {
 .summary-table th:nth-child(6),
 .summary-table td:nth-child(6) {
   width: 28%;
+}
+
+.summary-table th:nth-child(7),
+.summary-table td:nth-child(7),
+.summary-table th:nth-child(8),
+.summary-table td:nth-child(8) {
+  width: 8%;
+}
+
+.summary-table th:nth-child(9),
+.summary-table td:nth-child(9) {
+  width: 7%;
+}
+
+.summary-table th:nth-child(10),
+.summary-table td:nth-child(10) {
+  width: 4%;
+}
+
+.summary-table th:nth-child(11),
+.summary-table td:nth-child(11) {
+  width: 8%;
+}
+
+.summary-table th:nth-child(12),
+.summary-table td:nth-child(12) {
+  width: 5%;
 }
 
 .ceremony-schedule-table {
@@ -1236,6 +1273,11 @@ body.number-shadow-disabled .serial-grid td {
 .summary-table .summary-fellowship {
   color: #214b9b;
   font-weight: 700;
+}
+
+.summary-table .summary-notes,
+.summary-table th:nth-child(10) {
+  text-align: right;
 }
 
 .summary-table .summary-spirit-count {
