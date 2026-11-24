@@ -201,8 +201,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "【合同】"
-    assert_includes response.body, 'joint-report-line">お台場</span>'
-    assert_includes response.body, 'joint-report-line">大江戸</span>'
+    assert_match(/joint-report-line[^>]*>お台場<\/span>/, response.body)
+    assert_match(/joint-report-line[^>]*>大江戸<\/span>/, response.body)
     assert_includes response.body, 'mobile-joint-fellowship-name">お台場</span>10'
     assert_includes response.body, 'mobile-joint-fellowship-name">大江戸</span>3'
     assert_includes response.body, 'mobile-joint-fellowship-name">お台場</span>55'

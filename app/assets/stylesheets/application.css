@@ -712,7 +712,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .joint-report-line {
   display: block;
-  line-height: 1.7;
+  line-height: 1.45;
 }
 
 .joint-report-line--number {
@@ -720,7 +720,12 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .joint-report-line--header-spacer {
-  min-height: 1.7em;
+  min-height: 1.45em;
+}
+
+.joint-report-line--spaced,
+.joint-report-value-line--spaced {
+  margin-top: 0.5em;
 }
 
 .mobile-joint-fellowship-name {
