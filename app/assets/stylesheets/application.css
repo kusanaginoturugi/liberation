@@ -1135,7 +1135,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .summary-table th:nth-child(3),
 .summary-table td:nth-child(3) {
-  width: 8%;
+  width: 9%;
 }
 
 .summary-table th:nth-child(4),
@@ -1145,12 +1145,12 @@ body.number-shadow-disabled .serial-grid td {
 
 .summary-table th:nth-child(5),
 .summary-table td:nth-child(5) {
-  width: 6%;
+  width: 7%;
 }
 
 .summary-table th:nth-child(6),
 .summary-table td:nth-child(6) {
-  width: 28%;
+  width: 22%;
 }
 
 .summary-table th:nth-child(7),
@@ -1167,7 +1167,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .summary-table th:nth-child(10),
 .summary-table td:nth-child(10) {
-  width: 4%;
+  width: 5%;
 }
 
 .summary-table th:nth-child(11),
@@ -1177,7 +1177,7 @@ body.number-shadow-disabled .serial-grid td {
 
 .summary-table th:nth-child(12),
 .summary-table td:nth-child(12) {
-  width: 5%;
+  width: 8%;
 }
 
 .ceremony-schedule-table {
@@ -1287,6 +1287,12 @@ body.number-shadow-disabled .serial-grid td {
 
 .summary-table .summary-serial-numbers {
   font-size: 0.95rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.summary-table .summary-serial-number-header {
+  text-align: left;
 }
 
 .summary-table .summary-serial-numbers .joint-report-line {
