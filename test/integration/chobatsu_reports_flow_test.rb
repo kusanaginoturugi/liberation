@@ -285,6 +285,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ "【合同】", "羽田・大江戸・埼玉" ], report.report_display_name_lines
     assert_equal [ "羽田 4", "大江戸 3", "埼玉 2" ], report.participant_count_lines
     assert_equal [ "羽田 1〜20", "大江戸 101〜115", "埼玉 201〜210" ], report.serial_number_range_lines
+    assert_equal [ "1〜20", "101〜115", "201〜210" ], report.serial_number_range_value_lines
     assert_equal [ 0, 1, 2 ], report.chobatsu_report_fellowships.order(:position).pluck(:position)
   end
 

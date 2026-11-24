@@ -87,6 +87,14 @@ class ChobatsuReport < ApplicationRecord
     end
   end
 
+  def serial_number_range_value_lines
+    return serial_number_range_lines unless joint_report?
+
+    joint_report_contributions.map do |contribution|
+      contribution.number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" }.join("、")
+    end
+  end
+
   def usage_count_lines
     return [ formatted_number(usage_count) ] unless joint_report?
 

@@ -134,8 +134,8 @@
               <td class="summary-number summary-spirit-count" data-label="超抜霊数">
                 <% report.usage_count_lines.each do |line| %><span class="joint-report-line joint-report-line--number"><%= line %></span><% end %>
               </td>
-              <td class="summary-number" data-label="使用番号">
-                <% report.serial_number_range_lines.each do |line| %><span class="joint-report-line joint-report-line--number"><%= line %></span><% end %>
+              <td class="summary-number summary-serial-numbers" data-label="使用番号">
+                <% report.serial_number_range_value_lines.each do |line| %><span class="joint-report-line joint-report-line--number"><%= line %></span><% end %>
               </td>
               <td class="summary-number" data-label="功徳費合計"><%= yen_amount(report.calculated_merit_fee_total) %></td>
               <td class="summary-number" data-label="みろく寺分"><%= yen_amount(report.mirokuji_share) %></td>

@@ -1119,7 +1119,28 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .summary-table {
-  min-width: 960px;
+  min-width: 1080px;
+  table-layout: fixed;
+}
+
+.summary-table th:nth-child(3),
+.summary-table td:nth-child(3) {
+  width: 11%;
+}
+
+.summary-table th:nth-child(4),
+.summary-table td:nth-child(4) {
+  width: 8%;
+}
+
+.summary-table th:nth-child(5),
+.summary-table td:nth-child(5) {
+  width: 7%;
+}
+
+.summary-table th:nth-child(6),
+.summary-table td:nth-child(6) {
+  width: 15%;
 }
 
 .ceremony-schedule-table {
@@ -1220,6 +1241,14 @@ body.number-shadow-disabled .serial-grid td {
 .summary-table .summary-spirit-count {
   color: #087443;
   font-weight: 700;
+}
+
+.summary-table .summary-serial-numbers {
+  font-size: 0.95rem;
+}
+
+.summary-table .summary-serial-numbers .joint-report-line {
+  white-space: nowrap;
 }
 
 .ceremony-schedule-table tbody tr.schedule-row-even {
@@ -1879,6 +1908,14 @@ body.number-shadow-disabled .serial-grid td {
     border-bottom: 1px solid rgba(127, 136, 160, 0.14);
     text-align: right;
     overflow-wrap: anywhere;
+  }
+
+  .summary-table tbody td {
+    width: 100% !important;
+  }
+
+  .summary-table tbody td.summary-serial-numbers {
+    grid-template-columns: minmax(5rem, 31%) minmax(0, 1fr);
   }
 
   .ceremony-schedule-table tbody td {
