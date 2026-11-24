@@ -167,7 +167,7 @@
             <tr class="summary-total-row">
               <td colspan="3" class="summary-total-label">合計</td>
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></td>
-              <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:usage_count)) %></td>
+              <td class="summary-number"><%= @summary_reports.sum(&:usage_count) %></td>
               <td></td>
               <td class="summary-number"><%= yen_amount(@summary_reports.sum(&:calculated_merit_fee_total)) %></td>
               <td class="summary-number"><%= yen_amount(@summary_reports.sum(&:mirokuji_share)) %></td>
@@ -181,7 +181,7 @@
       </table>
     </div>
     <% unless @summary_reports.empty? %>
-      <p class="mobile-summary-total">超抜引保師数 <strong><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></strong>　超抜霊数 <strong><%= number_with_delimiter(@summary_reports.sum(&:usage_count)) %></strong></p>
+      <p class="mobile-summary-total">超抜引保師数 <strong><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></strong>　超抜霊数 <strong><%= @summary_reports.sum(&:usage_count) %></strong></p>
     <% end %>
   </section>
 </div>

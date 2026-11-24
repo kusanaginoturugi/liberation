@@ -25,6 +25,21 @@ class ChobatsuReportTest < ActiveSupport::TestCase
     assert_equal 6, report.usage_count
   end
 
+  test "usage count display omits thousands separators" do
+    report = ChobatsuReport.new(
+      ceremony_date: Date.current,
+      event: @event,
+      region: @region,
+      fellowship: @meeting,
+      participant_count: 3,
+      serial_number_from: 1,
+      serial_number_to: 1_234
+    )
+
+    assert_equal [ "1234" ], report.usage_count_lines
+    assert_equal [ "1234" ], report.usage_count_value_lines
+  end
+
   test "merit_fee_total is calculated from usage_count" do
     report = ChobatsuReport.create!(
       ceremony_date: Date.current,
