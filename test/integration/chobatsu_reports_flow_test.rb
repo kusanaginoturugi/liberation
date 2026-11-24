@@ -313,10 +313,13 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "UTF-8(BOM)"
     assert_includes response.body, "SJIS"
     assert_includes response.body, "PDF出力"
-    assert_includes response.body, "2026/04/09"
+    assert_includes response.body, "04/09"
     assert_includes response.body, @meeting.name
     assert_includes response.body, "超抜引保師数"
     assert_includes response.body, "超抜霊数"
+    assert_includes response.body, "使用番号"
+    assert_includes response.body, "1〜4"
+    assert_not_includes response.body, "ノアカード分"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"
     assert_includes response.body, ">20,000円<"
@@ -356,8 +359,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
     assert_response :success
-    dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
-    assert_equal [ newer_report.ceremony_date.strftime("%Y/%m/%d"), older_report.ceremony_date.strftime("%Y/%m/%d") ], dates.first(2)
+    dates = response.body.scan(%r{<td[^>]*>(\d{2}/\d{2})</td>}).flatten
+    assert_equal [ newer_report.ceremony_date.strftime("%m/%d"), older_report.ceremony_date.strftime("%m/%d") ], dates.first(2)
     assert_includes response.body, "挙行日"
     assert_includes response.body, "▲"
   end
@@ -389,8 +392,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date }
 
     assert_response :success
-    ascending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
-    assert_equal [ older_report.ceremony_date.strftime("%Y/%m/%d"), newer_report.ceremony_date.strftime("%Y/%m/%d") ],
+    ascending_dates = response.body.scan(%r{<td[^>]*>(\d{2}/\d{2})</td>}).flatten
+    assert_equal [ older_report.ceremony_date.strftime("%m/%d"), newer_report.ceremony_date.strftime("%m/%d") ],
                  ascending_dates.first(2)
     assert_includes response.body, "挙行日"
     assert_includes response.body, "▼"
@@ -398,8 +401,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :ceremony_date, direction: :desc }
 
     assert_response :success
-    descending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
-    assert_equal [ newer_report.ceremony_date.strftime("%Y/%m/%d"), older_report.ceremony_date.strftime("%Y/%m/%d") ],
+    descending_dates = response.body.scan(%r{<td[^>]*>(\d{2}/\d{2})</td>}).flatten
+    assert_equal [ newer_report.ceremony_date.strftime("%m/%d"), older_report.ceremony_date.strftime("%m/%d") ],
                  descending_dates.first(2)
     assert_includes response.body, "▲"
   end
@@ -431,8 +434,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :number }
 
     assert_response :success
-    ascending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
-    assert_equal [ first_report.ceremony_date.strftime("%Y/%m/%d"), second_report.ceremony_date.strftime("%Y/%m/%d") ],
+    ascending_dates = response.body.scan(%r{<td[^>]*>(\d{2}/\d{2})</td>}).flatten
+    assert_equal [ first_report.ceremony_date.strftime("%m/%d"), second_report.ceremony_date.strftime("%m/%d") ],
                  ascending_dates.first(2)
     assert_includes response.body, "No."
     assert_includes response.body, "▼"
@@ -440,8 +443,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id, sort: :number, direction: :desc }
 
     assert_response :success
-    descending_dates = response.body.scan(%r{<td[^>]*>(\d{4}/\d{2}/\d{2})</td>}).flatten
-    assert_equal [ second_report.ceremony_date.strftime("%Y/%m/%d"), first_report.ceremony_date.strftime("%Y/%m/%d") ],
+    descending_dates = response.body.scan(%r{<td[^>]*>(\d{2}/\d{2})</td>}).flatten
+    assert_equal [ second_report.ceremony_date.strftime("%m/%d"), first_report.ceremony_date.strftime("%m/%d") ],
                  descending_dates.first(2)
     assert_includes response.body, "▲"
   end
@@ -475,8 +478,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
     assert_response :success
-    assert_operator response.body.index(later_report.ceremony_date.strftime("%Y/%m/%d")), :<,
-                    response.body.index(earlier_report.ceremony_date.strftime("%Y/%m/%d"))
+    assert_operator response.body.index(later_report.ceremony_date.strftime("%m/%d")), :<,
+                    response.body.index(earlier_report.ceremony_date.strftime("%m/%d"))
     number_cells = response.body.scan(%r{<td data-label="No\.">(\d+)</td>}).flatten
     assert_equal [ "2", "1" ], number_cells.first(2)
   end
