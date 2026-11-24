@@ -719,6 +719,10 @@ body.number-shadow-disabled .serial-grid td {
   text-align: right;
 }
 
+.joint-report-line--header-spacer {
+  min-height: 1.45em;
+}
+
 .mobile-joint-fellowship-name {
   display: none;
 }
@@ -1998,6 +2002,10 @@ body.number-shadow-disabled .serial-grid td {
   .summary-table tbody td > .joint-report-line {
     grid-column: 2;
     min-width: 0;
+  }
+
+  .summary-table tbody td > .joint-report-line--header-spacer {
+    display: none;
   }
 
   .summary-table .mobile-joint-fellowship-name {

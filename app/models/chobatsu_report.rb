@@ -53,7 +53,7 @@ class ChobatsuReport < ApplicationRecord
   def report_display_name_lines
     return [ fellowship.name ] unless joint_report?
 
-    [ "【合同】", joint_report_contributions.map { |contribution| contribution.fellowship.name }.join("・") ]
+    [ "【合同】", *joint_report_contributions.map { |contribution| contribution.fellowship.name } ]
   end
 
   def joint_report_contributions

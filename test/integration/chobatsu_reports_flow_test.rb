@@ -191,7 +191,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal odaiba, report.fellowship
     assert_equal 13, report.participant_count
     assert_equal 125, report.usage_count
-    assert_equal [ "【合同】", "お台場・大江戸" ], report.report_display_name_lines
+    assert_equal [ "【合同】", "お台場", "大江戸" ], report.report_display_name_lines
     assert_equal [ "お台場 10", "大江戸 3" ], report.participant_count_lines
     assert_equal [ "お台場 55", "大江戸 70" ], report.usage_count_lines
     assert_equal [ "お台場 945〜999", "大江戸 1196〜1265" ], report.serial_number_range_lines
@@ -201,7 +201,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "【合同】"
-    assert_includes response.body, "お台場・大江戸"
+    assert_includes response.body, 'joint-report-line">お台場</span>'
+    assert_includes response.body, 'joint-report-line">大江戸</span>'
     assert_includes response.body, 'mobile-joint-fellowship-name">お台場</span>10'
     assert_includes response.body, 'mobile-joint-fellowship-name">大江戸</span>3'
     assert_includes response.body, 'mobile-joint-fellowship-name">お台場</span>55'
@@ -282,7 +283,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     report = ChobatsuReport.last
     assert_equal 9, report.participant_count
-    assert_equal [ "【合同】", "羽田・大江戸・埼玉" ], report.report_display_name_lines
+    assert_equal [ "【合同】", "羽田", "大江戸", "埼玉" ], report.report_display_name_lines
     assert_equal [ "羽田 4", "大江戸 3", "埼玉 2" ], report.participant_count_lines
     assert_equal [ "4", "3", "2" ], report.participant_count_value_lines
     assert_equal [ "20", "15", "10" ], report.usage_count_value_lines
