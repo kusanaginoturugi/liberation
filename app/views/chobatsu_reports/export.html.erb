@@ -122,6 +122,11 @@
           height: 1.15em;
         }
 
+        .joint-report-name-line,
+        .joint-report-value-line {
+          line-height: 1.4;
+        }
+
         .print-note {
           display: none;
         }
@@ -152,10 +157,12 @@
           <tr>
             <td><%= index + 1 %></td>
             <td><%= report.ceremony_date.strftime("%m/%d") %></td>
-            <td><% report.report_display_name_lines.each do |line| %><div><%= line %></div><% end %></td>
-            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.participant_count_value_lines.each do |line| %><div><%= line %></div><% end %></td>
-            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.usage_count_value_lines.each do |line| %><div><%= line %></div><% end %></td>
-            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.serial_number_range_value_lines.each do |line| %><div><%= line %></div><% end %></td>
+            <% joint_line_class = report.joint_report? ? "joint-report-name-line" : nil %>
+            <% joint_value_class = report.joint_report? ? "joint-report-value-line" : nil %>
+            <td><% report.report_display_name_lines.each do |line| %><div class="<%= joint_line_class %>"><%= line %></div><% end %></td>
+            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.participant_count_value_lines.each do |line| %><div class="<%= joint_value_class %>"><%= line %></div><% end %></td>
+            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.usage_count_value_lines.each do |line| %><div class="<%= joint_value_class %>"><%= line %></div><% end %></td>
+            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.serial_number_range_value_lines.each do |line| %><div class="<%= joint_value_class %>"><%= line %></div><% end %></td>
             <td><%= yen_amount(report.calculated_merit_fee_total) %></td>
             <td><%= yen_amount(report.mirokuji_share) %></td>
             <td><%= yen_amount(report.region_refund) %></td>

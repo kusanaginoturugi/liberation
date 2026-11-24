@@ -693,6 +693,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "height: 194mm"
     assert_includes response.body, "font-size: 11px"
     assert_includes response.body, "font-weight: 600"
+    assert_includes response.body, "joint-report-value-line"
     assert_includes response.body, 'class="report-export-table"'
     assert_includes response.body, "window.print()"
   end
