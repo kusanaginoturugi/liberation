@@ -682,6 +682,9 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "超抜霊数"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"
+    assert_includes response.body, "size: A4 portrait"
+    assert_includes response.body, "margin: 7mm"
+    assert_includes response.body, 'class="report-export-table"'
     assert_includes response.body, "window.print()"
   end
 

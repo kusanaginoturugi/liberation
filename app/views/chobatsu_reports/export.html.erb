@@ -42,6 +42,58 @@
       }
 
       @media print {
+        @page {
+          size: A4 portrait;
+          margin: 7mm;
+        }
+
+        body {
+          margin: 0;
+          font-size: 8px;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        h1 {
+          margin-bottom: 2px;
+          font-size: 15px;
+        }
+
+        p {
+          margin-bottom: 5px;
+          font-size: 9px;
+        }
+
+        .report-export-table {
+          table-layout: fixed;
+          font-size: 7.5px;
+        }
+
+        .report-export-table th,
+        .report-export-table td {
+          padding: 3px 4px;
+          line-height: 1.2;
+          overflow-wrap: anywhere;
+          vertical-align: top;
+        }
+
+        .report-export-table tr {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        .report-export-table th:nth-child(1) { width: 3%; }
+        .report-export-table th:nth-child(2) { width: 7%; }
+        .report-export-table th:nth-child(3) { width: 12%; }
+        .report-export-table th:nth-child(4) { width: 9%; }
+        .report-export-table th:nth-child(5) { width: 8%; }
+        .report-export-table th:nth-child(6) { width: 7%; }
+        .report-export-table th:nth-child(7) { width: 12%; }
+        .report-export-table th:nth-child(8) { width: 13%; }
+        .report-export-table th:nth-child(9) { width: 11%; }
+        .report-export-table th:nth-child(10) { width: 8%; }
+        .report-export-table th:nth-child(11) { width: 10%; }
+
         .print-note {
           display: none;
         }
@@ -52,7 +104,7 @@
     <h1>挙行報告</h1>
     <p><%= @selected_event.name %></p>
 
-    <table>
+    <table class="report-export-table">
       <thead>
         <tr>
           <th>No.</th>
