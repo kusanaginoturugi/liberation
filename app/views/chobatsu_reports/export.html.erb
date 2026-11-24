@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8">
-    <title>挙行報告 PDF出力</title>
+    <title>【<%= @selected_event.name %>】挙行一覧表@<%= @selected_region.name %></title>
     <style>
       body {
         margin: 24px;
@@ -43,35 +43,35 @@
 
       @media print {
         @page {
-          size: A4 portrait;
-          margin: 7mm;
+          size: A4 landscape;
+          margin: 8mm;
         }
 
         body {
           margin: 0;
-          font-size: 8px;
+          font-size: 9px;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
 
         h1 {
-          margin-bottom: 2px;
-          font-size: 15px;
+          margin-bottom: 3px;
+          font-size: 17px;
         }
 
         p {
-          margin-bottom: 5px;
-          font-size: 9px;
+          margin-bottom: 7px;
+          font-size: 10px;
         }
 
         .report-export-table {
           table-layout: fixed;
-          font-size: 7.5px;
+          font-size: 9.5px;
         }
 
         .report-export-table th,
         .report-export-table td {
-          padding: 3px 4px;
+          padding: 12px 5px;
           line-height: 1.2;
           overflow-wrap: anywhere;
           vertical-align: top;
