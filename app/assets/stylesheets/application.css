@@ -1292,7 +1292,7 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .summary-table .summary-serial-number-header {
-  text-align: left;
+  text-align: center;
 }
 
 .summary-table .summary-serial-numbers .joint-report-line {
