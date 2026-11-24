@@ -168,7 +168,12 @@
               <td colspan="3" class="summary-total-label">合計</td>
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></td>
               <td class="summary-number"><%= @summary_reports.sum(&:usage_count) %></td>
-              <td></td>
+              <td class="summary-number summary-serial-numbers summary-unused-serial-numbers">
+                <span class="summary-unused-serial-label">未使用番号</span>
+                <% unused_serial_number_range_lines(@total_serial_count, @summary_reports).each do |line| %>
+                  <span class="joint-report-line joint-report-line--number"><%= line %></span>
+                <% end %>
+              </td>
               <td class="summary-number"><%= yen_amount(@summary_reports.sum(&:calculated_merit_fee_total)) %></td>
               <td class="summary-number"><%= yen_amount(@summary_reports.sum(&:mirokuji_share)) %></td>
               <td class="summary-number"><%= yen_amount(@summary_reports.sum(&:region_refund)) %></td>

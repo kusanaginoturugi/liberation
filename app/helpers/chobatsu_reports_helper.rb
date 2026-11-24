@@ -23,6 +23,38 @@ module ChobatsuReportsHelper
     [ total_serial_count.to_i - used_serial_count(reports), 0 ].max
   end
 
+  def unused_serial_number_range_lines(total_serial_count, reports)
+    total = total_serial_count.to_i
+    return [] if total <= 0
+
+    used_ranges = reports.flat_map(&:number_ranges).filter_map do |from, to|
+      next if from.blank? || to.blank?
+
+      range_start = [ from, 1 ].max
+      range_end = [ to, total ].min
+      [ range_start, range_end ] if range_start <= range_end
+    end.sort_by(&:first)
+
+    merged_ranges = used_ranges.each_with_object([]) do |(range_start, range_end), ranges|
+      previous = ranges.last
+      if previous && range_start <= previous.last + 1
+        previous[1] = [ previous.last, range_end ].max
+      else
+        ranges << [ range_start, range_end ]
+      end
+    end
+
+    unused_ranges = []
+    next_number = 1
+    merged_ranges.each do |range_start, range_end|
+      unused_ranges << [ next_number, range_start - 1 ] if next_number < range_start
+      next_number = [ next_number, range_end + 1 ].max
+    end
+    unused_ranges << [ next_number, total ] if next_number <= total
+
+    unused_ranges.map { |range_start, range_end| "#{range_start}〜#{range_end}" }
+  end
+
   def yen_amount(amount)
     number_to_currency(amount, unit: "円", format: "%n%u", precision: 0)
   end

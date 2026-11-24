@@ -304,6 +304,18 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
       serial_number_to: 4,
       merit_fee_total: 20000
     )
+    overlapping_fellowship = Fellowship.create!(name: "別伝道会", color_code: "#111111", region: @region, enabled: true)
+    ChobatsuReport.create!(
+      ceremony_date: Date.new(2026, 4, 10),
+      region: @region,
+      event: @event,
+      user: @user,
+      fellowship: overlapping_fellowship,
+      participant_count: 1,
+      serial_number_from: 3,
+      serial_number_to: 6,
+      merit_fee_total: 20000
+    )
 
     get summary_chobatsu_reports_path, params: { event_id: @event.id }
 
@@ -323,6 +335,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "超抜霊数"
     assert_includes response.body, "使用番号"
     assert_includes response.body, "1〜4"
+    assert_includes response.body, "未使用番号"
+    assert_includes response.body, "7〜1667"
     assert_not_includes response.body, "ノアカード分"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"

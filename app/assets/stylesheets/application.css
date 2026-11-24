@@ -1304,6 +1304,13 @@ body.number-shadow-disabled .serial-grid td {
   text-align: left;
 }
 
+.summary-table .summary-unused-serial-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 @media (min-width: 641px) {
   .summary-table td.summary-serial-numbers {
     padding-left: 42px;

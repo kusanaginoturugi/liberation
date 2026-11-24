@@ -390,6 +390,7 @@ class ChobatsuReportsController < ApplicationController
     @summary_sort_column = summary_sort_column
     @summary_sort_direction = summary_sort_direction
     reports = reports_for_region_and_event(@selected_region.id, @selected_event.id).includes(:user)
+    @total_serial_count = total_serial_count_for(@selected_event, @selected_region)
     @summary_report_numbers = reports.reorder(ceremony_date: :asc, id: :asc).ids.each_with_index.to_h do |id, index|
       [ id, index + 1 ]
     end
@@ -398,6 +399,7 @@ class ChobatsuReportsController < ApplicationController
     @regions = []
     @events = []
     @summary_reports = ChobatsuReport.none
+    @total_serial_count = 0
   end
 
   def load_export_collections
