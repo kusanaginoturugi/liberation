@@ -128,7 +128,8 @@
         }
 
         .joint-report-name-line--spaced,
-        .joint-report-value-line--spaced {
+        .joint-report-value-line--spaced,
+        .serial-number-line--spaced {
           margin-top: 0.5em;
         }
 
@@ -165,7 +166,7 @@
             <td><% report.report_display_name_lines.each_with_index do |line, line_index| %><div class="<%= "joint-report-name-line" if report.joint_report? %> <%= "joint-report-name-line--spaced" if report.joint_report? && line_index > 1 %>"><%= line %></div><% end %></td>
             <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.participant_count_value_lines.each_with_index do |line, line_index| %><div class="<%= "joint-report-value-line" if report.joint_report? %> <%= "joint-report-value-line--spaced" if report.joint_report? && line_index.positive? %>"><%= line %></div><% end %></td>
             <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.usage_count_value_lines.each_with_index do |line, line_index| %><div class="<%= "joint-report-value-line" if report.joint_report? %> <%= "joint-report-value-line--spaced" if report.joint_report? && line_index.positive? %>"><%= line %></div><% end %></td>
-            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.serial_number_range_value_lines.each_with_index do |line, line_index| %><div class="<%= "joint-report-value-line" if report.joint_report? %> <%= "joint-report-value-line--spaced" if report.joint_report? && line_index.positive? %>"><%= line %></div><% end %></td>
+            <td><div class="joint-report-spacer" aria-hidden="true"<%= " hidden" unless report.joint_report? %>></div><% report.serial_number_range_value_lines.each_with_index do |line, line_index| %><div class="<%= "joint-report-value-line" if report.joint_report? %> <%= "joint-report-value-line--spaced" if report.joint_report? && line_index.positive? %> <%= "serial-number-line--spaced" if line_index.positive? %>"><%= line %></div><% end %></td>
             <td><%= yen_amount(report.calculated_merit_fee_total) %></td>
             <td><%= yen_amount(report.mirokuji_share) %></td>
             <td><%= yen_amount(report.region_refund) %></td>

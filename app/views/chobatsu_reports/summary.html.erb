@@ -144,7 +144,7 @@
               <td class="summary-number summary-serial-numbers" data-label="使用番号">
                 <% if report.joint_report? %><span class="joint-report-line joint-report-line--header-spacer" aria-hidden="true"></span><% end %>
                 <% report.serial_number_range_value_lines.each_with_index do |line, contribution_index| %>
-                  <span class="joint-report-line joint-report-line--number <%= "joint-report-line--spaced" if contribution_index.positive? %>"><% if joint_fellowship_names.present? %><span class="mobile-joint-fellowship-name"><%= joint_fellowship_names[contribution_index] %></span><% end %><%= line %></span>
+                  <span class="joint-report-line joint-report-line--number <%= "joint-report-line--spaced" if contribution_index.positive? %> <%= "serial-number-line--spaced" if contribution_index.positive? %>"><% if joint_fellowship_names.present? %><span class="mobile-joint-fellowship-name"><%= joint_fellowship_names[contribution_index] %></span><% end %><%= line %></span>
                 <% end %>
               </td>
               <td class="summary-number" data-label="功徳費合計"><%= yen_amount(report.calculated_merit_fee_total) %></td>

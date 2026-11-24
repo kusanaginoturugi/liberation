@@ -724,7 +724,8 @@ body.number-shadow-disabled .serial-grid td {
 }
 
 .joint-report-line--spaced,
-.joint-report-value-line--spaced {
+.joint-report-value-line--spaced,
+.serial-number-line--spaced {
   margin-top: 0.5em;
 }
 
