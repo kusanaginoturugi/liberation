@@ -1991,6 +1991,11 @@ body.number-shadow-disabled .serial-grid td {
     grid-template-columns: minmax(5rem, 31%) minmax(0, 1fr);
   }
 
+  .summary-table tbody td > .joint-report-line {
+    grid-column: 2;
+    min-width: 0;
+  }
+
   .ceremony-schedule-table tbody td {
     width: 100% !important;
   }
