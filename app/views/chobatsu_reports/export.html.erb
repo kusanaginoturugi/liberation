@@ -83,16 +83,16 @@
         }
 
         .report-export-table th:nth-child(1) { width: 3%; }
-        .report-export-table th:nth-child(2) { width: 7%; }
-        .report-export-table th:nth-child(3) { width: 12%; }
+        .report-export-table th:nth-child(2) { width: 6%; }
+        .report-export-table th:nth-child(3) { width: 9%; }
         .report-export-table th:nth-child(4) { width: 9%; }
-        .report-export-table th:nth-child(5) { width: 8%; }
-        .report-export-table th:nth-child(6) { width: 7%; }
+        .report-export-table th:nth-child(5) { width: 7%; }
+        .report-export-table th:nth-child(6) { width: 18%; }
         .report-export-table th:nth-child(7) { width: 12%; }
         .report-export-table th:nth-child(8) { width: 13%; }
         .report-export-table th:nth-child(9) { width: 11%; }
-        .report-export-table th:nth-child(10) { width: 8%; }
-        .report-export-table th:nth-child(11) { width: 10%; }
+        .report-export-table th:nth-child(10) { width: 5%; }
+        .report-export-table th:nth-child(11) { width: 7%; }
 
         .print-note {
           display: none;
@@ -112,7 +112,7 @@
           <th>伝道会名</th>
           <th>超抜引保師数</th>
           <th>超抜霊数</th>
-          <th>(内)ノアカード分</th>
+          <th>使用番号</th>
           <th>功徳費合計</th>
           <th>みろく寺分<br><small style="font-size: 0.75em; font-weight: normal">(ノア分勘案せず)</small></th>
           <th>聖院還付金</th>
@@ -124,14 +124,14 @@
         <% @export_reports.each_with_index do |report, index| %>
           <tr>
             <td><%= index + 1 %></td>
-            <td><%= report.ceremony_date.strftime("%Y/%m/%d") %></td>
+            <td><%= report.ceremony_date.strftime("%m/%d") %></td>
             <td><% report.report_display_name_lines.each do |line| %><div><%= line %></div><% end %></td>
-            <td><% report.participant_count_lines.each do |line| %><div><%= line %></div><% end %></td>
-            <td><% report.usage_count_lines.each do |line| %><div><%= line %></div><% end %></td>
-            <td><%= report.noah_card_count.present? ? report.noah_card_count : "-" %></td>
-            <td><%= report.calculated_merit_fee_total %></td>
-            <td><%= report.mirokuji_share %></td>
-            <td><%= report.region_refund %></td>
+            <td><% report.participant_count_value_lines.each do |line| %><div><%= line %></div><% end %></td>
+            <td><% report.usage_count_value_lines.each do |line| %><div><%= line %></div><% end %></td>
+            <td><% report.serial_number_range_value_lines.each do |line| %><div><%= line %></div><% end %></td>
+            <td><%= yen_amount(report.calculated_merit_fee_total) %></td>
+            <td><%= yen_amount(report.mirokuji_share) %></td>
+            <td><%= yen_amount(report.region_refund) %></td>
             <td><%= report.notes %></td>
             <td><%= report.user&.name || "未設定" %></td>
           </tr>
