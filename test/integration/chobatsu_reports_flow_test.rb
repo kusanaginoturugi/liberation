@@ -687,6 +687,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "未使用番号"
     assert_includes response.body, "残り霊数 1663"
     assert_includes response.body, "5〜1667"
+    assert_includes response.body, "report-export-unused-range-list"
     assert_not_includes response.body, "ノアカード分"
     assert_includes response.body, ">2<"
     assert_includes response.body, ">4<"

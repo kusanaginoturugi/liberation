@@ -150,6 +150,10 @@
           text-align: left;
         }
 
+        .report-export-unused-range-list {
+          text-align: left;
+        }
+
         .print-note {
           display: none;
         }
@@ -203,9 +207,11 @@
                 <span>未使用番号</span>
                 <span>残り霊数 <%= unused_serial_number_count(@total_serial_count, @export_reports) %></span>
               </div>
-              <% unused_serial_number_range_lines(@total_serial_count, @export_reports).each do |line| %>
-                <div class="serial-number-line--spaced"><%= line %></div>
-              <% end %>
+              <div class="report-export-unused-range-list">
+                <% unused_serial_number_range_lines(@total_serial_count, @export_reports).each do |line| %>
+                  <div class="serial-number-line--spaced"><%= line %></div>
+                <% end %>
+              </div>
             </td>
             <td><%= yen_amount(@export_reports.sum(&:calculated_merit_fee_total)) %></td>
             <td><%= yen_amount(@export_reports.sum(&:mirokuji_share)) %></td>
