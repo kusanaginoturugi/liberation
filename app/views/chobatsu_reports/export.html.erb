@@ -44,7 +44,7 @@
       @media print {
         @page {
           size: A4 landscape;
-          margin: 8mm;
+          margin: 4mm;
         }
 
         body {
@@ -55,25 +55,21 @@
         }
 
         h1 {
-          margin-bottom: 3px;
-          font-size: 17px;
-        }
-
-        p {
-          margin-bottom: 7px;
-          font-size: 10px;
+          margin: 0 0 3px;
+          font-size: 14px;
+          white-space: nowrap;
         }
 
         .report-export-table {
           table-layout: fixed;
-          font-size: 9.5px;
+          font-size: 8px;
         }
 
         .report-export-table th,
         .report-export-table td {
-          padding: 12px 5px;
-          line-height: 1.2;
-          overflow-wrap: anywhere;
+          padding: 4px 3px;
+          line-height: 1.1;
+          text-align: center;
           vertical-align: top;
         }
 
@@ -85,14 +81,39 @@
         .report-export-table th:nth-child(1) { width: 3%; }
         .report-export-table th:nth-child(2) { width: 6%; }
         .report-export-table th:nth-child(3) { width: 9%; }
-        .report-export-table th:nth-child(4) { width: 9%; }
+        .report-export-table th:nth-child(4) { width: 8%; }
         .report-export-table th:nth-child(5) { width: 7%; }
-        .report-export-table th:nth-child(6) { width: 18%; }
+        .report-export-table th:nth-child(6) { width: 20%; }
         .report-export-table th:nth-child(7) { width: 12%; }
         .report-export-table th:nth-child(8) { width: 13%; }
         .report-export-table th:nth-child(9) { width: 11%; }
-        .report-export-table th:nth-child(10) { width: 5%; }
+        .report-export-table th:nth-child(10) { width: 4%; }
         .report-export-table th:nth-child(11) { width: 7%; }
+
+        .report-export-table th:nth-child(-n+9),
+        .report-export-table td:nth-child(-n+9),
+        .report-export-table th:nth-child(11),
+        .report-export-table td:nth-child(11) {
+          white-space: nowrap;
+        }
+
+        .report-export-table th:nth-child(4),
+        .report-export-table td:nth-child(4),
+        .report-export-table th:nth-child(5),
+        .report-export-table td:nth-child(5),
+        .report-export-table th:nth-child(7),
+        .report-export-table td:nth-child(7),
+        .report-export-table th:nth-child(8),
+        .report-export-table td:nth-child(8),
+        .report-export-table th:nth-child(9),
+        .report-export-table td:nth-child(9) {
+          text-align: right;
+        }
+
+        .report-export-table th:nth-child(6),
+        .report-export-table td:nth-child(6) {
+          text-align: left;
+        }
 
         .print-note {
           display: none;
@@ -101,8 +122,7 @@
     </style>
   </head>
   <body>
-    <h1>挙行報告</h1>
-    <p><%= @selected_event.name %></p>
+    <h1><%= @selected_event.name %>挙行一覧　<%= @selected_region.name %></h1>
 
     <table class="report-export-table">
       <thead>

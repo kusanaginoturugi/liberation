@@ -677,7 +677,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "text/html", response.media_type
-    assert_includes response.body, "挙行報告"
+    assert_includes response.body, "#{@event.name}挙行一覧　#{@region.name}"
     assert_includes response.body, "超抜引保師数"
     assert_includes response.body, "超抜霊数"
     assert_includes response.body, "使用番号"
@@ -688,7 +688,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">4<"
     assert_includes response.body, "【#{@event.name}】挙行一覧表@#{@region.name}"
     assert_includes response.body, "size: A4 landscape"
-    assert_includes response.body, "margin: 8mm"
+    assert_includes response.body, "margin: 4mm"
     assert_includes response.body, 'class="report-export-table"'
     assert_includes response.body, "window.print()"
   end
