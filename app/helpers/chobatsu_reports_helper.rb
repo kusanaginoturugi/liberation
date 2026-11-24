@@ -24,6 +24,18 @@ module ChobatsuReportsHelper
   end
 
   def unused_serial_number_range_lines(total_serial_count, reports)
+    unused_serial_number_ranges(total_serial_count, reports).map do |range_start, range_end|
+      "#{range_start}〜#{range_end}"
+    end
+  end
+
+  def unused_serial_number_count(total_serial_count, reports)
+    unused_serial_number_ranges(total_serial_count, reports).sum do |range_start, range_end|
+      range_end - range_start + 1
+    end
+  end
+
+  def unused_serial_number_ranges(total_serial_count, reports)
     total = total_serial_count.to_i
     return [] if total <= 0
 
@@ -52,7 +64,7 @@ module ChobatsuReportsHelper
     end
     unused_ranges << [ next_number, total ] if next_number <= total
 
-    unused_ranges.map { |range_start, range_end| "#{range_start}〜#{range_end}" }
+    unused_ranges
   end
 
   def yen_amount(amount)

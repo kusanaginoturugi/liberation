@@ -169,7 +169,10 @@
               <td class="summary-number"><%= number_with_delimiter(@summary_reports.sum(&:participant_count)) %></td>
               <td class="summary-number"><%= @summary_reports.sum(&:usage_count) %></td>
               <td class="summary-number summary-serial-numbers summary-unused-serial-numbers">
-                <span class="summary-unused-serial-label">未使用番号</span>
+                <div class="summary-unused-serial-summary">
+                  <span class="summary-unused-serial-label">未使用番号</span>
+                  <span class="summary-unused-spirit-count">残り霊数 <strong><%= unused_serial_number_count(@total_serial_count, @summary_reports) %></strong></span>
+                </div>
                 <% unused_serial_number_range_lines(@total_serial_count, @summary_reports).each do |line| %>
                   <span class="joint-report-line joint-report-line--number"><%= line %></span>
                 <% end %>

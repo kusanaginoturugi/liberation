@@ -1304,9 +1304,16 @@ body.number-shadow-disabled .serial-grid td {
   text-align: left;
 }
 
-.summary-table .summary-unused-serial-label {
-  display: block;
+.summary-table .summary-unused-serial-summary {
+  align-items: baseline;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
   margin-bottom: 0.25rem;
+}
+
+.summary-table .summary-unused-serial-label,
+.summary-table .summary-unused-spirit-count {
   font-size: 0.8rem;
   font-weight: 700;
 }
