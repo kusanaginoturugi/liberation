@@ -1304,6 +1304,12 @@ body.number-shadow-disabled .serial-grid td {
   text-align: left;
 }
 
+@media (min-width: 641px) {
+  .summary-table td.summary-serial-numbers {
+    padding-left: 42px;
+  }
+}
+
 .ceremony-schedule-table tbody tr.schedule-row-even {
   background: rgba(255, 255, 255, 0.58);
 }
