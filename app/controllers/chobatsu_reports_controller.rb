@@ -53,6 +53,7 @@ class ChobatsuReportsController < ApplicationController
     @export_reports = reports_for_region_and_event(@selected_region.id, @selected_event.id)
                       .includes(:user)
                       .reorder(ceremony_date: :asc, id: :asc)
+    @total_serial_count = total_serial_count_for(@selected_event, @selected_region)
 
     respond_to do |format|
       format.html do
