@@ -103,6 +103,12 @@ class ChobatsuReport < ApplicationRecord
     end
   end
 
+  def usage_count_value_lines
+    return usage_count_lines unless joint_report?
+
+    joint_report_contributions.map { |contribution| formatted_number(contribution.usage_count) }
+  end
+
   def number_range_contributions
     return number_ranges.map { |from, to| [ fellowship, from, to ] } unless joint_report?
 
