@@ -689,6 +689,8 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "【#{@event.name}】挙行一覧表@#{@region.name}"
     assert_includes response.body, "size: A4 landscape"
     assert_includes response.body, "margin: 4mm"
+    assert_includes response.body, "font-size: 9px"
+    assert_includes response.body, "font-weight: 600"
     assert_includes response.body, 'class="report-export-table"'
     assert_includes response.body, "window.print()"
   end
