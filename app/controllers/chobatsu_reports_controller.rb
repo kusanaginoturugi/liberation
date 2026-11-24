@@ -152,56 +152,85 @@ class ChobatsuReportsController < ApplicationController
     )
   end
 
+  def joint_contribution_params
+    attributes = params.fetch(:chobatsu_report, {}).permit(
+      joint_contributions_attributes: [
+        :fellowship_id,
+        :participant_count,
+        :serial_number_from,
+        :serial_number_to,
+        :_destroy,
+        additional_ranges_attributes: [ :serial_number_from, :serial_number_to, :_destroy ]
+      ]
+    )[:joint_contributions_attributes]
+
+    return attributes.to_h.values unless attributes.blank?
+
+    legacy_joint_contribution_params
+  end
+
+  def legacy_joint_contribution_params
+    details = joint_report_params
+    [
+      {
+        fellowship_id: details[:joint_primary_fellowship_id],
+        participant_count: details[:joint_primary_participant_count],
+        serial_number_from: details[:joint_primary_serial_number_from],
+        serial_number_to: details[:joint_primary_serial_number_to],
+        additional_ranges_attributes: details[:joint_primary_additional_ranges_attributes]
+      },
+      {
+        fellowship_id: details[:joint_secondary_fellowship_id],
+        participant_count: details[:joint_secondary_participant_count],
+        serial_number_from: details[:joint_secondary_serial_number_from],
+        serial_number_to: details[:joint_secondary_serial_number_to],
+        additional_ranges_attributes: details[:joint_secondary_additional_ranges_attributes]
+      }
+    ]
+  end
+
   def apply_joint_report_details
     @joint_report_contributions = []
     @joint_report_valid = true
     return unless @chobatsu_report.joint_report?
 
-    details = joint_report_params
-    assign_joint_report_form_values(details)
+    rows = joint_contribution_params.reject { |row| ActiveModel::Type::Boolean.new.cast(row[:_destroy]) }
+    @chobatsu_report.joint_contribution_form_values = rows
+    add_joint_report_error("合同する伝道会を2つ以上入力してください") if rows.length < 2
 
-    primary_fellowship = @fellowships.find { |fellowship| fellowship.id == details[:joint_primary_fellowship_id].to_i }
-    secondary_fellowship = @fellowships.find { |fellowship| fellowship.id == details[:joint_secondary_fellowship_id].to_i }
-    primary_participant_count = nonnegative_integer(details[:joint_primary_participant_count])
-    secondary_participant_count = nonnegative_integer(details[:joint_secondary_participant_count])
-    primary_from = positive_integer(details[:joint_primary_serial_number_from])
-    primary_to = positive_integer(details[:joint_primary_serial_number_to]) || primary_from
-    secondary_from = positive_integer(details[:joint_secondary_serial_number_from])
-    secondary_to = positive_integer(details[:joint_secondary_serial_number_to]) || secondary_from
-    primary_additional_ranges = joint_additional_ranges(details[:joint_primary_additional_ranges_attributes])
-    secondary_additional_ranges = joint_additional_ranges(details[:joint_secondary_additional_ranges_attributes])
+    contributions = rows.each_with_index.map do |row, index|
+      fellowship = @fellowships.find { |candidate| candidate.id == row[:fellowship_id].to_i }
+      participant_count = nonnegative_integer(row[:participant_count])
+      from = positive_integer(row[:serial_number_from])
+      to = positive_integer(row[:serial_number_to]) || from
+      label = "#{index + 1}つ目の伝道会"
 
-    add_joint_report_error("合同する1つ目の伝道会を選択してください") unless primary_fellowship
-    add_joint_report_error("合同する2つ目の伝道会を選択してください") unless secondary_fellowship
-    add_joint_report_error("合同する伝道会は異なる伝道会を選択してください") if primary_fellowship && primary_fellowship == secondary_fellowship
-    add_joint_report_error("1つ目の伝道会の超抜引保師数を入力してください") if primary_participant_count.nil?
-    add_joint_report_error("2つ目の伝道会の超抜引保師数を入力してください") if secondary_participant_count.nil?
-    add_joint_report_error("1つ目の伝道会の使用修霊番号(始)を入力してください") if primary_from.nil?
-    add_joint_report_error("2つ目の伝道会の使用修霊番号(始)を入力してください") if secondary_from.nil?
-    add_joint_report_error("1つ目の伝道会の使用修霊番号(終)は始以上にしてください") if primary_from && primary_to < primary_from
-    add_joint_report_error("2つ目の伝道会の使用修霊番号(終)は始以上にしてください") if secondary_from && secondary_to < secondary_from
+      add_joint_report_error("#{label}を選択してください") unless fellowship
+      add_joint_report_error("#{label}の超抜引保師数を入力してください") if participant_count.nil?
+      add_joint_report_error("#{label}の使用修霊番号(始)を入力してください") if from.nil?
+      add_joint_report_error("#{label}の使用修霊番号(終)は始以上にしてください") if from && to < from
+
+      {
+        fellowship: fellowship,
+        participant_count: participant_count,
+        serial_number_from: from,
+        serial_number_to: to,
+        additional_ranges: joint_additional_ranges(row[:additional_ranges_attributes])
+      }
+    end
+
+    selected_fellowships = contributions.filter_map { |contribution| contribution[:fellowship] }
+    add_joint_report_error("合同する伝道会は重複させないでください") if selected_fellowships.uniq.length != selected_fellowships.length
     return if @chobatsu_report.errors.any?
 
-    @chobatsu_report.fellowship = primary_fellowship
-    @chobatsu_report.participant_count = primary_participant_count + secondary_participant_count
-    @chobatsu_report.serial_number_from = primary_from
-    @chobatsu_report.serial_number_to = primary_to
-    @joint_report_contributions = [
-      build_joint_contribution(primary_fellowship, primary_participant_count, primary_from, primary_to, primary_additional_ranges),
-      build_joint_contribution(secondary_fellowship, secondary_participant_count, secondary_from, secondary_to, secondary_additional_ranges)
-    ]
+    @chobatsu_report.fellowship = contributions.first[:fellowship]
+    @chobatsu_report.participant_count = contributions.sum { |contribution| contribution[:participant_count] }
+    @chobatsu_report.serial_number_from = contributions.first[:serial_number_from]
+    @chobatsu_report.serial_number_to = contributions.first[:serial_number_to]
+    @joint_report_contributions = contributions.each_with_index.map do |contribution, index|
+      build_joint_contribution(**contribution, position: index)
+    end
     @chobatsu_report.joint_range_contributions = @joint_report_contributions
-  end
-
-  def assign_joint_report_form_values(details)
-    @chobatsu_report.joint_primary_fellowship_id = details[:joint_primary_fellowship_id]
-    @chobatsu_report.joint_secondary_fellowship_id = details[:joint_secondary_fellowship_id]
-    @chobatsu_report.joint_primary_participant_count = details[:joint_primary_participant_count]
-    @chobatsu_report.joint_secondary_participant_count = details[:joint_secondary_participant_count]
-    @chobatsu_report.joint_primary_serial_number_from = details[:joint_primary_serial_number_from]
-    @chobatsu_report.joint_primary_serial_number_to = details[:joint_primary_serial_number_to]
-    @chobatsu_report.joint_secondary_serial_number_from = details[:joint_secondary_serial_number_from]
-    @chobatsu_report.joint_secondary_serial_number_to = details[:joint_secondary_serial_number_to]
   end
 
   def add_joint_report_error(message)
@@ -265,12 +294,13 @@ class ChobatsuReportsController < ApplicationController
     end
   end
 
-  def build_joint_contribution(fellowship, participant_count, serial_number_from, serial_number_to, additional_ranges)
+  def build_joint_contribution(fellowship:, participant_count:, serial_number_from:, serial_number_to:, additional_ranges:, position:)
     ChobatsuReportFellowship.new(
       fellowship: fellowship,
       participant_count: participant_count,
       serial_number_from: serial_number_from,
-      serial_number_to: serial_number_to
+      serial_number_to: serial_number_to,
+      position: position
     ).tap do |contribution|
       additional_ranges.each do |range|
         contribution.additional_serial_number_ranges.build(range)

@@ -1,0 +1,39 @@
+<% row_value = ->(key) { row[key] || row[key.to_s] } %>
+<% additional_ranges = row_value.call(:additional_ranges) || row_value.call(:additional_ranges_attributes)&.to_h&.values || [] %>
+<section class="joint-contribution" data-joint-contribution>
+  <div class="joint-report-section__inputs">
+    <div class="field">
+      <label>伝道会</label>
+      <%= select_tag "chobatsu_report[joint_contributions_attributes][#{index}][fellowship_id]", options_from_collection_for_select(fellowships, :id, :name, row_value.call(:fellowship_id)), include_blank: "選択してください", disabled: !report.joint_report?, data: { joint_report_input: true, joint_fellowship: true } %>
+    </div>
+    <div class="field">
+      <label data-joint-contribution-label="participant">伝道会の超抜引保師数</label>
+      <div class="input-with-unit"><%= number_field_tag "chobatsu_report[joint_contributions_attributes][#{index}][participant_count]", row_value.call(:participant_count), min: 0, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, joint_report_input: true } %><span class="input-unit">人</span></div>
+    </div>
+  </div>
+  <div class="number-range-list" data-joint-number-range-list>
+    <div class="serial-number-range" data-number-range>
+      <div class="field"><label data-joint-contribution-label="始">伝道会の使用修霊番号(始)</label><%= number_field_tag "chobatsu_report[joint_contributions_attributes][#{index}][serial_number_from]", row_value.call(:serial_number_from), min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_from: true, joint_report_input: true } %></div>
+      <div class="field"><label data-joint-contribution-label="終">伝道会の使用修霊番号(終)</label><%= number_field_tag "chobatsu_report[joint_contributions_attributes][#{index}][serial_number_to]", row_value.call(:serial_number_to), min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_to: true, joint_report_input: true } %></div>
+    </div>
+    <div data-additional-number-ranges>
+      <% additional_ranges.each_with_index do |range, range_index| %>
+        <% range_value = ->(key) { range[key] || range[key.to_s] } %>
+        <div class="serial-number-range" data-number-range>
+          <div class="field"><label data-joint-contribution-label="始">伝道会の使用修霊番号(始)</label><%= number_field_tag "chobatsu_report[joint_contributions_attributes][#{index}][additional_ranges_attributes][#{range_index}][serial_number_from]", range_value.call(:serial_number_from), min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_from: true, joint_report_input: true } %></div>
+          <div class="field"><label data-joint-contribution-label="終">伝道会の使用修霊番号(終)</label><%= number_field_tag "chobatsu_report[joint_contributions_attributes][#{index}][additional_ranges_attributes][#{range_index}][serial_number_to]", range_value.call(:serial_number_to), min: 1, max: total_serial_count, inputmode: "numeric", pattern: "[0-9]*", disabled: !report.joint_report?, data: { numeric_only: true, number_range_to: true, joint_report_input: true } %></div>
+          <button type="button" class="button-secondary compact-button" data-remove-number-range>削除</button>
+        </div>
+      <% end %>
+    </div>
+    <button type="button" class="button-secondary compact-button" data-add-joint-number-range>番号を追加</button>
+    <template data-joint-number-range-template>
+      <div class="serial-number-range" data-number-range>
+        <div class="field"><label data-joint-contribution-label="始">伝道会の使用修霊番号(始)</label><input type="number" min="1" max="<%= total_serial_count %>" inputmode="numeric" pattern="[0-9]*" name="chobatsu_report[joint_contributions_attributes][<%= index %>][additional_ranges_attributes][NEW_RECORD][serial_number_from]" data-numeric-only="true" data-number-range-from="true" data-joint-report-input="true"></div>
+        <div class="field"><label data-joint-contribution-label="終">伝道会の使用修霊番号(終)</label><input type="number" min="1" max="<%= total_serial_count %>" inputmode="numeric" pattern="[0-9]*" name="chobatsu_report[joint_contributions_attributes][<%= index %>][additional_ranges_attributes][NEW_RECORD][serial_number_to]" data-numeric-only="true" data-number-range-to="true" data-joint-report-input="true"></div>
+        <button type="button" class="button-secondary compact-button" data-remove-number-range>削除</button>
+      </div>
+    </template>
+  </div>
+  <button type="button" class="button-secondary compact-button" data-remove-joint-contribution>この伝道会を削除</button>
+</section>

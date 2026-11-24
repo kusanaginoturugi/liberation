@@ -1,5 +1,6 @@
 class ChobatsuReport < ApplicationRecord
-  attr_accessor :joint_primary_fellowship_id,
+  attr_accessor :joint_contribution_form_values,
+                :joint_primary_fellowship_id,
                 :joint_secondary_fellowship_id,
                 :joint_primary_participant_count,
                 :joint_secondary_participant_count,
@@ -58,9 +59,7 @@ class ChobatsuReport < ApplicationRecord
   def joint_report_contributions
     return [] unless joint_report?
 
-    chobatsu_report_fellowships.includes(:fellowship).sort_by do |contribution|
-      contribution.fellowship_id == fellowship_id ? 0 : 1
-    end
+    chobatsu_report_fellowships.includes(:fellowship).order(:position, :id)
   end
 
   def joint_primary_contribution

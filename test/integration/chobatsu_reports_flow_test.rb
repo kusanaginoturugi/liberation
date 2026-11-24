@@ -262,6 +262,32 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ [ odaiba, 1, 50 ], [ odaiba, 82, 91 ], [ @meeting, 101, 101 ], [ @meeting, 150, 202 ] ], report.number_range_contributions
   end
 
+  test "creating a joint report accepts three fellowships with their own counts and number ranges" do
+    haneda = Fellowship.create!(name: "羽田", color_code: "#123456", region: @region, enabled: true)
+    saitama = Fellowship.create!(name: "埼玉", color_code: "#654321", region: @region, enabled: true)
+
+    assert_difference("ChobatsuReportFellowship.count", 3) do
+      post chobatsu_reports_path, params: {
+        chobatsu_report: {
+          ceremony_date: Date.current,
+          joint_report: "1",
+          joint_contributions_attributes: {
+            "0" => { fellowship_id: haneda.id, participant_count: 4, serial_number_from: 1, serial_number_to: 20 },
+            "1" => { fellowship_id: @meeting.id, participant_count: 3, serial_number_from: 101, serial_number_to: 115 },
+            "2" => { fellowship_id: saitama.id, participant_count: 2, serial_number_from: 201, serial_number_to: 210 }
+          }
+        }
+      }
+    end
+
+    report = ChobatsuReport.last
+    assert_equal 9, report.participant_count
+    assert_equal [ "【合同】", "羽田・大江戸・埼玉" ], report.report_display_name_lines
+    assert_equal [ "羽田 4", "大江戸 3", "埼玉 2" ], report.participant_count_lines
+    assert_equal [ "羽田 1〜20", "大江戸 101〜115", "埼玉 201〜210" ], report.serial_number_range_lines
+    assert_equal [ 0, 1, 2 ], report.chobatsu_report_fellowships.order(:position).pluck(:position)
+  end
+
   test "summary page shows registered report data" do
     report = ChobatsuReport.create!(
       ceremony_date: Date.new(2026, 4, 9),

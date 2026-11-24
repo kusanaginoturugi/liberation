@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_123000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_090000) do
   create_table "ceremony_schedule_allocation_snapshots", force: :cascade do |t|
     t.integer "event_id", null: false
     t.text "allocation_counts", default: "{}", null: false
@@ -81,6 +81,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_123000) do
     t.integer "serial_number_to", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "position", default: 0, null: false
     t.index ["chobatsu_report_id"], name: "index_chobatsu_report_fellowships_on_chobatsu_report_id"
     t.index ["fellowship_id"], name: "index_chobatsu_report_fellowships_on_fellowship_id"
   end

@@ -8,6 +8,7 @@ class ChobatsuReportFellowship < ApplicationRecord
   before_validation :fill_end_number
 
   validates :participant_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :serial_number_from, :serial_number_to,
             numericality: { only_integer: true, greater_than: 0 }
   validate :serial_number_range_is_valid
