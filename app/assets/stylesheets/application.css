@@ -1300,6 +1300,10 @@ body.number-shadow-disabled .serial-grid td {
   word-break: keep-all;
 }
 
+.summary-table .summary-serial-numbers .joint-report-line--number {
+  text-align: left;
+}
+
 .ceremony-schedule-table tbody tr.schedule-row-even {
   background: rgba(255, 255, 255, 0.58);
 }
