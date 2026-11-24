@@ -719,6 +719,10 @@ body.number-shadow-disabled .serial-grid td {
   text-align: right;
 }
 
+.mobile-joint-fellowship-name {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .joint-schedule-section__inputs {
     grid-template-columns: 1fr;
@@ -1994,6 +1998,14 @@ body.number-shadow-disabled .serial-grid td {
   .summary-table tbody td > .joint-report-line {
     grid-column: 2;
     min-width: 0;
+  }
+
+  .summary-table .mobile-joint-fellowship-name {
+    display: inline;
+    margin-right: 0.45rem;
+    color: var(--muted);
+    font-size: 0.82em;
+    font-weight: 700;
   }
 
   .ceremony-schedule-table tbody td {

@@ -122,6 +122,7 @@
         </thead>
         <tbody>
           <% @summary_reports.each_with_index do |report, index| %>
+            <% joint_fellowship_names = report.joint_report? ? report.joint_report_contributions.map { |contribution| contribution.fellowship.name } : [] %>
             <tr>
               <td data-label="No."><%= @summary_report_numbers[report.id] %></td>
               <td data-label="挙行日"><%= report.ceremony_date.strftime("%m/%d") %></td>
@@ -129,13 +130,19 @@
                 <% report.report_display_name_lines.each do |line| %><span class="joint-report-line"><%= line %></span><% end %>
               </td>
               <td class="summary-number" data-label="超抜引保師数">
-                <% report.participant_count_lines.each do |line| %><span class="joint-report-line joint-report-line--number"><%= line %></span><% end %>
+                <% report.participant_count_value_lines.each_with_index do |line, contribution_index| %>
+                  <span class="joint-report-line joint-report-line--number"><% if joint_fellowship_names.present? %><span class="mobile-joint-fellowship-name"><%= joint_fellowship_names[contribution_index] %></span><% end %><%= line %></span>
+                <% end %>
               </td>
               <td class="summary-number summary-spirit-count" data-label="超抜霊数">
-                <% report.usage_count_value_lines.each do |line| %><span class="joint-report-line joint-report-line--number"><%= line %></span><% end %>
+                <% report.usage_count_value_lines.each_with_index do |line, contribution_index| %>
+                  <span class="joint-report-line joint-report-line--number"><% if joint_fellowship_names.present? %><span class="mobile-joint-fellowship-name"><%= joint_fellowship_names[contribution_index] %></span><% end %><%= line %></span>
+                <% end %>
               </td>
               <td class="summary-number summary-serial-numbers" data-label="使用番号">
-                <% report.serial_number_range_value_lines.each do |line| %><span class="joint-report-line joint-report-line--number"><%= line %></span><% end %>
+                <% report.serial_number_range_value_lines.each_with_index do |line, contribution_index| %>
+                  <span class="joint-report-line joint-report-line--number"><% if joint_fellowship_names.present? %><span class="mobile-joint-fellowship-name"><%= joint_fellowship_names[contribution_index] %></span><% end %><%= line %></span>
+                <% end %>
               </td>
               <td class="summary-number" data-label="功徳費合計"><%= yen_amount(report.calculated_merit_fee_total) %></td>
               <td class="summary-number" data-label="みろく寺分"><%= yen_amount(report.mirokuji_share) %></td>

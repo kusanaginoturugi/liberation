@@ -202,12 +202,10 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "【合同】"
     assert_includes response.body, "お台場・大江戸"
-    assert_includes response.body, "お台場 10"
-    assert_includes response.body, "大江戸 3"
-    assert_includes response.body, ">55<"
-    assert_includes response.body, ">70<"
-    assert_not_includes response.body, "お台場 55"
-    assert_not_includes response.body, "大江戸 70"
+    assert_includes response.body, 'mobile-joint-fellowship-name">お台場</span>10'
+    assert_includes response.body, 'mobile-joint-fellowship-name">大江戸</span>3'
+    assert_includes response.body, 'mobile-joint-fellowship-name">お台場</span>55'
+    assert_includes response.body, 'mobile-joint-fellowship-name">大江戸</span>70'
 
     patch chobatsu_report_path(report), params: {
       chobatsu_report: {
@@ -286,6 +284,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal 9, report.participant_count
     assert_equal [ "【合同】", "羽田・大江戸・埼玉" ], report.report_display_name_lines
     assert_equal [ "羽田 4", "大江戸 3", "埼玉 2" ], report.participant_count_lines
+    assert_equal [ "4", "3", "2" ], report.participant_count_value_lines
     assert_equal [ "20", "15", "10" ], report.usage_count_value_lines
     assert_equal [ "羽田 1〜20", "大江戸 101〜115", "埼玉 201〜210" ], report.serial_number_range_lines
     assert_equal [ "1〜20", "101〜115", "201〜210" ], report.serial_number_range_value_lines
