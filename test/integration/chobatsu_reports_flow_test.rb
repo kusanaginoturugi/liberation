@@ -194,7 +194,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     assert_equal [ "【合同】", "お台場・大江戸" ], report.report_display_name_lines
     assert_equal [ "お台場 10", "大江戸 3" ], report.participant_count_lines
     assert_equal [ "お台場 55", "大江戸 70" ], report.usage_count_lines
-    assert_equal [ "お台場 945〜999", "大江戸 1,196〜1,265" ], report.serial_number_range_lines
+    assert_equal [ "お台場 945〜999", "大江戸 1196〜1265" ], report.serial_number_range_lines
     assert_equal [ [ odaiba, 945, 999 ], [ @meeting, 1196, 1265 ] ], report.number_range_contributions
 
     get summary_chobatsu_reports_path, params: { event_id: @next_event.id }
@@ -228,7 +228,7 @@ class ChobatsuReportsFlowTest < ActionDispatch::IntegrationTest
     report.reload
     assert_equal 15, report.participant_count
     assert_equal [ "お台場 11", "大江戸 4" ], report.participant_count_lines
-    assert_equal [ "お台場 945〜1,000", "大江戸 1,196〜1,266" ], report.serial_number_range_lines
+    assert_equal [ "お台場 945〜1000", "大江戸 1196〜1266" ], report.serial_number_range_lines
   end
 
   test "creating a joint report saves added number ranges for each fellowship" do

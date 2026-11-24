@@ -79,10 +79,10 @@ class ChobatsuReport < ApplicationRecord
   end
 
   def serial_number_range_lines
-    return number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" } unless joint_report?
+    return number_ranges.map { |from, to| "#{from}〜#{to}" } unless joint_report?
 
     joint_report_contributions.map do |contribution|
-      ranges = contribution.number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" }
+      ranges = contribution.number_ranges.map { |from, to| "#{from}〜#{to}" }
       [ contribution.fellowship.name, ranges.join("、") ].join(" ")
     end
   end
@@ -91,7 +91,7 @@ class ChobatsuReport < ApplicationRecord
     return serial_number_range_lines unless joint_report?
 
     joint_report_contributions.map do |contribution|
-      contribution.number_ranges.map { |from, to| "#{formatted_number(from)}〜#{formatted_number(to)}" }.join("、")
+      contribution.number_ranges.map { |from, to| "#{from}〜#{to}" }.join("、")
     end
   end
 
