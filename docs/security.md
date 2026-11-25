@@ -4,7 +4,7 @@
 
 ## 構成と攻撃面
 
-- Rails 8.1 (Ruby 3.4.8)、SQLite。本番は Cloudflare 経由で nspawn コンテナの Puma に届く。デプロイは [deploy.md](deploy.md)。
+- Rails 8.1 (Ruby 3.4.13)、SQLite。本番は Cloudflare 経由で nspawn コンテナの Puma に届く。デプロイは [deploy.md](deploy.md)。
 - 認証は Authentik (OIDC)。`AUTHENTIK_CLIENT_SECRET` があるとパスワードログインは使えない。
 - ログインなしで見られるもの: 修霊番号一覧、挙行一覧と CSV/印刷用 HTML、挙行予定表と PDF。画面のナビゲーションから辿れるようにしている仕様。
 - PDF は Cloudflare Worker `workers/liberation-pdf` (Browser Rendering) が作る。Worker は別の Cloudflare アカウントにあり、この repo の CI ではデプロイしない。

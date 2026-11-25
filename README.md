@@ -57,5 +57,5 @@ CSV 出力:
 
 ## Environment
 
-- Ruby `3.4.8`
+- Ruby `3.4.13`
 - Bundler gems are installed into `vendor/bundle`
