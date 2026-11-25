@@ -34,3 +34,14 @@
 - CI 専用鍵の公開鍵は、コンテナの `admin` の `~/.ssh/authorized_keys` に登録してある。
 - 鍵を入れ替えるときは、新しい鍵ペアを作って公開鍵をコンテナに追記し、`gh secret set EC2_SSH_KEY < 秘密鍵` で登録してから、古い公開鍵を `authorized_keys` から消す。
 - runner は毎回まっさらなので、ホスト鍵は `StrictHostKeyChecking=accept-new` で受け入れている。接続先ノードの正当性は Tailscale が担保する。
+
+## Ruby のバージョンを上げるとき
+
+本番の Ruby のパスは、リポジトリ外の `/etc/systemd/system/liberation.service`（`PATH` と `ExecStart`）と `scripts/deploy.sh` の `RUBY_BIN` に直書きしてある。`.ruby-version` / `.mise.toml` / `Dockerfile` / CI を上げるだけでは本番は旧版のまま動く。
+
+1. コンテナで `mise install ruby@<新版>` する。
+2. コンテナで unit の `PATH` と `ExecStart` を新版に書き換え、`sudo systemctl daemon-reload` する（再起動はデプロイに任せる）。
+3. リポジトリ側で `scripts/deploy.sh` の `RUBY_BIN` ほかを上げて push する。
+4. デプロイ後、`readlink /proc/$(systemctl show -p MainPID --value liberation)/exe` が新版を指していることを確認する。
+
+コンテナの作業ツリーで `.mise.toml` などを手で書き換えると、デプロイの `git pull --ff-only` が止まる。
