@@ -25,7 +25,7 @@ module ChobatsuReportsHelper
 
   def unused_serial_number_range_lines(total_serial_count, reports)
     unused_serial_number_ranges(total_serial_count, reports).map do |range_start, range_end|
-      "#{range_start}〜#{range_end}"
+      "#{range_start}〜#{range_end}(#{range_end - range_start + 1})"
     end
   end
 
